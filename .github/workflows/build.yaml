@@ -14,7 +14,7 @@ name: build
 
 on:
   push:
-    branches: ["**"]
+    branches: ['main']
     tags: ["*"] # Required to trigger PyPI job
   pull_request:
     branches: ["**"]
@@ -63,10 +63,13 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade pip setuptools wheel build twine
 
       - name: Build & Test
-        run: make build
+        run: |
+          python -m build
+          python -m twine check dist/
+
 
   publish-release:
     if: "github.ref_name == 'main' && github.event_name != 'pull_request'"
