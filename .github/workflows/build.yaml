@@ -67,6 +67,7 @@ jobs:
           python -m pip install --upgrade pip build twine
 
       - name: Build & Verify
+        run: |
           python -m build
           python -m twine check dist/*
 
