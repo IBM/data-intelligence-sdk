@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-# IBM watsonx.data intelligence SDK Version 0.5.3
+# IBM watsonx.data intelligence SDK Version 1.0.0
 
 A comprehensive Python SDK for performing data quality validations on streaming data records (arrays), Pandas DataFrames, and PySpark DataFrames with complete REST API integration for IBM Cloud Pak for Data.
 
