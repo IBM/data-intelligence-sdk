@@ -569,9 +569,10 @@ class IssueReporter:
         1. Fetches the data asset entity from CAMS
         2. Fetches all column assets and builds a lookup map
         3. For each (column, check) pair in combined_statistics:
-           - Checks if the column has the specific check type in the data asset
-           - If the check exists, obtains check_id, number_of_occurrences, and total_records
-           - If the check doesn't exist, calls create_check method
+        
+          - Checks if the column has the specific check type in the data asset
+          - If the check exists, obtains check_id, number_of_occurrences, and total_records
+          - If the check doesn't exist, calls create_check method
         
         Args:
             stats: Nested dictionary from consolidator.get_combined_statistics()

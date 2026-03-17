@@ -20,12 +20,12 @@ Validation Checks API
 
 The validation checks module provides nine comprehensive check types for data quality validation.
 
-.. currentmodule:: dq_validator.checks
+.. currentmodule:: wxdi.dq_validator.checks
 
 LengthCheck
 -----------
 
-.. autoclass:: dq_validator.checks.length_check.LengthCheck
+.. autoclass:: wxdi.dq_validator.checks.length_check.LengthCheck
    :members:
    :undoc-members:
    :show-inheritance:
@@ -33,7 +33,7 @@ LengthCheck
 ValidValuesCheck
 ----------------
 
-.. autoclass:: dq_validator.checks.valid_values_check.ValidValuesCheck
+.. autoclass:: wxdi.dq_validator.checks.valid_values_check.ValidValuesCheck
    :members:
    :undoc-members:
    :show-inheritance:
@@ -41,7 +41,7 @@ ValidValuesCheck
 ComparisonCheck
 ---------------
 
-.. autoclass:: dq_validator.checks.comparison_check.ComparisonCheck
+.. autoclass:: wxdi.dq_validator.checks.comparison_check.ComparisonCheck
    :members:
    :undoc-members:
    :show-inheritance:
@@ -49,7 +49,7 @@ ComparisonCheck
 CaseCheck
 ---------
 
-.. autoclass:: dq_validator.checks.case_check.CaseCheck
+.. autoclass:: wxdi.dq_validator.checks.case_check.CaseCheck
    :members:
    :undoc-members:
    :show-inheritance:
@@ -57,7 +57,7 @@ CaseCheck
 CompletenessCheck
 -----------------
 
-.. autoclass:: dq_validator.checks.completeness_check.CompletenessCheck
+.. autoclass:: wxdi.dq_validator.checks.completeness_check.CompletenessCheck
    :members:
    :undoc-members:
    :show-inheritance:
@@ -65,7 +65,7 @@ CompletenessCheck
 RangeCheck
 ----------
 
-.. autoclass:: dq_validator.checks.range_check.RangeCheck
+.. autoclass:: wxdi.dq_validator.checks.range_check.RangeCheck
    :members:
    :undoc-members:
    :show-inheritance:
@@ -73,7 +73,7 @@ RangeCheck
 RegexCheck
 ----------
 
-.. autoclass:: dq_validator.checks.regex_check.RegexCheck
+.. autoclass:: wxdi.dq_validator.checks.regex_check.RegexCheck
    :members:
    :undoc-members:
    :show-inheritance:
@@ -81,7 +81,7 @@ RegexCheck
 FormatCheck
 -----------
 
-.. autoclass:: dq_validator.checks.format_check.FormatCheck
+.. autoclass:: wxdi.dq_validator.checks.format_check.FormatCheck
    :members:
    :undoc-members:
    :show-inheritance:
@@ -89,7 +89,7 @@ FormatCheck
 DataTypeCheck
 -------------
 
-.. autoclass:: dq_validator.checks.datatype_check.DataTypeCheck
+.. autoclass:: wxdi.dq_validator.checks.datatype_check.DataTypeCheck
    :members:
    :undoc-members:
    :show-inheritance:

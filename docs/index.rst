@@ -14,7 +14,7 @@
    limitations under the License.
 
 IBM watsonx.data intelligence SDK for Python
-====================================
+============================================
 
 The ``IBM watsonx.data intelligence SDK`` for Python is a comprehensive toolkit for data intelligence operations, providing modular components for data quality validation, authentication, and more.
 

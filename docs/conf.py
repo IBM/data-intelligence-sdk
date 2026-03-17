@@ -64,6 +64,7 @@ autodoc_mock_imports = [
     "pandas",
     "pyspark",
     "numpy",
+    "pydantic",
 ]
 
 templates_path = ["_templates"]

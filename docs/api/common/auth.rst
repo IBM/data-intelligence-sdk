@@ -20,7 +20,7 @@ Authentication API
 
 The authentication module provides a unified framework for authenticating with multiple cloud environments.
 
-.. currentmodule:: common.auth
+.. currentmodule:: wxdi.common.auth
 
 Configuration
 -------------
@@ -28,17 +28,15 @@ Configuration
 AuthConfig
 ~~~~~~~~~~
 
-.. autoclass:: common.auth.auth_config.AuthConfig
+.. autoclass:: wxdi.common.auth.auth_config.AuthConfig
    :members:
-   :undoc-members:
    :show-inheritance:
 
 EnvironmentType
 ~~~~~~~~~~~~~~~
 
-.. autoclass:: common.auth.auth_config.EnvironmentType
+.. autoclass:: wxdi.common.auth.auth_config.EnvironmentType
    :members:
-   :undoc-members:
    :show-inheritance:
 
 Authentication Provider
@@ -47,7 +45,7 @@ Authentication Provider
 AuthProvider
 ~~~~~~~~~~~~
 
-.. autoclass:: common.auth.auth_provider.AuthProvider
+.. autoclass:: wxdi.common.auth.auth_provider.AuthProvider
    :members:
    :undoc-members:
    :show-inheritance:
@@ -58,17 +56,15 @@ Government Cloud Authenticator
 GovCloudAuthenticator
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: common.auth.gov_cloud_authenticator.GovCloudAuthenticator
+.. autoclass:: wxdi.common.auth.gov_cloud_authenticator.GovCloudAuthenticator
    :members:
-   :undoc-members:
    :show-inheritance:
 
 GovCloudTokenManager
 ~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: common.auth.gov_cloud_token_manager.GovCloudTokenManager
+.. autoclass:: wxdi.common.auth.gov_cloud_token_manager.GovCloudTokenManager
    :members:
-   :undoc-members:
    :show-inheritance:
 
 Usage Examples

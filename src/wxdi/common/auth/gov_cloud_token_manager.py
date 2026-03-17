@@ -154,5 +154,3 @@ class GovCloudTokenManager(JWTTokenManager):
         # Parent class handles token and expiration extraction from JWT
         super()._save_token_info(token_response)
         
-        # Additionally store refresh token if provided
-        self.refresh_token = token_response.get("refresh_token")

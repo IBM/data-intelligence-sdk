@@ -20,7 +20,7 @@ REST API Providers
 
 The providers module integrates with IBM Cloud Pak for Data REST APIs.
 
-.. currentmodule:: dq_validator.provider
+.. currentmodule:: wxdi.dq_validator.provider
 
 Configuration
 -------------
@@ -28,7 +28,7 @@ Configuration
 ProviderConfig
 ~~~~~~~~~~~~~~
 
-.. autoclass:: dq_validator.provider.config.ProviderConfig
+.. autoclass:: wxdi.dq_validator.provider.config.ProviderConfig
    :members:
    :undoc-members:
    :show-inheritance:
@@ -36,7 +36,7 @@ ProviderConfig
 Base Provider
 -------------
 
-.. autoclass:: dq_validator.provider.base_provider.BaseProvider
+.. autoclass:: wxdi.dq_validator.provider.base_provider.BaseProvider
    :members:
    :undoc-members:
    :show-inheritance:
@@ -44,7 +44,7 @@ Base Provider
 Glossary Provider
 -----------------
 
-.. autoclass:: dq_validator.provider.glossary.GlossaryProvider
+.. autoclass:: wxdi.dq_validator.provider.glossary.GlossaryProvider
    :members:
    :undoc-members:
    :show-inheritance:
@@ -52,7 +52,7 @@ Glossary Provider
 CAMS Provider
 -------------
 
-.. autoclass:: dq_validator.provider.cams.CamsProvider
+.. autoclass:: wxdi.dq_validator.provider.cams.CamsProvider
    :members:
    :undoc-members:
    :show-inheritance:
@@ -60,7 +60,7 @@ CAMS Provider
 Assets Provider
 ---------------
 
-.. autoclass:: dq_validator.provider.assets.DQAssetsProvider
+.. autoclass:: wxdi.dq_validator.provider.assets.DQAssetsProvider
    :members:
    :undoc-members:
    :show-inheritance:
@@ -68,7 +68,7 @@ Assets Provider
 Dimensions Provider
 -------------------
 
-.. autoclass:: dq_validator.provider.dimensions.DimensionsProvider
+.. autoclass:: wxdi.dq_validator.provider.dimensions.DimensionsProvider
    :members:
    :undoc-members:
    :show-inheritance:
@@ -76,7 +76,7 @@ Dimensions Provider
 Checks Provider
 ---------------
 
-.. autoclass:: dq_validator.provider.checks.ChecksProvider
+.. autoclass:: wxdi.dq_validator.provider.checks.ChecksProvider
    :members:
    :undoc-members:
    :show-inheritance:
@@ -84,7 +84,7 @@ Checks Provider
 Issues Provider
 ---------------
 
-.. autoclass:: dq_validator.provider.issues.IssuesProvider
+.. autoclass:: wxdi.dq_validator.provider.issues.IssuesProvider
    :members:
    :undoc-members:
    :show-inheritance:
@@ -92,7 +92,7 @@ Issues Provider
 DQ Search Provider
 ------------------
 
-.. autoclass:: dq_validator.provider.dq_search.DQSearchProvider
+.. autoclass:: wxdi.dq_validator.provider.dq_search.DQSearchProvider
    :members:
    :undoc-members:
    :show-inheritance:
@@ -103,7 +103,7 @@ Data Models
 DataAsset
 ~~~~~~~~~
 
-.. automodule:: dq_validator.provider.data_asset_model
+.. automodule:: wxdi.dq_validator.provider.data_asset_model
    :members:
    :undoc-members:
    :show-inheritance:
@@ -111,7 +111,7 @@ DataAsset
 Constraint Models
 ~~~~~~~~~~~~~~~~~
 
-.. automodule:: dq_validator.provider.constraint_model
+.. automodule:: wxdi.dq_validator.provider.constraint_model
    :members:
    :undoc-members:
    :show-inheritance:
@@ -119,7 +119,7 @@ Constraint Models
 Response Models
 ~~~~~~~~~~~~~~~
 
-.. automodule:: dq_validator.provider.response_model
+.. automodule:: wxdi.dq_validator.provider.response_model
    :members:
    :undoc-members:
    :show-inheritance:

@@ -25,7 +25,7 @@ class BaseProvider:
     This class provides common functionality like thread-local session management
     that is shared across all provider implementations.
     
-    Args:
+    Attributes:
         config (ProviderConfig): Configuration containing URL and authentication token
     """
     

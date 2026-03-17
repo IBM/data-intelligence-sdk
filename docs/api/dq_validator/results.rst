@@ -20,12 +20,12 @@ Results API
 
 The results module provides classes for validation results and consolidation.
 
-.. currentmodule:: dq_validator
+.. currentmodule:: wxdi.dq_validator
 
 ValidationResult
 ----------------
 
-.. autoclass:: dq_validator.result.ValidationResult
+.. autoclass:: wxdi.dq_validator.result.ValidationResult
    :members:
    :undoc-members:
    :show-inheritance:
@@ -33,7 +33,7 @@ ValidationResult
 ValidationResultConsolidated
 ----------------------------
 
-.. autoclass:: dq_validator.result_consolidator.ValidationResultConsolidated
+.. autoclass:: wxdi.dq_validator.result_consolidator.ValidationResultConsolidated
    :members:
    :undoc-members:
    :show-inheritance:
@@ -41,7 +41,7 @@ ValidationResultConsolidated
 Issue Reporting
 ---------------
 
-.. autoclass:: dq_validator.issue_reporting.IssueReporter
+.. autoclass:: wxdi.dq_validator.issue_reporting.IssueReporter
    :members:
    :undoc-members:
    :show-inheritance:

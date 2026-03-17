@@ -20,12 +20,12 @@ Core Classes API
 
 The core classes provide the foundation for data quality validation.
 
-.. currentmodule:: dq_validator
+.. currentmodule:: wxdi.dq_validator
 
 Validator
 ---------
 
-.. autoclass:: dq_validator.validator.Validator
+.. autoclass:: wxdi.dq_validator.validator.Validator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -33,7 +33,7 @@ Validator
 ValidationRule
 --------------
 
-.. autoclass:: dq_validator.rule.ValidationRule
+.. autoclass:: wxdi.dq_validator.rule.ValidationRule
    :members:
    :undoc-members:
    :show-inheritance:
@@ -41,7 +41,7 @@ ValidationRule
 BaseCheck
 ---------
 
-.. autoclass:: dq_validator.base.BaseCheck
+.. autoclass:: wxdi.dq_validator.base.BaseCheck
    :members:
    :undoc-members:
    :show-inheritance:
@@ -49,7 +49,7 @@ BaseCheck
 ValidationError
 ---------------
 
-.. autoclass:: dq_validator.base.ValidationError
+.. autoclass:: wxdi.dq_validator.base.ValidationError
    :members:
    :undoc-members:
    :show-inheritance:
@@ -57,7 +57,7 @@ ValidationError
 Data Quality Dimensions
 -----------------------
 
-.. autoclass:: dq_validator.data_quality_dimension.DataQualityDimension
+.. autoclass:: wxdi.dq_validator.data_quality_dimension.DataQualityDimension
    :members:
    :undoc-members:
    :show-inheritance:

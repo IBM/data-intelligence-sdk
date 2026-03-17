@@ -20,12 +20,12 @@ Metadata API
 
 Metadata classes define the structure of data assets and columns.
 
-.. currentmodule:: dq_validator
+.. currentmodule:: wxdi.dq_validator
 
 AssetMetadata
 -------------
 
-.. autoclass:: dq_validator.metadata.AssetMetadata
+.. autoclass:: wxdi.dq_validator.metadata.AssetMetadata
    :members:
    :undoc-members:
    :show-inheritance:
@@ -33,7 +33,7 @@ AssetMetadata
 ColumnMetadata
 --------------
 
-.. autoclass:: dq_validator.metadata.ColumnMetadata
+.. autoclass:: wxdi.dq_validator.metadata.ColumnMetadata
    :members:
    :undoc-members:
    :show-inheritance:
@@ -41,7 +41,7 @@ ColumnMetadata
 DataType
 --------
 
-.. autoclass:: dq_validator.datatypes.DataType
+.. autoclass:: wxdi.dq_validator.datatypes.DataType
    :members:
    :undoc-members:
    :show-inheritance:
@@ -49,7 +49,7 @@ DataType
 DataTypeEnum
 ------------
 
-.. autoclass:: dq_validator.datatypes.DataTypeEnum
+.. autoclass:: wxdi.dq_validator.datatypes.DataTypeEnum
    :members:
    :undoc-members:
    :show-inheritance:

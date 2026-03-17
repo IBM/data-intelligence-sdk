@@ -22,7 +22,7 @@ General Questions
 -----------------
 
 What is the IBM watsonx.data intelligence SDK?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The IBM watsonx.data intelligence SDK is a comprehensive Python toolkit for data intelligence operations. It provides modular components for data quality validation, authentication, and other data-related tasks. The SDK is designed with a modular architecture that allows different teams to contribute specialized functionality.
 

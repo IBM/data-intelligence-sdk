@@ -50,8 +50,8 @@ class SparkValidator(DataFrameValidator[SparkDataFrame]):
     - Consistent struct column output
 
     Example:
-        >>> from dq_validator import Validator, ValidationRule, LengthCheck
-        >>> from dq_validator.integrations import SparkValidator
+        >>> from wxdi.dq_validator import Validator, ValidationRule, LengthCheck
+        >>> from wxdi.dq_validator.integrations import SparkValidator
         >>> from pyspark.sql import SparkSession
         >>>
         >>> spark = SparkSession.builder.getOrCreate()
@@ -74,7 +74,7 @@ class SparkValidator(DataFrameValidator[SparkDataFrame]):
 
         Args:
             validator: Configured Validator instance with validation rules
-            column_prefix: Prefix for validation columns (default: "dq_")
+            column_prefix: Prefix for validation columns (default: `dq_`)
         """
         super().__init__(validator, column_prefix)
         self._validation_udf: Optional[Any] = None

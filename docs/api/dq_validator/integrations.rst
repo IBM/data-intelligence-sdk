@@ -20,12 +20,12 @@ DataFrame Integration API
 
 The integrations module provides DataFrame validators for Pandas and PySpark.
 
-.. currentmodule:: dq_validator.integrations
+.. currentmodule:: wxdi.dq_validator.integrations
 
 Base Integration
 ----------------
 
-.. autoclass:: dq_validator.integrations.base.DataFrameValidator
+.. autoclass:: wxdi.dq_validator.integrations.base.DataFrameValidator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -33,7 +33,7 @@ Base Integration
 Pandas Integration
 ------------------
 
-.. autoclass:: dq_validator.integrations.pandas_validator.PandasValidator
+.. autoclass:: wxdi.dq_validator.integrations.pandas_validator.PandasValidator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -41,7 +41,7 @@ Pandas Integration
 PySpark Integration
 -------------------
 
-.. autoclass:: dq_validator.integrations.spark_validator.SparkValidator
+.. autoclass:: wxdi.dq_validator.integrations.spark_validator.SparkValidator
    :members:
    :undoc-members:
    :show-inheritance:

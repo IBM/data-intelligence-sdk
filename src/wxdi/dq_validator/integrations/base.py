@@ -46,7 +46,7 @@ class DataFrameValidator(ABC, Generic[DF]):
         
         Args:
             validator: Configured Validator instance with validation rules
-            column_prefix: Prefix for validation columns (default: "dq_")
+            column_prefix: Prefix for validation columns (default: `dq_`)
                           This prevents conflicts with existing DataFrame columns
         """
         self.validator = validator

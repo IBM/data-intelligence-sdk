@@ -40,8 +40,8 @@ class PandasValidator(DataFrameValidator[pd.DataFrame]):
     - Column conflict detection
     
     Example:
-        >>> from dq_validator import Validator, ValidationRule, LengthCheck
-        >>> from dq_validator.integrations import PandasValidator
+        >>> from wxdi.dq_validator import Validator, ValidationRule, LengthCheck
+        >>> from wxdi.dq_validator.integrations import PandasValidator
         >>> 
         >>> # Setup validator
         >>> validator = Validator(metadata)
@@ -69,7 +69,7 @@ class PandasValidator(DataFrameValidator[pd.DataFrame]):
             chunk_size: Number of rows to process at once (default: 10,000)
                        Larger values = faster but more memory
                        Smaller values = slower but less memory
-            column_prefix: Prefix for validation columns (default: "dq_")
+            column_prefix: Prefix for validation columns (default: `dq_`)
         
         Raises:
             ValueError: If chunk_size is not positive
