@@ -27,7 +27,7 @@ long_description = (this_directory / "README.md").read_text(encoding='utf-8')
 
 setup(
     name="data-intelligence-sdk",
-    version="0.5.3",
+    version='0.5.3',
     author="IBM",
     author_email="Data_Intelligence_SDK@wwpdl.vnet.ibm.com",
     description="A Python SDK for performing data quality validations on streaming data records and DataFrames",
