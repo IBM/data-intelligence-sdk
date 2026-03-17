@@ -1,0 +1,189 @@
+/**
+ * Copyright 2026 IBM Corporation
+ * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0);
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ * 
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ */
+/* Custom CSS for IBM watsonx.data intelligence SDK Documentation */
+
+/* IBM Color Palette */
+:root {
+    --ibm-blue: #0f62fe;
+    --ibm-blue-dark: #0043ce;
+    --ibm-blue-light: #4589ff;
+    --ibm-gray-10: #f4f4f4;
+    --ibm-gray-20: #e0e0e0;
+    --ibm-gray-50: #8d8d8d;
+    --ibm-gray-100: #161616;
+    --ibm-white: #ffffff;
+}
+
+/* Header and Navigation */
+.bd-header {
+    background-color: var(--ibm-blue) !important;
+}
+
+.bd-header .navbar-brand {
+    color: var(--ibm-white) !important;
+}
+
+.bd-sidebar .bd-toc-item .active {
+    border-left-color: var(--ibm-blue) !important;
+    color: var(--ibm-blue) !important;
+}
+
+/* Links */
+a {
+    color: var(--ibm-blue);
+}
+
+a:hover {
+    color: var(--ibm-blue-dark);
+}
+
+/* Code blocks */
+.highlight {
+    background-color: var(--ibm-gray-10);
+    border-left: 3px solid var(--ibm-blue);
+    padding: 1em;
+    margin: 1em 0;
+}
+
+/* Admonitions */
+.admonition {
+    border-left: 3px solid var(--ibm-blue);
+}
+
+.admonition.note {
+    border-left-color: var(--ibm-blue);
+}
+
+.admonition.warning {
+    border-left-color: #ff832b;
+}
+
+.admonition.tip {
+    border-left-color: #24a148;
+}
+
+/* Tables */
+table.docutils {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table.docutils th {
+    background-color: var(--ibm-blue);
+    color: var(--ibm-white);
+    padding: 0.75em;
+    text-align: left;
+}
+
+table.docutils td {
+    padding: 0.75em;
+    border-bottom: 1px solid var(--ibm-gray-20);
+}
+
+table.docutils tr:hover {
+    background-color: var(--ibm-gray-10);
+}
+
+/* Logo and branding */
+.bd-header .navbar-brand img {
+    height: 32px;
+    margin-right: 10px;
+}
+
+/* Search box */
+.bd-search {
+    border-color: var(--ibm-blue);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--ibm-blue);
+    border-color: var(--ibm-blue);
+}
+
+.btn-primary:hover {
+    background-color: var(--ibm-blue-dark);
+    border-color: var(--ibm-blue-dark);
+}
+
+/* Code inline */
+code.literal {
+    background-color: var(--ibm-gray-10);
+    color: var(--ibm-gray-100);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+/* Section headers */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--ibm-gray-100);
+}
+
+h1 {
+    border-bottom: 2px solid var(--ibm-blue);
+    padding-bottom: 0.3em;
+}
+
+/* Footer */
+.bd-footer {
+    background-color: var(--ibm-gray-10);
+    border-top: 1px solid var(--ibm-gray-20);
+}
+
+/* Sidebar */
+.bd-sidebar {
+    border-right: 1px solid var(--ibm-gray-20);
+}
+
+/* Copy button */
+button.copybtn {
+    background-color: var(--ibm-blue);
+    color: var(--ibm-white);
+}
+
+button.copybtn:hover {
+    background-color: var(--ibm-blue-dark);
+}
+
+/* API documentation specific styles */
+dl.class, dl.function, dl.method {
+    border-left: 3px solid var(--ibm-blue);
+    padding-left: 1em;
+    margin: 1em 0;
+}
+
+dt {
+    font-weight: bold;
+    color: var(--ibm-blue-dark);
+}
+
+/* Version badge */
+.version {
+    background-color: var(--ibm-blue);
+    color: var(--ibm-white);
+    padding: 0.2em 0.6em;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .bd-sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--ibm-gray-20);
+    }
+}
+
+/* Made with Bob */
