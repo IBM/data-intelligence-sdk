@@ -77,6 +77,13 @@ jobs:
     name: semantic-release
     runs-on: ubuntu-latest
     steps:
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+         app-id: ${{ secrets.BOT_APP_ID }}
+         private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+      
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -100,7 +107,7 @@ jobs:
 
       - name: Run semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: npm run semantic-release
 
   deploy-pypi:
