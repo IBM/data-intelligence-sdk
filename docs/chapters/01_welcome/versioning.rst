@@ -102,7 +102,7 @@ Or in Python:
 
     >>> import wxdi.dq_validator
     >>> print(dq_validator.__version__)
-    0.5.0
+    1.0.0
 
 Support Policy
 --------------
