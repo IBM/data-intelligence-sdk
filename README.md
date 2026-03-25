@@ -753,11 +753,12 @@ issues.update_tested_records(issue_id="issue-123", tested_records=1000)
 # Set ignored status
 issues.set_issue_ignored(issue_id="issue-123", ignored=True)
 
-# Update multiple metrics at once
-issues.update_issue_metrics(
+# Update issue metrics
+issues.update_issue_values(
     issue_id="issue-123",
-    occurrences=767,
-    tested_records=1000
+    occurrences=10,
+    tested_records=100,
+    project_id="project-123"
 )
 ```
 
@@ -820,6 +821,7 @@ checks = ChecksProvider(config)
 
 # Create a new check
 check_id = checks.create_check(
+    name="Format Check",
     native_id="asset-id/column-name",
     check_type="format",
     dimension_id="dimension-id",
@@ -828,9 +830,9 @@ check_id = checks.create_check(
 
 # Get existing checks
 checks_list = checks.get_checks(
-    native_id="asset-id/column-name",
-    project_id="project-id",
-    include_children=True
+    asset_id="asset-id",
+    check_type="format",
+    project_id="project-id"
 )
 ```
 
@@ -1144,6 +1146,6 @@ For issues, questions, or contributions, please open an issue on GitHub.
 - pytest >= 7.0.0
 - pytest-cov >= 4.0.0
 - pytest-mock >= 3.7.0
-- black >= 23.0.0
+- black >= 26.3.1
 - mypy >= 1.0.0
 - flake8 >= 6.0.0

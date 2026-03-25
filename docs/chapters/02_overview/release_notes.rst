@@ -20,7 +20,7 @@ Release Notes
 
 This page documents the release history and changes for the ``IBM watsonx.data intelligence SDK``.
 
-Version 0.5.0 (Current)
+Version 1.0.0 (Current)
 -----------------------
 
 *Release Date: March 2026*
@@ -87,87 +87,12 @@ See :ref:`Known Issues<known_issues>` for current limitations.
 Previous Versions
 -----------------
 
-Version 0.4.0 (Beta)
-~~~~~~~~~~~~~~~~~~~~
-
-*Release Date: February 2026*
-
-* Beta release for internal testing
-* Core validation engine implementation
-* Basic DataFrame integration
-* Initial REST API providers
-
-Version 0.3.0 (Alpha)
-~~~~~~~~~~~~~~~~~~~~~
-
-*Release Date: January 2026*
-
-* Alpha release for early adopters
-* Prototype validation checks
-* Authentication framework
-
-Version 0.2.0 (Alpha)
-~~~~~~~~~~~~~~~~~~~~~
-
-*Release Date: December 2025*
-
-* Initial alpha release
-* Basic validation framework
-* Proof of concept
-
-Version 0.1.0 (Pre-Alpha)
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-*Release Date: November 2025*
-
-* Initial development version
-* Project structure and architecture
+There are no previous versions.
 
 Upgrade Guide
 -------------
 
-From 0.4.x to 0.5.0
-~~~~~~~~~~~~~~~~~~~
-
-**Breaking Changes**
-
-* Authentication configuration now uses Pydantic models instead of dictionaries
-* ValidationResult structure has been enhanced with additional fields
-* Some provider method signatures have changed for consistency
-
-**Migration Steps**
-
-1. Update authentication configuration:
-
-   .. code-block:: python
-
-       # Old (0.4.x)
-       config = {
-           'base_url': 'https://api.example.com',
-           'username': 'user',
-           'api_key': 'key'
-       }
-
-       # New (0.5.0)
-       from wxdi.common.auth import AuthConfig
-       config = AuthConfig(
-           base_url='https://api.example.com',
-           username='user',
-           api_key='key'
-       )
-
-2. Update ValidationResult usage:
-
-   .. code-block:: python
-
-       # Old (0.4.x)
-       score = result.score
-
-       # New (0.5.0)
-       score = result.validation_score
-       pass_rate = result.pass_rate  # New field
-
-3. Review provider method signatures in the API documentation
+There are no upgrades.
 
 Deprecation Notices
 -------------------
@@ -177,21 +102,7 @@ No features are currently deprecated. Future deprecations will be announced here
 Future Releases
 ---------------
 
-Planned for Version 0.6.0
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Enhanced error messages with suggestions
-* Performance optimizations for large datasets
-* Additional validation check types
-* Improved documentation with more examples
-
-Planned for Version 1.0.0
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Stable API with backward compatibility guarantees
-* Additional modules from partner teams
-* Enhanced integration capabilities
-* Production-ready performance and reliability
+We have plans to extend functionality 
 
 Stay Updated
 ------------
@@ -206,6 +117,6 @@ Feedback
 We welcome your feedback! Please report issues or suggest features through:
 
 * GitHub Issues: https://github.com/IBM/data-intelligence-sdk/issues
-* Email: data-intelligence-sdk@ibm.com
+* Email: Data_Intelligence_SDK@wwpdl.vnet.ibm.com
 
 .. Made with Bob

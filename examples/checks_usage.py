@@ -21,7 +21,7 @@ This example demonstrates the ChecksProvider operations:
 create_check(): Create a new data quality check
    - Requires: name, dimension_id, native_id, and either project_id OR catalog_id
    - Optional: check_type (defaults to the check name if not provided)
-   - Returns: The created check_id
+   - Returns: The check ID (string)
 
 get_checks(): Retrieve checks for a specific asset filtered by check type
    - Requires: asset_id, check_type, and either project_id OR catalog_id
@@ -69,7 +69,7 @@ def main():
     try:
         # Note: Update these values with your actual data
         # When check_type is not provided, it defaults to the check name
-        new_check_id = check_provider.create_check(
+        check_id = check_provider.create_check(
             name="uniqueness_check",
             dimension_id="371114cd-5516-4691-8b2e-1e66edf66486",  # Use appropriate dimension ID
             native_id="your-asset-id/your-check-id-1",  # Format: <asset_id>/<check_id>
@@ -77,9 +77,7 @@ def main():
             # check_type not specified - will default to "uniqueness_check"
         )
         print(f"\n✓ Successfully created check")
-        print(f"  New Check ID: {new_check_id}")
-        print(f"  Check Name: uniqueness_check")
-        print(f"  Check Type: uniqueness_check (defaulted to name)")
+        print(f"  New Check ID: {check_id}")
         
     except ValueError as e:
         print(f"\n✗ Error creating check: {e}")
@@ -92,7 +90,7 @@ def main():
     print("=" * 70)
     
     try:
-        new_check_id = check_provider.create_check(
+        check_id = check_provider.create_check(
             name="Example Comparison Check",
             dimension_id="ec453723-669c-48bb-82c1-11b69b3b8c93",  # Validity dimension
             native_id="your-asset-id/your-check-id-2",
@@ -100,8 +98,7 @@ def main():
             project_id=project_id
         )
         print(f"\n✓ Successfully created comparison check")
-        print(f"  New Check ID: {new_check_id}")
-        print(f"  Check Type: comparison")
+        print(f"  New Check ID: {check_id}")
         
     except ValueError as e:
         print(f"\n✗ Error creating check: {e}")
@@ -114,7 +111,7 @@ def main():
     print("=" * 70)
     
     try:
-        new_check_id = check_provider.create_check(
+        check_id = check_provider.create_check(
             name="Catalog Check Example",
             dimension_id="371114cd-5516-4691-8b2e-1e66edf66486",
             native_id="catalog-asset-id/catalog-check-id",
@@ -122,8 +119,7 @@ def main():
             catalog_id=catalog_id
         )
         print(f"\n✓ Successfully created check using catalog_id")
-        print(f"  New Check ID: {new_check_id}")
-        print(f"  Check Type: data_rule")
+        print(f"  New Check ID: {check_id}")
         
     except ValueError as e:
         print(f"\n✗ Error creating check: {e}")
@@ -275,12 +271,13 @@ def main():
     print("Examples Complete!")
     print("=" * 70)
     print("\nKey Points:")
-    print("  • create_check() creates a new data quality check")
+    print("  • create_check() creates a new data quality check and returns the check ID")
     print("  • get_checks() retrieves checks for an asset filtered by type")
     print("  • Either project_id OR catalog_id must be provided (not both)")
     print("  • check_type defaults to the check name if not specified in create_check()")
     print("  • native_id format: <asset_id>/<check_id>")
     print("  • get_checks() returns a list of check objects")
+    print("  • Extract check ID from returned dict using check_body.get('id') for each check in the list of retrieved checks")
 
 
 if __name__ == "__main__":

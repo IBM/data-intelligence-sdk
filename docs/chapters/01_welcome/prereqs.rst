@@ -69,7 +69,7 @@ If you plan to contribute to the SDK or run tests:
 .. code-block:: console
 
     $ pip install pytest>=7.0.0 pytest-cov>=4.0.0 pytest-mock>=3.7.0
-    $ pip install black>=23.0.0 mypy>=1.0.0 flake8>=6.0.0
+    $ pip install black>=26.3.1 mypy>=1.0.0 flake8>=6.0.0
 
 Environment Setup
 -----------------
