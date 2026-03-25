@@ -90,7 +90,7 @@ If your team is planning to add a module to the SDK:
 
 For questions or to propose a new module:
 
-* Email: data-intelligence-sdk@ibm.com
+* Email: Data_Intelligence_SDK@wwpdl.vnet.ibm.com
 * GitHub: Open an issue or discussion
 
 Contributing

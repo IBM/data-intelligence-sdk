@@ -27,7 +27,7 @@ long_description = (this_directory / "README.md").read_text(encoding='utf-8')
 
 setup(
     name="data-intelligence-sdk",
-    version='1.0.0',
+    version='0.5.3',
     author="IBM",
     author_email="Data_Intelligence_SDK@wwpdl.vnet.ibm.com",
     description="A Python SDK for performing data quality validations on streaming data records and DataFrames",
@@ -64,7 +64,7 @@ setup(
             "pytest>=7.0.0",
             "pytest-cov>=4.0.0",
             "pytest-mock>=3.7.0",
-            "black>=23.0.0",
+            "black>=26.3.1",
             "mypy>=1.0.0",
             "flake8>=6.0.0",
         ],
@@ -84,7 +84,7 @@ setup(
             "pytest>=7.0.0",
             "pytest-cov>=4.0.0",
             "pytest-mock>=3.7.0",
-            "black>=23.0.0",
+            "black>=26.3.1",
             "mypy>=1.0.0",
             "flake8>=6.0.0",
         ],

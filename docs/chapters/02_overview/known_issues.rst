@@ -23,7 +23,7 @@ This page documents known issues, limitations, and workarounds for the ``IBM wat
 Current Known Issues
 --------------------
 
-Version 0.5.0
+Version 1.0.0
 ~~~~~~~~~~~~~
 
 **Performance**
