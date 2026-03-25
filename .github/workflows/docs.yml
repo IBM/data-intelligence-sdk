@@ -67,7 +67,7 @@ jobs:
 
   deploy:
     # Only deploy on push to main/master, not on PRs
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: contains(fromJSON('["push", "workflow_dispatch"]'), github.event_name) && github.ref == 'refs/heads/main'
     
     environment:
       name: github-pages
