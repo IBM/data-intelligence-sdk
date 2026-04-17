@@ -329,6 +329,6 @@ If your question isn't answered here:
 * Check the :ref:`API Reference<api_ref>`
 * Review the code examples
 * Open an issue on GitHub
-* Contact: data-intelligence-sdk@ibm.com
+* Contact: Data_Intelligence_SDK@wwpdl.vnet.ibm.com
 
 .. Made with Bob

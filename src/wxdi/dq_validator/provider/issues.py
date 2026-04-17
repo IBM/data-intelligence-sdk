@@ -39,6 +39,10 @@ class IssuesProvider(BaseProvider):
         >>> provider = IssuesProvider(config)
         >>> provider.update_issue_values("issue-123", "project-123", occurrences=10, tested_records=100)
     """
+    
+    # Error message constants
+    _ERR_MISSING_PROJECT_OR_CATALOG = "Either project_id or catalog_id must be provided"
+    _ERR_BOTH_PROJECT_AND_CATALOG = "Only one of project_id or catalog_id should be provided, not both"
 
     def __init__(self, config: ProviderConfig):
         """Initialize the IssuesProvider with configuration.
@@ -78,9 +82,9 @@ class IssuesProvider(BaseProvider):
         
         # Validate that exactly one of project_id or catalog_id is provided
         if project_id is None and catalog_id is None:
-            raise ValueError("Either project_id or catalog_id must be provided")
+            raise ValueError(self._ERR_MISSING_PROJECT_OR_CATALOG)
         if project_id is not None and catalog_id is not None:
-            raise ValueError("Only one of project_id or catalog_id should be provided, not both")
+            raise ValueError(self._ERR_BOTH_PROJECT_AND_CATALOG)
         
         url = f"{self.config.url}/data_quality/v4/issues/{issue_id}"
         
@@ -171,9 +175,9 @@ class IssuesProvider(BaseProvider):
         
         # Validate that exactly one of project_id or catalog_id is provided
         if project_id is None and catalog_id is None:
-            raise ValueError("Either project_id or catalog_id must be provided")
+            raise ValueError(self._ERR_MISSING_PROJECT_OR_CATALOG)
         if project_id is not None and catalog_id is not None:
-            raise ValueError("Only one of project_id or catalog_id should be provided, not both")
+            raise ValueError(self._ERR_BOTH_PROJECT_AND_CATALOG)
         
         # Build patch operations list
         patch_operations = []
@@ -227,7 +231,7 @@ class IssuesProvider(BaseProvider):
     def get_issue(
         self,
         reported_for_id: str,
-        check_id: str,
+        dq_check_id: str,
         project_id: Optional[str] = None,
         catalog_id: Optional[str] = None
     ) -> dict:
@@ -238,7 +242,7 @@ class IssuesProvider(BaseProvider):
 
         Args:
             reported_for_id (str): The DQ asset ID to search for
-            check_id (str): The check ID to search for
+            dq_check_id (str): The check ID to search for
             project_id (str, optional): The project ID containing the issue
             catalog_id (str, optional): The catalog ID containing the issue
             
@@ -253,13 +257,13 @@ class IssuesProvider(BaseProvider):
             >>> # Using project_id
             >>> provider.get_issue(
             ...     reported_for_id="1488a413-99f9-4bed-906d-c33b505d5728",
-            ...     check_id="ad277842-dea7-44ef-8e4b-d940df0f79aa",
+            ...     dq_check_id="ad277842-dea7-44ef-8e4b-d940df0f79aa",
             ...     project_id="24419069-d649-45cb-a2c1-64d6eed650d5"
             ... )
             >>> # Using catalog_id
             >>> provider.get_issue(
             ...     reported_for_id="1488a413-99f9-4bed-906d-c33b505d5728",
-            ...     check_id="ad277842-dea7-44ef-8e4b-d940df0f79aa",
+            ...     dq_check_id="ad277842-dea7-44ef-8e4b-d940df0f79aa",
             ...     catalog_id="catalog-123"
             ... )
             {
@@ -272,16 +276,16 @@ class IssuesProvider(BaseProvider):
         
         # Validate that exactly one of project_id or catalog_id is provided
         if project_id is None and catalog_id is None:
-            raise ValueError("Either project_id or catalog_id must be provided")
+            raise ValueError(self._ERR_MISSING_PROJECT_OR_CATALOG)
         if project_id is not None and catalog_id is not None:
-            raise ValueError("Only one of project_id or catalog_id should be provided, not both")
+            raise ValueError(self._ERR_BOTH_PROJECT_AND_CATALOG)
         
         url = f"{self.config.url}/data_quality/v4/search_dq_issue"
 
         # Build query parameters
         params = {
             "reported_for.id": reported_for_id,
-            "check.id": check_id,
+            "check.id": dq_check_id,
         }
         
         # Add either project_id or catalog_id
@@ -309,7 +313,7 @@ class IssuesProvider(BaseProvider):
     def get_issue_id(
         self,
         reported_for_id: str,
-        check_id: str,
+        dq_check_id: str,
         project_id: Optional[str] = None,
         catalog_id: Optional[str] = None
     ) -> str:
@@ -320,7 +324,7 @@ class IssuesProvider(BaseProvider):
         
         Args:
             reported_for_id (str): The DQ asset ID to search for
-            check_id (str): The check ID to search for
+            dq_check_id (str): The check ID to search for
             project_id (str, optional): The project ID containing the issue
             catalog_id (str, optional): The catalog ID containing the issue
             
@@ -335,23 +339,72 @@ class IssuesProvider(BaseProvider):
             >>> # Using project_id
             >>> provider.get_issue_id(
             ...     reported_for_id="1488a413-99f9-4bed-906d-c33b505d5728",
-            ...     check_id="ad277842-dea7-44ef-8e4b-d940df0f79aa",
+            ...     dq_check_id="ad277842-dea7-44ef-8e4b-d940df0f79aa",
             ...     project_id="24419069-d649-45cb-a2c1-64d6eed650d5"
             ... )
             >>> # Using catalog_id
             >>> provider.get_issue_id(
             ...     reported_for_id="1488a413-99f9-4bed-906d-c33b505d5728",
-            ...     check_id="ad277842-dea7-44ef-8e4b-d940df0f79aa",
+            ...     dq_check_id="ad277842-dea7-44ef-8e4b-d940df0f79aa",
             ...     catalog_id="catalog-123"
             ... )
             'b8f4252b-cd35-4668-9b35-4635bfc6e2e0'
         """
-        issue = self.get_issue(reported_for_id, check_id, project_id, catalog_id)
+        issue = self.get_issue(reported_for_id, dq_check_id, project_id, catalog_id)
         issue_id = issue.get("id")
         if issue_id is None:
             raise ValueError("Issue ID not found in response")
         return issue_id
     
+    def _validate_and_resolve_ids(
+        self,
+        asset_id: Optional[str],
+        check_id: Optional[str],
+        check_native_id: Optional[str]
+    ) -> tuple[str, str, str]:
+        """Validate and resolve asset_id, check_id, and check_native_id.
+        
+        Args:
+            asset_id: The CAMS data asset ID (optional)
+            check_id: The CAMS check ID (optional)
+            check_native_id: The check native_id (optional)
+            
+        Returns:
+            tuple: (asset_id, check_id, check_native_id) all resolved
+            
+        Raises:
+            ValueError: If validation fails or IDs cannot be resolved
+        """
+        SEPARATOR = '/'
+        
+        # Validate that either (asset_id + check_id) or check_native_id is provided
+        has_cams_ids = asset_id is not None and check_id is not None
+        has_native_id = check_native_id is not None
+        
+        if not has_cams_ids and not has_native_id:
+            raise ValueError("Either (asset_id and check_id) or check_native_id must be provided")
+        
+        # If check_native_id is provided without asset_id/check_id, extract them
+        if has_native_id and not has_cams_ids:
+            # Parse check_native_id: first part before first SEPARATOR is asset_id, rest is check_id
+            # Format: "<asset_id>/<check_id>" where check_id can contain slashes
+            first_slash_index = check_native_id.find(SEPARATOR)
+            if first_slash_index == -1:
+                raise ValueError(f"Invalid check_native_id format (missing {SEPARATOR}): {check_native_id}")
+            asset_id = check_native_id[:first_slash_index]
+            check_id = check_native_id[first_slash_index + 1:]
+        elif not has_native_id:
+            # Construct check_native_id from asset_id and check_id
+            # At this point, has_cams_ids is guaranteed to be True
+            check_native_id = f"{asset_id}{SEPARATOR}{check_id}"
+        
+        # At this point, all IDs should be set
+        assert asset_id is not None, "asset_id should be set by now"
+        assert check_id is not None, "check_id should be set by now"
+        assert check_native_id is not None, "check_native_id should be set by now"
+        
+        return asset_id, check_id, check_native_id
+
     def update_issue_metrics(
         self,
         occurrences: int,
@@ -362,8 +415,8 @@ class IssuesProvider(BaseProvider):
         catalog_id: Optional[str] = None,
         asset_type: str = "column",
         operation: str = "add",
-        cams_asset_id: Optional[str] = None,
-        cams_check_id: Optional[str] = None,
+        asset_id: Optional[str] = None,
+        check_id: Optional[str] = None,
         check_native_id: Optional[str] = None
     ) -> dict:
         """Update issue metrics using CAMS asset and check IDs or check native_id.
@@ -381,10 +434,10 @@ class IssuesProvider(BaseProvider):
             catalog_id (str, optional): The catalog ID containing the issue
             asset_type (str, optional): The type of asset ("column" or "table"). Default is "column"
             operation (str, optional): Operation for both metrics - "add" or "replace". Default is "add"
-            cams_asset_id (str, optional): The CAMS data asset ID (required if check_native_id not provided)
-            cams_check_id (str, optional): The CAMS check ID (required if check_native_id not provided)
-            check_native_id (str, optional): The check native_id (required if cams_asset_id and cams_check_id not provided).
-                Format: "<cams_asset_id>/<cams_check_id>" where cams_check_id can contain slashes
+            asset_id (str, optional): The CAMS data asset ID (required if check_native_id not provided)
+            check_id (str, optional): The CAMS check ID (required if check_native_id not provided)
+            check_native_id (str, optional): The check native_id (required if asset_id and check_id not provided).
+                Format: "<asset_id>/<check_id>" where check_id can contain slashes
             
         Returns:
             dict: The response from the API containing the updated issue data
@@ -392,13 +445,13 @@ class IssuesProvider(BaseProvider):
         Raises:
             ValueError: If the API request fails or returns an error status, or if neither
                 project_id nor catalog_id is provided, or if both are provided, or if neither
-                (cams_asset_id + cams_check_id) nor check_native_id is provided
+                (asset_id + check_id) nor check_native_id is provided
             
         Example:
-            >>> # Using cams_asset_id and cams_check_id with project_id
+            >>> # Using asset_id and check_id with project_id
             >>> provider.update_issue_metrics(
-            ...     cams_asset_id="b2debda2-6ab9-4a39-8c23-17954e004dcf",
-            ...     cams_check_id="7377e2cd-ac0e-4833-8760-fd0e8cb682aa",
+            ...     asset_id="b2debda2-6ab9-4a39-8c23-17954e004dcf",
+            ...     check_id="7377e2cd-ac0e-4833-8760-fd0e8cb682aa",
             ...     occurrences=10,
             ...     tested_records=100,
             ...     column_name="RTN",
@@ -426,39 +479,16 @@ class IssuesProvider(BaseProvider):
             ... )
             {'issue_id': 'b8f4252b-cd35-4668-9b35-4635bfc6e2e0', 'number_of_occurrences': 10, ...}
         """
-        # Separator used in native_id format
-        SEPARATOR = '/'
-        
         # Validate that exactly one of project_id or catalog_id is provided
         if project_id is None and catalog_id is None:
-            raise ValueError("Either project_id or catalog_id must be provided")
+            raise ValueError(self._ERR_MISSING_PROJECT_OR_CATALOG)
         if project_id is not None and catalog_id is not None:
-            raise ValueError("Only one of project_id or catalog_id should be provided, not both")
+            raise ValueError(self._ERR_BOTH_PROJECT_AND_CATALOG)
         
-        # Validate that either (cams_asset_id + cams_check_id) or check_native_id is provided
-        has_cams_ids = cams_asset_id is not None and cams_check_id is not None
-        has_native_id = check_native_id is not None
-        
-        if not has_cams_ids and not has_native_id:
-            raise ValueError("Either (cams_asset_id and cams_check_id) or check_native_id must be provided")
-        
-        # If check_native_id is provided, extract cams_asset_id and cams_check_id from it
-        if has_native_id and not has_cams_ids:
-            # Parse check_native_id: first part before first SEPARATOR is cams_asset_id, rest is cams_check_id
-            # Format: "<cams_asset_id>/<cams_check_id>" where cams_check_id can contain slashes
-            first_slash_index = check_native_id.find(SEPARATOR)
-            if first_slash_index == -1:
-                raise ValueError(f"Invalid check_native_id format (missing {SEPARATOR}): {check_native_id}")
-            cams_asset_id = check_native_id[:first_slash_index]
-            cams_check_id = check_native_id[first_slash_index + 1:]
-        elif has_cams_ids and not has_native_id:
-            # Construct check_native_id from cams_asset_id and cams_check_id
-            check_native_id = f"{cams_asset_id}{SEPARATOR}{cams_check_id}"
-        
-        # At this point, cams_asset_id and cams_check_id should be set
-        assert cams_asset_id is not None, "cams_asset_id should be set by now"
-        assert cams_check_id is not None, "cams_check_id should be set by now"
-        assert check_native_id is not None, "check_native_id should be set by now"
+        # Validate and resolve asset_id, check_id, and check_native_id
+        asset_id, check_id, check_native_id = self._validate_and_resolve_ids(
+            asset_id, check_id, check_native_id
+        )
         
         from .dq_search import DQSearchProvider
         
@@ -466,10 +496,10 @@ class IssuesProvider(BaseProvider):
         search_provider = DQSearchProvider(self.config)
         
         # Build native IDs for searching
-        # For asset: <cams_asset_id> (for table) or <cams_asset_id>/<column_name> (for column)
-        asset_native_id = cams_asset_id  # For table type, just the asset ID
+        # For asset: <asset_id> (for table) or <asset_id>/<column_name> (for column)
+        asset_native_id = asset_id  # For table type, just the asset ID
         if asset_type == "column":
-            asset_native_id += SEPARATOR + column_name
+            asset_native_id += '/' + column_name
         
         # Search for the DQ asset
         asset_response = search_provider.search_dq_asset(
@@ -480,20 +510,20 @@ class IssuesProvider(BaseProvider):
         )
         dq_asset_id = asset_response.get("id")
         if not dq_asset_id:
-            raise ValueError(f"DQ asset not found for CAMS asset ID: {cams_asset_id}")
+            raise ValueError(f"DQ asset not found for CAMS asset ID: {asset_id}")
         
-        # Get the issue using get_issues with the cams_check_id
+        # Get the issue using get_issues with the check_id
         issue = self.get_issues(
             dq_asset_id=dq_asset_id,
             check_type=check_type,
-            check_id=cams_check_id,
+            check_id=check_id,
             project_id=project_id,
             catalog_id=catalog_id
         )
         
         if not issue:
             raise ValueError(
-                f"Issue not found for CAMS check ID: {cams_check_id} "
+                f"Issue not found for CAMS check ID: {check_id} "
                 f"with type: {check_type}"
             )
         
@@ -581,9 +611,9 @@ class IssuesProvider(BaseProvider):
         
         # Validate that exactly one of project_id or catalog_id is provided
         if project_id is None and catalog_id is None:
-            raise ValueError("Either project_id or catalog_id must be provided")
+            raise ValueError(self._ERR_MISSING_PROJECT_OR_CATALOG)
         if project_id is not None and catalog_id is not None:
-            raise ValueError("Only one of project_id or catalog_id should be provided, not both")
+            raise ValueError(self._ERR_BOTH_PROJECT_AND_CATALOG)
         
         url = f"{self.config.url}/data_quality/v4/issues"
         
@@ -643,7 +673,7 @@ class IssuesProvider(BaseProvider):
     
     def create_issue(
         self,
-        check_id: str,
+        dq_check_id: str,
         reported_for_id: str,
         number_of_occurrences: int,
         number_of_tested_records: int,
@@ -658,7 +688,7 @@ class IssuesProvider(BaseProvider):
         This method creates a new issue for a specific check and data asset.
         
         Args:
-            check_id: The ID of the check for which to create the issue
+            dq_check_id: The ID of the check for which to create the issue
             reported_for_id: The ID of the data asset being reported on
             number_of_occurrences: Number of issue occurrences
             number_of_tested_records: Total number of records tested
@@ -676,7 +706,7 @@ class IssuesProvider(BaseProvider):
         
         Example:
             >>> provider.create_issue(
-            ...     check_id="6be18374-573a-4cf8-8ab7-e428506e428b",
+            ...     dq_check_id="6be18374-573a-4cf8-8ab7-e428506e428b",
             ...     reported_for_id="894d01fd-bdfc-4a4f-b68b-62751e06e06a",
             ...     number_of_occurrences=123,
             ...     number_of_tested_records=456789,
@@ -688,9 +718,9 @@ class IssuesProvider(BaseProvider):
         
         # Validate that exactly one of project_id or catalog_id is provided
         if project_id is None and catalog_id is None:
-            raise ValueError("Either project_id or catalog_id must be provided")
+            raise ValueError(self._ERR_MISSING_PROJECT_OR_CATALOG)
         if project_id is not None and catalog_id is not None:
-            raise ValueError("Only one of project_id or catalog_id should be provided, not both")
+            raise ValueError(self._ERR_BOTH_PROJECT_AND_CATALOG)
         
         # Build the URL for issue creation API
         url = f"{self.config.url}/data_quality/v4/issues"
@@ -706,7 +736,7 @@ class IssuesProvider(BaseProvider):
         # Prepare the payload
         payload = {
             "check": {
-                "id": check_id
+                "id": dq_check_id
             },
             "reported_for": {
                 "id": reported_for_id
@@ -742,3 +772,146 @@ class IssuesProvider(BaseProvider):
             raise ValueError("Issue ID not found in response")
         
         return issue_id
+    
+    def create_issues_bulk(
+        self,
+        payload: dict,
+        project_id: Optional[str] = None,
+        catalog_id: Optional[str] = None,
+        incremental_reporting: bool = False,
+        refresh_assets: bool = False
+    ) -> dict:
+        """
+        Create multiple data quality issues in bulk.
+        
+        This method creates multiple issues, assets, and checks in a single API call
+        for better performance when reporting multiple related issues.
+        
+        Args:
+            payload: The bulk payload containing issues, assets, and existing_checks arrays.
+                Expected structure:
+                {
+                    "issues": [
+                        {
+                            "check": {"native_id": str, "type": str},
+                            "reported_for": {"native_id": str, "type": str},
+                            "number_of_occurrences": int,
+                            "number_of_tested_records": int,
+                            "status": str,
+                            "ignored": bool
+                        },
+                        ...
+                    ],
+                    "assets": [
+                        {
+                            "name": str,
+                            "type": str,
+                            "native_id": str,
+                            "weight": int,
+                            "parent": {"native_id": str, "type": str} (optional)
+                        },
+                        ...
+                    ],
+                    "existing_checks": [
+                        {"native_id": str, "type": str},
+                        ...
+                    ]
+                }
+            project_id (str, optional): The project ID containing the issues
+            catalog_id (str, optional): The catalog ID containing the issues
+            incremental_reporting (bool): If true, adds archived issue counts to new issues
+                instead of replacing them. Default is False.
+            refresh_assets (bool): If true, assets will be refreshed and any assets not
+                present in the updated list will be deleted. Default is False.
+        
+        Returns:
+            dict: The response from the API containing the created issues data
+        
+        Raises:
+            ValueError: If the API request fails or returns an error status, or if neither
+                project_id nor catalog_id is provided, or if both are provided
+        
+        Example:
+            >>> payload = {
+            ...     "issues": [
+            ...         {
+            ...             "check": {
+            ...                 "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f/format/Validity",
+            ...                 "type": "format"
+            ...             },
+            ...             "reported_for": {
+            ...                 "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f",
+            ...                 "type": "data_asset"
+            ...             },
+            ...             "number_of_occurrences": 200,
+            ...             "number_of_tested_records": 1000,
+            ...             "status": "aggregation",
+            ...             "ignored": False
+            ...         }
+            ...     ],
+            ...     "assets": [
+            ...         {
+            ...             "name": "ACCOUNT_HOLDERS.csv",
+            ...             "type": "data_asset",
+            ...             "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f",
+            ...             "weight": 1
+            ...         }
+            ...     ],
+            ...     "existing_checks": [
+            ...         {
+            ...             "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f/format/Validity",
+            ...             "type": "format"
+            ...         }
+            ...     ]
+            ... }
+            >>> provider.create_issues_bulk(
+            ...     payload=payload,
+            ...     project_id="project-123",
+            ...     incremental_reporting=True
+            ... )
+            {'issues': [...], 'assets': [...], ...}
+        """
+        from ..utils import get_url_with_query_params
+        
+        # Validate that exactly one of project_id or catalog_id is provided
+        if project_id is None and catalog_id is None:
+            raise ValueError(self._ERR_MISSING_PROJECT_OR_CATALOG)
+        if project_id is not None and catalog_id is not None:
+            raise ValueError(self._ERR_BOTH_PROJECT_AND_CATALOG)
+        
+        # Build the URL for bulk issue creation API
+        url = f"{self.config.url}/data_quality/v4/create_issues"
+        
+        # Build query parameters
+        params = {}
+        if project_id is not None:
+            params["project_id"] = project_id
+        elif catalog_id is not None:
+            params["catalog_id"] = catalog_id
+        
+        # Add boolean query parameters
+        params["incremental_reporting"] = str(incremental_reporting).lower()
+        params["refresh_assets"] = str(refresh_assets).lower()
+        
+        url = get_url_with_query_params(url, params)
+        
+        # Get request headers
+        headers = get_request_headers(self.config.auth_token)
+        
+        # Make POST request
+        response = self.session.post(
+            url,
+            headers=headers,
+            data=json.dumps(payload),
+            verify=False
+        )
+        
+        if not response.ok:
+            raise ValueError(
+                f"Failed to create issues in bulk. "
+                f"Status: {response.status_code}, "
+                f"Response: {response.text}"
+            )
+        
+        # Parse and return response
+        return json.loads(response.text)

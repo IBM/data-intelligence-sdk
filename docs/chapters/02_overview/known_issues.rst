@@ -275,7 +275,7 @@ If you're experiencing issues:
 * Check the :ref:`API Reference<api_ref>` for detailed documentation
 * Search GitHub issues for similar problems
 * Open a new issue with detailed information
-* Contact: data-intelligence-sdk@ibm.com
+* Contact: Data_Intelligence_SDK@wwpdl.vnet.ibm.com
 
 We appreciate your patience as we continue to improve the SDK!
 
