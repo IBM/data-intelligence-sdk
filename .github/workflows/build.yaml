@@ -22,7 +22,7 @@ on:
 
 jobs:
   build-and-verify:
-    uses: ./verify.yaml
+    uses: ./.github/workflows/verify.yaml
 
   publish-release:
     if: contains(fromJSON('["main", "sandbox"]', github.ref_name) && github.event.pull_request.action == 'closed' && github.event.pull_request.merged

@@ -19,7 +19,7 @@ on:
 
 jobs:
   build:
-    uses: ./verify.yaml
+    uses: ./.github/workflows/verify.yaml
 
   deploy-pypi:
     if: startsWith(github.ref, 'refs/tags/') && !contains(github.ref, '-rc.')
@@ -77,7 +77,7 @@ jobs:
   build-documentation:
     if: startsWith(github.ref, 'refs/tags/') && !contains(github.ref, '-rc.')
     name: Build and deploy documentation
-    uses: ./docs.yml
+    uses: ./.github/workflows/docs.yml
         
   update-sandbox:
     if: startsWith(github.ref, 'refs/tags/') && !contains(github.ref, '-rc.')
