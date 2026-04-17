@@ -788,35 +788,36 @@ class IssuesProvider(BaseProvider):
         for better performance when reporting multiple related issues.
         
         Args:
-            payload: The bulk payload containing issues, assets, and existing_checks arrays.
-                Expected structure:
-                {
-                    "issues": [
-                        {
-                            "check": {"native_id": str, "type": str},
-                            "reported_for": {"native_id": str, "type": str},
-                            "number_of_occurrences": int,
-                            "number_of_tested_records": int,
-                            "status": str,
-                            "ignored": bool
-                        },
-                        ...
-                    ],
-                    "assets": [
-                        {
-                            "name": str,
-                            "type": str,
-                            "native_id": str,
-                            "weight": int,
-                            "parent": {"native_id": str, "type": str} (optional)
-                        },
-                        ...
-                    ],
-                    "existing_checks": [
-                        {"native_id": str, "type": str},
-                        ...
-                    ]
-                }
+            payload: The bulk payload containing issues, assets, and existing_checks arrays. Expected structure is
+
+                >>> {
+                ...     "issues": [
+                ...         {
+                ...             "check": {"native_id": str, "type": str},
+                ...             "reported_for": {"native_id": str, "type": str},
+                ...             "number_of_occurrences": int,
+                ...             "number_of_tested_records": int,
+                ...             "status": str,
+                ...             "ignored": bool
+                ...         },
+                ...         ...
+                ...     ],
+                ...     "assets": [
+                ...         {
+                ...             "name": str,
+                ...             "type": str,
+                ...             "native_id": str,
+                ...             "weight": int,
+                ...             "parent": {"native_id": str, "type": str} (optional)
+                ...         },
+                ...         ...
+                ...     ],
+                ...     "existing_checks": [
+                ...         {"native_id": str, "type": str},
+                ...         ...
+                ...     ]
+                ... }
+
             project_id (str, optional): The project ID containing the issues
             catalog_id (str, optional): The catalog ID containing the issues
             incremental_reporting (bool): If true, adds archived issue counts to new issues
