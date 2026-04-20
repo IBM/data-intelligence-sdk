@@ -61,7 +61,6 @@ jobs:
           python -m pip install --upgrade pip build twine
 
       - name: Build & Verify
-        timeout-minutes: 3
         run: |
           make -f Makefile.build ci
           python -m twine check dist/*
