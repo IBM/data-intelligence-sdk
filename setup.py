@@ -50,7 +50,7 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     install_requires=[
         "pydantic>=2.12.0",
         "requests>=2.33.1",

@@ -14,7 +14,7 @@ name: build
 
 on:
   pull_request:
-    types: ['opened', 'synchronized', 'reopened', 'closed']
+    types: ['opened', 'synchronize', 'reopened', 'closed']
     branches:
       - main
       - sandbox

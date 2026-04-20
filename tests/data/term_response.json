@@ -1,0 +1,117 @@
+{
+  "metadata": {
+    "artifact_type": "glossary_term",
+    "artifact_id": "30d1b847-0aa9-4840-a182-dd157fe977a0",
+    "version_id": "bdeef8cc-d9ab-4822-b3df-cef82b4de538_0",
+    "source_repository_id": "1be893e3-d512-4fd8-b449-c953abeedb6c",
+    "global_id": "1be893e3-d512-4fd8-b449-c953abeedb6c_30d1b847-0aa9-4840-a182-dd157fe977a0",
+    "is_target_draft": false,
+    "draft_ancestor_id": "90774b3c-16c6-4dcf-8c81-407d2e440baa",
+    "effective_start_date": "2026-01-09T09:01:15.648Z",
+    "created_by": "IBMid-0600012F5M",
+    "created_at": "2026-01-09T09:01:15.648Z",
+    "modified_by": "IBMid-0600012F5M",
+    "modified_at": "2026-01-09T09:01:15.648Z",
+    "revision": "0",
+    "name": "mango",
+    "state": "PUBLISHED",
+    "tags": [],
+    "steward_ids": [],
+    "steward_group_ids": [],
+    "read_only": false
+  },
+  "entity": {
+    "parent_category": {
+      "resources": [
+        {
+          "metadata": {
+            "artifact_type": "relationship",
+            "artifact_id": "97b2a3df-94cf-446c-9338-ba8c664bc09a",
+            "version_id": "2728caaf-714b-4440-8558-b1d97077d34e_0",
+            "source_repository_id": "1be893e3-d512-4fd8-b449-c953abeedb6c",
+            "global_id": "1be893e3-d512-4fd8-b449-c953abeedb6c_97b2a3df-94cf-446c-9338-ba8c664bc09a",
+            "is_target_draft": false,
+            "effective_start_date": "2026-01-09T09:01:15.567Z",
+            "created_by": "IBMid-0600012F5M",
+            "created_at": "2026-01-09T09:01:15.567Z",
+            "modified_by": "IBMid-0600012F5M",
+            "modified_at": "2026-01-09T09:01:15.567Z",
+            "revision": "0",
+            "state": "PUBLISHED",
+            "read_only": false,
+            "user_access": true
+          },
+          "entity": {
+            "child_href": "/v3/glossary_terms/30d1b847-0aa9-4840-a182-dd157fe977a0/versions?status=ACTIVE",
+            "parent_enabled": true,
+            "relationship_type": "parent_category",
+            "source_type": "glossary_term",
+            "target_type": "category",
+            "reference_copy": false,
+            "parent_href": "/v3/categories/e39ada11-8338-3704-90e3-681a71e7c839",
+            "parent_name": "[uncategorized]",
+            "parent_global_id": "1be893e3-d512-4fd8-b449-c953abeedb6c_e39ada11-8338-3704-90e3-681a71e7c839",
+            "parent_version_id": "0b9f1be1-e076-3203-9d65-a8df62cbdbeb_0",
+            "parent_id": "e39ada11-8338-3704-90e3-681a71e7c839",
+            "parent_description": "This is the system default if a standard category is not assigned.",
+            "child_id": "30d1b847-0aa9-4840-a182-dd157fe977a0",
+            "child_global_id": "1be893e3-d512-4fd8-b449-c953abeedb6c_30d1b847-0aa9-4840-a182-dd157fe977a0",
+            "child_name": "mango"
+          }
+        }
+      ],
+      "offset": 0,
+      "set_uri": false,
+      "limit": 5,
+      "count": 1
+    },
+    "custom_relationships": [],
+    "abbreviations": [],
+    "extended_attribute_groups": {
+      "dq_constraints": [
+        {
+          "metadata": {
+            "type": "data_type",
+            "confirmed": false,
+            "hidden": false
+          },
+          "origin": [],
+          "check": [
+            {
+              "name": "data_type",
+              "value": "STRING"
+            },
+            {
+              "name": "length",
+              "numeric_value": 80
+            }
+          ]
+        },
+        {
+          "metadata": {
+            "type": "length",
+            "confirmed": false,
+            "hidden": false
+          },
+          "origin": [],
+          "check": [
+            {
+              "name": "min",
+              "numeric_value": 3
+            },
+            {
+              "name": "max",
+              "numeric_value": 80
+            }
+          ]
+        }
+      ]
+    },
+    "state": "PUBLISHED",
+    "default_locale_id": "en-US",
+    "reference_copy": false,
+    "steward_ids": [],
+    "steward_group_ids": [],
+    "custom_attributes": []
+  }
+}

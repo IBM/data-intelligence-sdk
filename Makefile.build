@@ -38,13 +38,14 @@ test: test-unit test-int
 
 test-unit:
 	${PYTHON} -m pytest --cov=src/wxdi/dph_services --cov=src/wxdi/data_product_recommender --cov=src/wxdi/odcs_generator \
-      --cov-report=xml:coverage.xml --cov-report=html --cov-report=term test/dph_servicestest/data_product_recommender test/odcs_generator
+      --cov-report=xml:coverage.xml --cov-report=html --cov-report=term tests/src/dph_services tests/src/data_product_recommender \
+      tests/src/odcs_generator tests/src/dq_validator tests/src/auth
 
 test-int:
-	${PYTHON} -m pytest test/integration
+	${PYTHON} -m pytest tests/src/integration
 
 coverage:
-	${PYTHON} -m pytest --cov=src/wxdi/dph_services --cov-report=xml:coverage.xml --cov-report=html --cov-report=term test/dph_services test/integration
+	${PYTHON} -m pytest --cov=src/wxdi/dph_services --cov-report=xml:coverage.xml --cov-report=html --cov-report=term tests/src/dph_services tests/src/integration
 
 test-examples:
 	${PYTHON} -m pytest examples
