@@ -34,7 +34,7 @@ def main():
     print("=" * 60)
     print("IBM watsonx.data intelligence SDK - Basic Usage Example")
     print("=" * 60)
-    
+
     metadata = AssetMetadata(
         table_name='employee_data',
         columns=[
@@ -52,25 +52,25 @@ def main():
             ColumnMetadata('employee_code', DataType.STRING, length=10)
         ]
     )
-    
+
     print(f"\nAsset: {metadata.table_name}")
     print(f"Columns: {len(metadata.columns)}")
-    
+
     # Step 2: Create validator with rules
     validator = Validator(metadata)
-    
+
     # Add length check for name (works with any type)
     validator.add_rule(
         ValidationRule('name')
             .add_check(LengthCheck(min_length=2, max_length=100))
     )
-    
+
     # Add length check for emp_id (integer converted to string)
     validator.add_rule(
         ValidationRule('emp_id')
             .add_check(LengthCheck(min_length=4, max_length=6))
     )
-    
+
     # Add valid values check for department (case-insensitive)
     validator.add_rule(
         ValidationRule('department')
@@ -79,7 +79,7 @@ def main():
                 case_sensitive=False
             ))
     )
-    
+
     # Add comparison checks using enum
     validator.add_rule(
         ValidationRule('age')
@@ -92,7 +92,7 @@ def main():
                 target_value=65
             ))
     )
-    
+
     validator.add_rule(
         ValidationRule('salary')
             .add_check(ComparisonCheck(
@@ -100,43 +100,43 @@ def main():
                 target_column='min_salary'
             ))
     )
-    
+
     # Add CaseCheck for email (must be lowercase)
     validator.add_rule(
         ValidationRule('email')
             .add_check(CaseCheck(case_type=ColumnCaseEnum.LOWER_CASE))
     )
-    
+
     # Add CompletenessCheck for name (required field)
     validator.add_rule(
         ValidationRule('name')
             .add_check(CompletenessCheck(missing_values_allowed=False))
     )
-    
+
     # Add RangeCheck for bonus (0 to 50000)
     validator.add_rule(
         ValidationRule('bonus')
             .add_check(RangeCheck(min_value=0, max_value=50000))
     )
-    
+
     # Add RegexCheck for phone (format: XXX-XXX-XXXX)
     validator.add_rule(
         ValidationRule('phone')
             .add_check(RegexCheck(pattern=r'^\d{3}-\d{3}-\d{4}$'))
     )
-    
+
     # Add CaseCheck for status (must be NameCase)
     validator.add_rule(
         ValidationRule('status')
             .add_check(CaseCheck(case_type=ColumnCaseEnum.NAME_CASE))
     )
-    
+
     # Add DataTypeCheck for age (must be INTEGER)
     validator.add_rule(
         ValidationRule('age')
             .add_check(DataTypeCheck(expected_type=DType(dtype=DataTypeEnum.INT32)))
     )
-    
+
     # Add FormatCheck for hire_date (must be valid date format)
     # NEW: Using DateTimeFormats constants for readable format names
     validator.add_rule(
@@ -150,7 +150,7 @@ def main():
                 }
             ))
     )
-    
+
     print(f"\nValidator configured with {len(validator.rules)} rules")
     print("Checks included:")
     print("  - LengthCheck (name, emp_id)")
@@ -162,12 +162,12 @@ def main():
     print("  - RegexCheck (phone)")
     print("  - DataTypeCheck (age)")
     print("  - FormatCheck (hire_date)")
-    
+
     # Step 3: Validate records
     print("\n" + "=" * 60)
     print("Validating Records")
     print("=" * 60)
-    
+
     records = [
         # [emp_id, name, email, age, department, salary, min_salary, phone, status, bonus, hire_date, employee_code]
         [1001, 'John Doe', 'john@company.com', 30, 'engineering', 75000.00, 60000.00, '555-123-4567', 'Active', 5000.00, '2020-01-15', 'EMP001'],
@@ -177,39 +177,39 @@ def main():
         [1005, 'Charlie Brown', 'charlie@company.com', 40, 'Finance', 55000.00, 60000.00, '555-567-8901', 'Active', 4000.00, '2023-06-10', 'EMP005'],
         [1006, None, 'test@company.com', 28, 'Engineering', 70000.00, 65000.00, '555-678-9012', 'Active', 3500.00, '07/20/2024', 'EMP006'],  # Name is None (completeness check)
     ]
-    
+
     results = validator.validate_batch(records)
-    
+
     # Step 4: Display results
     for idx, result in enumerate(results):
         status_symbol = '[PASS]' if result.is_valid else '[FAIL]'
-        
+
         print(f"\nRecord {idx + 1}: {status_symbol} (Score: {result.score}, Pass Rate: {result.pass_rate:.1f}%)")
-        
+
         if not result.is_valid:
             for error in result.errors:
                 print(f"  - {error.column_name}: {error.message}")
-    
+
     # Step 5: Summary statistics
     print("\n" + "=" * 60)
     print("Summary")
     print("=" * 60)
-    
+
     total_records = len(results)
     valid_records = sum(1 for r in results if r.is_valid)
     invalid_records = total_records - valid_records
     overall_pass_rate = (valid_records / total_records) * 100
-    
+
     print(f"Total Records: {total_records}")
     print(f"Valid Records: {valid_records}")
     print(f"Invalid Records: {invalid_records}")
     print(f"Overall Pass Rate: {overall_pass_rate:.1f}%")
-    
+
     # Step 6: Detailed validation result for first failed record
     print("\n" + "=" * 60)
     print("Detailed Result Example (First Failed Record)")
     print("=" * 60)
-    
+
     failed_result = next((r for r in results if not r.is_valid), None)
     if failed_result:
         print(f"\nRecord Index: {failed_result.record_index}")

@@ -16,7 +16,7 @@
 """
 Example usage of IssuesProvider for managing data quality issues.
 
-This example demonstrates four main operations:
+This example demonstrates five main operations:
 
 1. get_issues(): Retrieve a specific issue for a DQ asset, check type, and check_id
    - Requires: dq_asset_id, check_type, check_id, and either project_id OR catalog_id
@@ -28,16 +28,21 @@ This example demonstrates four main operations:
    - Optional: operation ("add" or "replace", default: "add")
 
 3. update_issue_metrics(): Update issue metrics using CAMS asset and check IDs OR check_native_id
-   - Option A: Provide cams_asset_id and cams_check_id
-   - Option B: Provide check_native_id (format: "<cams_asset_id>/<cams_check_id>")
+   - Option A: Provide asset_id and check_id
+   - Option B: Provide check_native_id (format: "<asset_id>/<check_id>")
    - Also requires: occurrences, tested_records, column_name, check_type, and either project_id OR catalog_id
    - Optional: asset_type (default: "column"), operation (default: "add")
    - This method automatically searches for the DQ asset, check, and issue before updating
 
 4. create_issue(): Create a new data quality issue for a check
-   - Requires: check_id, reported_for_id, number_of_occurrences, number_of_tested_records, and either project_id OR catalog_id
+   - Requires: dq_check_id, reported_for_id, number_of_occurrences, number_of_tested_records, and either project_id OR catalog_id
    - Optional: status (default: "actual"), ignored (default: False)
    - Returns: The created issue_id
+
+5. create_issues_bulk(): Create multiple issues, assets, and checks in a single API call
+   - Requires: payload (dict with issues, assets, existing_checks), and either project_id OR catalog_id
+   - Optional: incremental_reporting (default: False), refresh_assets (default: False)
+   - Returns: The full API response with created issues
 
 Both update methods require occurrences and tested_records as mandatory parameters.
 The operation parameter (default: "add") applies to both metrics.
@@ -49,27 +54,27 @@ from wxdi.dq_validator.provider import ProviderConfig, IssuesProvider
 
 def main():
     """Main function demonstrating IssuesProvider usage."""
-    
+
     # Step 1: Configure the provider with your instance URL and authentication token
     config = ProviderConfig(
         url="https://your-instance.cloud.ibm.com",
         auth_token="Bearer your-auth-token-here"
     )
-    
+
     # Step 2: Create an IssuesProvider instance
     issues_provider = IssuesProvider(config)
-    
+
     # Define IDs that will be used throughout the examples
     issue_id = "your-issue-id-here"
     project_id = "your-project-id-here"
     catalog_id = "your-catalog-id-here"  # Alternative to project_id
-    
+
     # Step 3: Get issues for a specific DQ asset, check type, and check_id
     print("\n--- Getting issues for a DQ asset with check_id filter ---")
     dq_asset_id = "08b139ca-35a6-4b61-b87b-aa832870d89c"
     check_type = "format"
     check_id = "065c2b72-4600-4d15-8c48-298a2abf66cd"  # The check ID to filter by
-    
+
     try:
         # Get issues using catalog_id and check_id
         issue_result = issues_provider.get_issues(
@@ -93,7 +98,7 @@ def main():
             print(f"No issue found matching check_id {check_id}")
     except ValueError as e:
         print(f"Error getting issues: {e}")
-    
+
     # Example: Get issues using project_id instead
     try:
         issue_result = issues_provider.get_issues(
@@ -110,7 +115,7 @@ def main():
             print(f"No matching issue found")
     except ValueError as e:
         print(f"Error getting issues with project_id: {e}")
-    
+
     # Step 4: Update both occurrences and tested records using issue ID directly
     # Note: Both occurrences and tested_records are mandatory
     # Either project_id OR catalog_id must be provided (but not both)
@@ -127,7 +132,7 @@ def main():
         print(f"Response: {result}")
     except ValueError as e:
         print(f"Error updating issue: {e}")
-    
+
     # Step 4: Use catalog_id instead of project_id
     try:
         result = issues_provider.update_issue_values(
@@ -140,7 +145,7 @@ def main():
         print(f"Response: {result}")
     except ValueError as e:
         print(f"Error updating issue with catalog_id: {e}")
-    
+
     # Step 5: Use replace operation instead of add
     try:
         result = issues_provider.update_issue_values(
@@ -154,7 +159,7 @@ def main():
         print(f"Response: {result}")
     except ValueError as e:
         print(f"Error replacing metrics: {e}")
-    
+
     # Example: Using replace operation with different values
     try:
         # Replace both metrics with specific values
@@ -169,14 +174,14 @@ def main():
         print(f"Response: {result}")
     except ValueError as e:
         print(f"Error resetting metrics: {e}")
-    
+
     # Example: Update multiple issues with both metrics
     issues_to_update = [
         ("issue-123", 10, 100),
         ("issue-456", 25, 250),
         ("issue-789", 50, 500),
     ]
-    
+
     print("\n--- Updating multiple issues with both metrics ---")
     for issue_id, occurrences, records in issues_to_update:
         try:
@@ -189,14 +194,14 @@ def main():
             print(f"✓ Updated {issue_id}: +{occurrences} occurrences, +{records} tested records")
         except ValueError as e:
             print(f"✗ Failed to update {issue_id}: {e}")
-    
+
     # Step 6: Update issue metrics using CAMS IDs
     print("\n--- Updating issue metrics using CAMS IDs ---")
     try:
         # Update issue metrics by providing CAMS asset and check IDs with project_id
         result = issues_provider.update_issue_metrics(
-            cams_asset_id="b2debda2-6ab9-4a39-8c23-17954e004dcf",
-            cams_check_id="7377e2cd-ac0e-4833-8760-fd0e8cb682aa",
+            asset_id="b2debda2-6ab9-4a39-8c23-17954e004dcf",
+            check_id="7377e2cd-ac0e-4833-8760-fd0e8cb682aa",
             occurrences=10,
             tested_records=100,
             column_name="RTN",    # Required for column type assets
@@ -208,12 +213,12 @@ def main():
         print(f"Response: {result}")
     except ValueError as e:
         print(f"Error updating issue with CAMS IDs: {e}")
-    
+
     # Example: Using catalog_id instead of project_id
     try:
         result = issues_provider.update_issue_metrics(
-            cams_asset_id="b2debda2-6ab9-4a39-8c23-17954e004dcf",
-            cams_check_id="7377e2cd-ac0e-4833-8760-fd0e8cb682aa",
+            asset_id="b2debda2-6ab9-4a39-8c23-17954e004dcf",
+            check_id="7377e2cd-ac0e-4833-8760-fd0e8cb682aa",
             occurrences=10,
             tested_records=100,
             column_name="RTN",
@@ -225,7 +230,7 @@ def main():
         print(f"Response: {result}")
     except ValueError as e:
         print(f"Error updating issue with CAMS IDs and catalog_id: {e}")
-    
+
     # Example: Using check_native_id instead of cams_asset_id and cams_check_id
     print("\n--- Updating issue metrics using check_native_id ---")
     try:
@@ -244,7 +249,7 @@ def main():
         print(f"Response: {result}")
     except ValueError as e:
         print(f"Error updating issue with check_native_id: {e}")
-    
+
     # Example: Using check_native_id for comparison check with target column
     try:
         # For comparison checks with target columns, the native_id includes the operator and target column
@@ -262,12 +267,12 @@ def main():
         print(f"Response: {result}")
     except ValueError as e:
         print(f"Error updating comparison check with check_native_id: {e}")
-    
+
     # Example: Update multiple issues using CAMS IDs
     cams_updates = [
         {
-            "cams_asset_id": "asset-1",
-            "cams_check_id": "check-1",
+            "asset_id": "asset-1",
+            "check_id": "check-1",
             "occurrences": 5,
             "tested_records": 50,
             "column_name": "test_column",
@@ -276,8 +281,8 @@ def main():
             "asset_type": "column"
         },
         {
-            "cams_asset_id": "asset-2",
-            "cams_check_id": "check-2",
+            "asset_id": "asset-2",
+            "check_id": "check-2",
             "occurrences": 15,
             "tested_records": 150,
             "column_name": "another_column",
@@ -286,15 +291,15 @@ def main():
             "asset_type": "table"
         },
     ]
-    
+
     print("\n--- Updating multiple issues using CAMS IDs ---")
     for update_params in cams_updates:
         try:
             result = issues_provider.update_issue_metrics(**update_params)
-            print(f"✓ Updated issue for asset {update_params['cams_asset_id']}")
+            print(f"✓ Updated issue for asset {update_params['asset_id']}")
         except ValueError as e:
-            print(f"✗ Failed to update issue for asset {update_params['cams_asset_id']}: {e}")
-    
+            print(f"✗ Failed to update issue for asset {update_params['asset_id']}: {e}")
+
     # Step 7: Create a new issue for a check (using project_id)
     print("\n--- Creating a new issue for a check (using project_id) ---")
     try:
@@ -303,7 +308,7 @@ def main():
         # reported_for_id: The ID of the DQ asset being reported on
         issue_check_id = "c3c97a92-8a45-4456-be6e-ab0d13b65a33"
         reported_for_id = "3f73a9d8-1664-482b-829f-9c879a4dd5d6"
-        
+
         print(f"\nCreating issue with:")
         print(f"  Check ID: {issue_check_id}")
         print(f"  Reported For ID: {reported_for_id}")
@@ -312,9 +317,9 @@ def main():
         print(f"  Status: actual")
         print(f"  Ignored: False")
         print(f"  Project ID: {project_id}")
-        
+
         new_issue_id = issues_provider.create_issue(
-            check_id=issue_check_id,
+            dq_check_id=issue_check_id,
             reported_for_id=reported_for_id,
             number_of_occurrences=25,
             number_of_tested_records=1000,
@@ -322,18 +327,18 @@ def main():
             ignored=False,
             project_id=project_id
         )
-        
+
         print(f"\n✓ Successfully created issue!")
         print(f"  New Issue ID: {new_issue_id}")
-        
+
     except ValueError as e:
         print(f"\n✗ Error creating issue: {e}")
-    
+
     # Step 8: Create issue with different parameters (using project_id)
     print("\n--- Creating issue with ignored=True (using project_id) ---")
     try:
         new_issue_id = issues_provider.create_issue(
-            check_id="c3c97a92-8a45-4456-be6e-ab0d13b65a33",
+            dq_check_id="c3c97a92-8a45-4456-be6e-ab0d13b65a33",
             reported_for_id="3f73a9d8-1664-482b-829f-9c879a4dd5d6",
             number_of_occurrences=100,
             number_of_tested_records=5000,
@@ -341,21 +346,21 @@ def main():
             ignored=True,  # This issue is ignored
             project_id=project_id
         )
-        
+
         print(f"\n✓ Successfully created issue with ignored=True")
         print(f"  New Issue ID: {new_issue_id}")
         print(f"  Occurrences: 100")
         print(f"  Tested Records: 5000")
         print(f"  Ignored: True")
-        
+
     except ValueError as e:
         print(f"\n✗ Error creating issue: {e}")
-    
+
     # Step 9: Create issue using catalog_id
     print("\n--- Creating issue using catalog_id ---")
     try:
         new_issue_id = issues_provider.create_issue(
-            check_id="c3c97a92-8a45-4456-be6e-ab0d13b65a33",
+            dq_check_id="c3c97a92-8a45-4456-be6e-ab0d13b65a33",
             reported_for_id="3f73a9d8-1664-482b-829f-9c879a4dd5d6",
             number_of_occurrences=50,
             number_of_tested_records=2000,
@@ -363,10 +368,117 @@ def main():
             ignored=False,
             catalog_id=catalog_id
         )
-        
+
         print(f"\n✓ Successfully created issue using catalog_id")
         print(f"  New Issue ID: {new_issue_id}")
-    
+
+    except ValueError as e:
+        print(f"\n✗ Error: {e}")
+
+    # Step 10: Create multiple issues in bulk (using project_id)
+    print("\n" + "=" * 70)
+    print("Creating Multiple Issues in Bulk")
+    print("=" * 70)
+
+    # Construct the bulk payload with issues, assets, and existing_checks
+    bulk_payload = {
+            "issues": [
+                {
+                    "check": {
+                        "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f/format/Validity",
+                        "type": "format"
+                    },
+                    "reported_for": {
+                        "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f",
+                        "type": "data_asset"
+                    },
+                    "number_of_occurrences": 200,
+                    "number_of_tested_records": 1000,
+                    "status": "aggregation",
+                    "ignored": False
+                },
+                {
+                    "check": {
+                        "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f/format/sample3",
+                        "type": "format"
+                    },
+                    "reported_for": {
+                        "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f/NAME",
+                        "type": "column"
+                    },
+                    "number_of_occurrences": 200,
+                    "number_of_tested_records": 1000,
+                    "status": "actual",
+                    "ignored": False
+                }
+            ],
+            "assets": [
+                {
+                    "name": "ACCOUNT_HOLDERS.csv",
+                    "type": "data_asset",
+                    "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f",
+                    "weight": 1
+                },
+                {
+                    "name": "NAME",
+                    "type": "column",
+                    "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f/NAME",
+                    "parent": {
+                        "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f",
+                        "type": "data_asset"
+                    },
+                    "weight": 1
+                }
+            ],
+            "existing_checks": [
+                {
+                    "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f/format/Validity",
+                    "type": "format"
+                },
+                {
+                    "native_id": "ba23145a-6d0a-46db-b314-41526b1e465f/format/sample3",
+                    "type": "format"
+                }
+            ]
+    }
+
+    try:
+        print(f"\nCreating bulk issues with:")
+        print(f"  Number of issues: {len(bulk_payload['issues'])}")
+        print(f"  Number of assets: {len(bulk_payload['assets'])}")
+        print(f"  Number of checks: {len(bulk_payload['existing_checks'])}")
+        print(f"  Project ID: {project_id}")
+        print(f"  Incremental Reporting: False")
+        print(f"  Refresh Assets: False")
+
+        response = issues_provider.create_issues_bulk(
+            payload=bulk_payload,
+            project_id=project_id,
+            incremental_reporting=False,
+            refresh_assets=False
+        )
+
+        print(f"\n✓ Successfully created issues in bulk!")
+        print(f"  Response keys: {list(response.keys())}")
+
+    except ValueError as e:
+        print(f"\n✗ Error creating bulk issues: {e}")
+
+    # Step 11: Create bulk issues with incremental reporting (using catalog_id)
+    print("\n--- Creating bulk issues with incremental reporting (using catalog_id) ---")
+    try:
+        # Same payload structure but with incremental_reporting=True
+        response = issues_provider.create_issues_bulk(
+            payload=bulk_payload,
+            catalog_id=catalog_id,
+            incremental_reporting=True,  # Adds archived counts to new issues
+            refresh_assets=False
+        )
+
+        print(f"\n✓ Successfully created bulk issues with incremental reporting!")
+        print(f"  Using catalog_id: {catalog_id}")
+        print(f"  Incremental reporting enabled")
+
     except ValueError as e:
         print(f"\n✗ Error: {e}")
 

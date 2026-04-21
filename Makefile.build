@@ -1,0 +1,58 @@
+# Copyright 2026 IBM Corporation
+# Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0);
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+# See the LICENSE file in the project root for license information.
+
+PYTHON=python
+LINT_DIRS=src/wxdi/dph_services src/wxdi/data_product_recommender src/wxdi/odcs_generator tests/src/data_product_recommender tests/src/dph_services tests/src/odcs_generator tests/src/integration examples
+
+setup: deps dev_deps install_project
+
+all: upgrade_pip setup test-unit lint
+
+ci: setup test-unit # lint  # enable when ready
+
+upgrade_pip:
+	${PYTHON} -m pip install --upgrade pip
+
+deps:
+	${PYTHON} -m pip install -r requirements.txt
+
+dev_deps:
+	${PYTHON} -m pip install -r requirements-dev.txt
+
+install_project:
+	${PYTHON} -m pip install -e .
+
+test: test-unit test-int
+
+test-unit:
+	${PYTHON} -m pytest --cov=src/wxdi/dph_services --cov=src/wxdi/data_product_recommender --cov=src/wxdi/odcs_generator \
+      --cov-report=xml:coverage.xml --cov-report=html --cov-report=term tests/src/dph_services tests/src/data_product_recommender \
+      tests/src/odcs_generator tests/src/dq_validator tests/src/auth
+
+test-int:
+	${PYTHON} -m pytest tests/src/integration
+
+coverage:
+	${PYTHON} -m pytest --cov=src/wxdi/dph_services --cov-report=xml:coverage.xml --cov-report=html --cov-report=term tests/src/dph_services tests/src/integration
+
+test-examples:
+	${PYTHON} -m pytest examples
+
+lint:
+	${PYTHON} -m pylint ${LINT_DIRS}
+	black --check ${LINT_DIRS}
+
+lint-fix:
+	black ${LINT_DIRS}

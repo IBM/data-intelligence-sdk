@@ -16,7 +16,8 @@
 """
 WXDI - IBM watsonx.data intelligence SDK
 
-A comprehensive Python SDK for data quality validation and data intelligence operations.
+A comprehensive Python SDK for data quality validation, data intelligence operations,
+data product hub services, ODCS generation, and data product recommendations.
 """
 
 # Re-export commonly used modules for convenience
@@ -97,5 +98,11 @@ __all__ = [
     # Data Quality Dimensions
     "DataQualityDimension",
 ]
+
+# Note: dph_services, odcs_generator, and data_product_recommender are available as submodules
+# Import them explicitly:
+#   from wxdi.dph_services import DphV1
+#   from wxdi.odcs_generator import CollibraClient, ODCSGenerator, InformaticaClient
+#   from wxdi.data_product_recommender import DataProductRecommender
 
 # Made with Bob

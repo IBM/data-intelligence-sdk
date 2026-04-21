@@ -273,4 +273,4 @@ When contributing documentation:
 
 For documentation issues or questions:
 - Open an issue on GitHub
-- Contact: data-intelligence-sdk@ibm.com
+- Contact: Data_Intelligence_SDK@wwpdl.vnet.ibm.com
