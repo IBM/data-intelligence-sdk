@@ -63,4 +63,5 @@ jobs:
       - name: Build & Verify
         run: |
           make -f Makefile.build ci
+          python -m build 
           python -m twine check dist/*
