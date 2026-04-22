@@ -13,8 +13,11 @@
 name: build
 
 on:
+  push:
+    branches:
+      - main
+      - sandbox
   pull_request:
-    types: ['opened', 'synchronize', 'reopened', 'closed']
     branches:
       - main
       - sandbox
@@ -25,25 +28,25 @@ jobs:
     uses: ./.github/workflows/verify.yaml
 
   publish-release:
-    if: contains(fromJSON('["main", "sandbox"]'), github.ref_name) && (github.event_name == 'workflow_dispatch' || github.event.action == 'closed' && github.event.pull_request.merged)
+    if: contains(fromJSON('["main", "sandbox"]'), github.ref_name) && (github.event_name != 'pull_request')
     needs: build-and-verify
     name: semantic-release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
           fetch-depth: 0
           ref: ${{ github.ref }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.14"
 
