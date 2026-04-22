@@ -100,7 +100,7 @@ To verify that the SDK is installed correctly:
     >>> import wxdi.dq_validator
     >>> from wxdi.common.auth import AuthProvider
     >>> print(dq_validator.__version__)
-    1.0.0
+    2.0.0
 
 Versioning
 ----------
@@ -116,7 +116,7 @@ Version numbers follow the format ``MAJOR.MINOR.PATCH``:
 Current Version
 ~~~~~~~~~~~~~~~
 
-The current version of the SDK is **1.0.0**.
+The current version of the SDK is **2.0.0**.
 
 Checking Your Version
 ~~~~~~~~~~~~~~~~~~~~~
@@ -133,7 +133,7 @@ Or programmatically:
 
     >>> import wxdi.dq_validator
     >>> print(dq_validator.__version__)
-    1.0.0
+    2.0.0
 
 Upgrading
 ---------
