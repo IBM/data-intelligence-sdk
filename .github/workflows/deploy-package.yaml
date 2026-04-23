@@ -79,26 +79,26 @@ jobs:
     name: Build and deploy documentation
     uses: ./.github/workflows/docs.yml
         
-  update-sandbox:
-    if: startsWith(github.ref, 'refs/tags/') && !contains(github.ref, '-rc.')
-    name: Update sandbox branch
-    needs: build-documentation
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout main
-        uses: actions/checkout@v4   
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-          ref: 'refs/heads/main'
-
-      - name: Also get the sandbox branch
-        run: |
-            git remote set-branches --add origin sandbox
-            git fetch
-      - name: Checkout main
-        run: git checkout sandbox
-      - name: Merge main into sandbox
-        run: git merge --signoff main
-      - name: Push changes to sandbox
-        run: git push -v origin 
+#  update-sandbox:
+#    if: startsWith(github.ref, 'refs/tags/') && !contains(github.ref, '-rc.')
+#    name: Update sandbox branch
+#    needs: build-documentation
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout main
+#        uses: actions/checkout@v4   
+#        with:
+#          persist-credentials: false
+#          fetch-depth: 0
+#          ref: 'refs/heads/main'
+#
+#      - name: Also get the sandbox branch
+#        run: |
+#            git remote set-branches --add origin sandbox
+#            git fetch
+#      - name: Checkout main
+#        run: git checkout sandbox
+#      - name: Merge main into sandbox
+#        run: git merge --signoff main
+#      - name: Push changes to sandbox
+#        run: git push -v origin 
