@@ -1,0 +1,739 @@
+{
+  "metadata": {
+    "project_id": "72d21c1d-499b-4784-a3c7-6f84507f9a20",
+    "sandbox_id": "72d21c1d-499b-4784-a3c7-6f84507f9a20",
+    "usage": {
+      "last_updated_at": "2026-01-27T05:50:24Z",
+      "last_updater_id": "1000330999",
+      "last_update_time": 1769493024580,
+      "last_accessed_at": "2026-01-27T05:50:24Z",
+      "last_access_time": 1769493024580,
+      "last_accessor_id": "1000330999",
+      "access_count": 0
+    },
+    "rov": {
+      "mode": 0,
+      "collaborator_ids": {},
+      "member_roles": {
+        "1000330999": {
+          "user_iam_id": "1000330999",
+          "roles": [
+            "OWNER"
+          ]
+        }
+      }
+    },
+    "is_linked_with_sub_container": false,
+    "name": "DEPARTMENT",
+    "tags": [
+      "connected-data"
+    ],
+    "asset_type": "data_asset",
+    "origin_country": "none",
+    "resource_key": "0000:0000:0000:0000:0000:FFFF:091E:D6B4|50000|sample:/DB2INST1/DEPARTMENT",
+    "rating": 0,
+    "total_ratings": 0,
+    "catalog_id": "92223cde-d54c-49c6-8476-af53a4c1d7b6",
+    "created": 1766630683099,
+    "created_at": "2025-12-25T02:44:43Z",
+    "owner_id": "1000330999",
+    "size": 0,
+    "version": 2,
+    "asset_state": "available",
+    "asset_attributes": [
+      "data_asset",
+      "discovered_asset",
+      "metadata_enrichment_area_info",
+      "metadata_enrichment_info",
+      "data_profile",
+      "key_analyses",
+      "column_info",
+      "dataview_visualization",
+      "asset_data_quality_constraint"
+    ],
+    "asset_id": "6862f3ba-81f5-4122-8286-62bb4c5d6543",
+    "asset_category": "USER",
+    "creator_id": "1000330999",
+    "is_branched": true,
+    "is_managed_asset": false
+  },
+  "entity": {
+    "data_asset": {
+      "columns": [
+        {
+          "name": "DEPTNO",
+          "type": {
+            "type": "char",
+            "scale": 0,
+            "length": 3,
+            "signed": false,
+            "nullable": false,
+            "native_type": "CHAR"
+          },
+          "columnProperties": {}
+        },
+        {
+          "name": "DEPTNAME",
+          "type": {
+            "type": "varchar",
+            "scale": 0,
+            "length": 36,
+            "signed": false,
+            "nullable": false,
+            "native_type": "VARCHAR"
+          },
+          "columnProperties": {}
+        },
+        {
+          "name": "MGRNO",
+          "type": {
+            "type": "char",
+            "scale": 0,
+            "length": 6,
+            "signed": false,
+            "nullable": true,
+            "native_type": "CHAR"
+          },
+          "columnProperties": {}
+        },
+        {
+          "name": "ADMRDEPT",
+          "type": {
+            "type": "char",
+            "scale": 0,
+            "length": 3,
+            "signed": false,
+            "nullable": false,
+            "native_type": "CHAR"
+          },
+          "columnProperties": {}
+        },
+        {
+          "name": "LOCATION",
+          "type": {
+            "type": "char",
+            "scale": 0,
+            "length": 16,
+            "signed": false,
+            "nullable": true,
+            "native_type": "CHAR"
+          },
+          "columnProperties": {}
+        }
+      ],
+      "dataset": true,
+      "mime_type": "application/x-ibm-rel-table",
+      "properties": [
+        {
+          "name": "schema_name",
+          "value": "DB2INST1"
+        },
+        {
+          "name": "table_name",
+          "value": "DEPARTMENT"
+        }
+      ]
+    },
+    "column_info": {
+      "MGRNO": {
+        "data_class": {
+          "selected_data_class": {
+            "id": "U",
+            "name": "NoClassDetected",
+            "setByUser": false
+          }
+        },
+        "column_checks": [
+          {
+            "check": [
+              {
+                "name": "formats",
+                "list_value": [
+                  "999999"
+                ]
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "format",
+              "hidden": false,
+              "check_id": "977d185d-56db-4145-bbe3-fee2d5ee60c5",
+              "confirmed": false,
+              "dimension": "Validity",
+              "created_at": "2026-01-27T05:50:23.320Z",
+              "description": "Check whether values have the required format.",
+              "modified_at": "2026-01-27T05:50:23.320Z",
+              "origin_type": "profiling/result"
+            }
+          },
+          {
+            "check": [
+              {
+                "name": "unique",
+                "boolean_value": true
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "uniqueness",
+              "hidden": false,
+              "check_id": "64abfcbf-80b9-40c8-8ff1-2e225589eac6",
+              "confirmed": false,
+              "dimension": "Uniqueness",
+              "created_at": "2026-01-27T05:50:23.320Z",
+              "description": "Check whether values are unique.",
+              "modified_at": "2026-01-27T05:50:23.320Z",
+              "origin_type": "profiling/result"
+            }
+          },
+          {
+            "check": [
+              {
+                "name": "range_type",
+                "value": "number"
+              },
+              {
+                "name": "min",
+                "numeric_value": 0
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "range",
+              "hidden": false,
+              "check_id": "40a901eb-531a-4904-85f3-fc3fabbf3030",
+              "confirmed": false,
+              "dimension": "Validity",
+              "created_at": "2026-01-27T05:50:23.320Z",
+              "description": "Check whether values are within the allowed range.",
+              "modified_at": "2026-01-27T05:50:23.320Z",
+              "origin_type": "profiling/result"
+            }
+          }
+        ],
+        "inferred_type": {
+          "type": "INT8",
+          "scale": 0,
+          "length": 6,
+          "precision": 3,
+          "display_name": "tinyint"
+        },
+        "rejected_checks": [],
+        "suggested_checks": []
+      },
+      "DEPTNO": {
+        "data_class": {
+          "suggested_classes": [
+            {
+              "id": "588b9c94-34d4-411f-89b6-1d74927b0aef_fa8e90fa-d34b-5a19-a232-6c0557973af5",
+              "name": "ICD-10",
+              "confidence": 1
+            },
+            {
+              "id": "588b9c94-34d4-411f-89b6-1d74927b0aef_0b193af8-a07d-5964-80c1-d6b3273947e8",
+              "name": "Identifier",
+              "confidence": 1
+            }
+          ],
+          "selected_data_class": {
+            "id": "588b9c94-34d4-411f-89b6-1d74927b0aef_fa8e90fa-d34b-5a19-a232-6c0557973af5",
+            "name": "ICD-10",
+            "setByUser": false,
+            "confidence": 1
+          }
+        },
+        "column_checks": [
+          {
+            "check": [
+              {
+                "name": "formats",
+                "list_value": [
+                  "A99"
+                ]
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "format",
+              "hidden": false,
+              "check_id": "d50e784b-de8e-4f88-a121-d76f93ccd6b1",
+              "confirmed": false,
+              "dimension": "Validity",
+              "created_at": "2026-01-27T05:50:23.320Z",
+              "description": "Check whether values have the required format.",
+              "modified_at": "2026-01-27T05:50:23.320Z",
+              "origin_type": "profiling/result"
+            }
+          },
+          {
+            "check": [
+              {
+                "name": "unique",
+                "boolean_value": true
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "uniqueness",
+              "hidden": false,
+              "check_id": "5a7f7f77-5ce1-4584-8929-1a7fc2d09f22",
+              "confirmed": false,
+              "dimension": "Uniqueness",
+              "created_at": "2026-01-27T05:50:23.320Z",
+              "description": "Check whether values are unique.",
+              "modified_at": "2026-01-27T05:50:23.320Z",
+              "origin_type": "profiling/result"
+            }
+          },
+          {
+            "check": [
+              {
+                "name": "missing_values_allowed",
+                "boolean_value": false
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "completeness",
+              "hidden": false,
+              "check_id": "21641493-0233-4731-ab78-c8ad08d4cda5",
+              "confirmed": false,
+              "dimension": "Completeness",
+              "created_at": "2026-01-27T05:50:23.320Z",
+              "description": "Check whether all rows have a value in this column.",
+              "modified_at": "2026-01-27T05:50:23.320Z",
+              "origin_type": "profiling/result"
+            }
+          },
+          {
+            "check": [
+              {
+                "name": "data_class",
+                "value": "588b9c94-34d4-411f-89b6-1d74927b0aef_fa8e90fa-d34b-5a19-a232-6c0557973af5"
+              },
+              {
+                "name": "data_class_name",
+                "value": "ICD-10"
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "data_class",
+              "hidden": false,
+              "check_id": "816e3722-ae12-4040-910e-8d4f05c2684b",
+              "confirmed": false,
+              "dimension": "Validity",
+              "created_at": "2026-01-27T05:50:23.320Z",
+              "description": "Check whether values match a specific data class.",
+              "modified_at": "2026-01-27T05:50:23.320Z",
+              "origin_type": "profiling/result"
+            }
+          }
+        ],
+        "inferred_type": {
+          "type": "STRING",
+          "scale": 0,
+          "length": 3,
+          "precision": 0,
+          "display_name": "varchar(3)"
+        },
+        "rejected_checks": [],
+        "suggested_checks": []
+      },
+      "ADMRDEPT": {
+        "data_class": {
+          "suggested_classes": [
+            {
+              "id": "588b9c94-34d4-411f-89b6-1d74927b0aef_fa8e90fa-d34b-5a19-a232-6c0557973af5",
+              "name": "ICD-10",
+              "confidence": 1
+            },
+            {
+              "id": "588b9c94-34d4-411f-89b6-1d74927b0aef_9f81abbf-b98f-5555-91ed-883195e1823d",
+              "name": "Code",
+              "confidence": 1
+            }
+          ],
+          "selected_data_class": {
+            "id": "588b9c94-34d4-411f-89b6-1d74927b0aef_fa8e90fa-d34b-5a19-a232-6c0557973af5",
+            "name": "ICD-10",
+            "setByUser": false,
+            "confidence": 1
+          }
+        },
+        "column_checks": [
+          {
+            "check": [
+              {
+                "name": "formats",
+                "list_value": [
+                  "A99"
+                ]
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "format",
+              "hidden": false,
+              "check_id": "7224564a-a403-4c11-a386-52ac1fb8d6ca",
+              "confirmed": false,
+              "dimension": "Validity",
+              "created_at": "2026-01-27T05:50:23.284Z",
+              "description": "Check whether values have the required format.",
+              "modified_at": "2026-01-27T05:50:23.284Z",
+              "origin_type": "profiling/result"
+            }
+          },
+          {
+            "check": [
+              {
+                "name": "missing_values_allowed",
+                "boolean_value": false
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "completeness",
+              "hidden": false,
+              "check_id": "97f7c29a-1c06-47b3-90d2-29c9f9acc01f",
+              "confirmed": false,
+              "dimension": "Completeness",
+              "created_at": "2026-01-27T05:50:23.284Z",
+              "description": "Check whether all rows have a value in this column.",
+              "modified_at": "2026-01-27T05:50:23.284Z",
+              "origin_type": "profiling/result"
+            }
+          },
+          {
+            "check": [
+              {
+                "name": "data_class",
+                "value": "588b9c94-34d4-411f-89b6-1d74927b0aef_fa8e90fa-d34b-5a19-a232-6c0557973af5"
+              },
+              {
+                "name": "data_class_name",
+                "value": "ICD-10"
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "data_class",
+              "hidden": false,
+              "check_id": "1bcaf011-8d50-40c9-9235-f4da7ed25639",
+              "confirmed": false,
+              "dimension": "Validity",
+              "created_at": "2026-01-27T05:50:23.320Z",
+              "description": "Check whether values match a specific data class.",
+              "modified_at": "2026-01-27T05:50:23.320Z",
+              "origin_type": "profiling/result"
+            }
+          }
+        ],
+        "inferred_type": {
+          "type": "STRING",
+          "scale": 0,
+          "length": 3,
+          "precision": 0,
+          "display_name": "varchar(3)"
+        },
+        "rejected_checks": [],
+        "suggested_checks": []
+      },
+      "DEPTNAME": {
+        "data_class": {
+          "suggested_classes": [
+            {
+              "id": "588b9c94-34d4-411f-89b6-1d74927b0aef_ab084a02-8cd4-57db-8035-96fe65aecaac",
+              "name": "Text",
+              "confidence": 1
+            }
+          ],
+          "selected_data_class": {
+            "id": "588b9c94-34d4-411f-89b6-1d74927b0aef_ab084a02-8cd4-57db-8035-96fe65aecaac",
+            "name": "Text",
+            "setByUser": false,
+            "confidence": 1
+          }
+        },
+        "column_checks": [
+          {
+            "check": [
+              {
+                "name": "unique",
+                "boolean_value": true
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "uniqueness",
+              "hidden": false,
+              "check_id": "604e4736-cd14-40f8-b36d-feeab6e72c04",
+              "confirmed": false,
+              "dimension": "Uniqueness",
+              "created_at": "2026-01-27T05:50:23.320Z",
+              "description": "Check whether values are unique.",
+              "modified_at": "2026-01-27T05:50:23.320Z",
+              "origin_type": "profiling/result"
+            }
+          },
+          {
+            "check": [
+              {
+                "name": "missing_values_allowed",
+                "boolean_value": false
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "completeness",
+              "hidden": false,
+              "check_id": "391c525a-ecd6-467b-82c5-779ca5a308dd",
+              "confirmed": false,
+              "dimension": "Completeness",
+              "created_at": "2026-01-27T05:50:23.320Z",
+              "description": "Check whether all rows have a value in this column.",
+              "modified_at": "2026-01-27T05:50:23.320Z",
+              "origin_type": "profiling/result"
+            }
+          },
+          {
+            "check": [
+              {
+                "name": "case_type",
+                "value": "UpperCase"
+              }
+            ],
+            "origin": [],
+            "metadata": {
+              "type": "case",
+              "hidden": false,
+              "check_id": "404268af-86fc-49c6-bfee-4560c0105b51",
+              "confirmed": false,
+              "dimension": "Consistency",
+              "created_at": "2026-01-27T05:50:23.320Z",
+              "description": "Check whether values match the selected capitalization style.",
+              "modified_at": "2026-01-27T05:50:23.320Z",
+              "origin_type": "profiling/result"
+            }
+          }
+        ],
+        "inferred_type": {
+          "type": "STRING",
+          "scale": 0,
+          "length": 28,
+          "precision": 0,
+          "display_name": "varchar(28)"
+        },
+        "rejected_checks": [],
+        "suggested_checks": []
+      },
+      "LOCATION": {
+        "data_class": {
+          "selected_data_class": {
+            "id": "U",
+            "name": "NoClassDetected",
+            "setByUser": false
+          }
+        },
+        "column_checks": [],
+        "rejected_checks": [],
+        "suggested_checks": []
+      }
+    },
+    "data_profile": {
+      "attribute_classes": [
+        "ICD-10",
+        "Identifier",
+        "Text",
+        "Code"
+      ],
+      "e092d07b-60ac-4fb1-9168-ef57fc886008": {
+        "href": "https://internal-nginx-svc.wkc.svc:12443/v2/data_profiles/e092d07b-60ac-4fb1-9168-ef57fc886008?project_id=72d21c1d-499b-4784-a3c7-6f84507f9a20&dataset_id=6862f3ba-81f5-4122-8286-62bb4c5d6543",
+        "entity": {
+          "columns": [],
+          "data_profile": {
+            "logs": [],
+            "columns": [],
+            "options": {
+              "enable_dqa": false,
+              "sample_type": "SEQUENTIAL",
+              "max_row_count": 1000,
+              "min_row_count": 0,
+              "disable_profiling": false,
+              "max_rows_per_batch": 10000,
+              "collect_data_values": false,
+              "key_analysis_options": {
+                "analysis_id": "6fc5fd21-c74c-4f30-9f86-c55dc8af1535",
+                "min_confidence": 0.8
+              },
+              "max_columns_per_task": 250,
+              "uniqueness_threshold": 0.95,
+              "max_distribution_size": 100,
+              "nullability_threshold": 0.05,
+              "classification_options": {
+                "disabled": false,
+                "ibm_class_codes": [],
+                "custom_class_codes": [],
+                "use_all_ibm_classes": true,
+                "use_all_custom_classes": true
+              },
+              "max_numeric_stats_bins": 100,
+              "collect_historical_data": true,
+              "historical_retention_days": 30,
+              "enable_fast_classification": true,
+              "use_approximate_record_count": true,
+              "data_classification_confidence_threshold": 0.75,
+              "min_data_classification_confidence_threshold": 0.25
+            },
+            "execution": {
+              "bulk": true,
+              "run_by": "999",
+              "status": "finished",
+              "hb_task_id": "6f2379cc-d8aa-4713-b43c-6e61434a5968",
+              "create_time": "2026-01-27T05:49:34.034Z",
+              "is_supported": true,
+              "completed_date": "2026-01-27T05:50:20.020Z"
+            },
+            "failed_assets": []
+          }
+        },
+        "metadata": {
+          "url": "https://internal-nginx-svc.wkc.svc:12443/v2/data_profiles/048b9a79-8161-40bb-9545-5ce955db28d7?project_id=72d21c1d-499b-4784-a3c7-6f84507f9a20&dataset_id=6862f3ba-81f5-4122-8286-62bb4c5d6543",
+          "guid": "e092d07b-60ac-4fb1-9168-ef57fc886008",
+          "owner": "admin",
+          "asset_id": "e092d07b-60ac-4fb1-9168-ef57fc886008",
+          "owner_id": "1000330999",
+          "created_at": "2026-01-27T05:49:33.033Z",
+          "dataset_id": "6862f3ba-81f5-4122-8286-62bb4c5d6543",
+          "project_id": "72d21c1d-499b-4784-a3c7-6f84507f9a20",
+          "accessed_at": "2026-01-27T05:49:33.033Z",
+          "dataset_ids": [],
+          "last_updater_id": "1000330999"
+        },
+        "record_info": {
+          "computed": true,
+          "approximated": true,
+          "number_of_records": 14
+        }
+      }
+    },
+    "key_analyses": {
+      "fk_defined": 0,
+      "pk_defined": 0,
+      "fk_assigned": 0,
+      "pk_assigned": 0,
+      "fk_suggested": 0,
+      "pk_suggested": 2,
+      "primary_keys": [],
+      "fk_defined_as_pk": 0,
+      "overlap_assigned": 0,
+      "fk_assigned_as_pk": 0,
+      "overlap_suggested": 0,
+      "fk_suggested_as_pk": 0,
+      "key_analysis_area_id": "6fc5fd21-c74c-4f30-9f86-c55dc8af1535"
+    },
+    "discovered_asset": {
+      "extended_metadata": [
+        {
+          "name": "table_type",
+          "value": "TABLE"
+        }
+      ]
+    },
+    "dataview_visualization": {
+      "jobs": {
+        "3f5c41cd-ea04-4eec-bf6b-6c4281e8901b": {
+          "job_type": "profile",
+          "execution": {
+            "status": "completed",
+            "last_updated_at": "2026-01-26T05:55:49.391629198Z",
+            "last_update_time": 1769406949391
+          },
+          "resultAttachmentNames": [
+            "viz_job_3f5c41cd-ea04-4eec-bf6b-6c4281e8901b_0.json"
+          ]
+        }
+      }
+    },
+    "metadata_enrichment_info": {
+      "MDE_instrumented": true
+    },
+    "asset_data_quality_constraint": {
+      "asset_checks": [],
+      "rejected_checks": [],
+      "suggested_checks": []
+    },
+    "metadata_enrichment_area_info": {
+      "job_id": "8e10bfa2-ce48-4eb0-a6fa-241faf519502",
+      "area_id": "ed95a40c-d97b-4de4-a10a-eea2f425c8ff",
+      "added_date": 1766630744611,
+      "job_run_id": "087dcf60-d61c-44b3-b8d4-b61912301efc",
+      "last_enrichment_status": "finished",
+      "last_enrichment_timestamp": 1769493024511
+    }
+  },
+  "attachments": [
+    {
+      "id": "3d11a882-968a-47c3-b854-28cc6ce689da",
+      "version": 2,
+      "asset_type": "data_asset",
+      "name": "DEPARTMENT",
+      "description": "remote",
+      "mime": "application/x-ibm-rel-table",
+      "connection_id": "8f2948af-9bb6-4bae-93b1-ab986a5a744c",
+      "connection_path": "/DB2INST1/DEPARTMENT",
+      "datasource_type": "8c1a4480-1c29-4b33-9086-9cb799d7b157",
+      "creator_id": "1000330999",
+      "create_time": 1766630683187,
+      "size": 0,
+      "is_remote": true,
+      "is_managed": false,
+      "is_referenced": false,
+      "is_object_key_read_only": false,
+      "is_user_provided_path_key": true,
+      "transfer_complete": true,
+      "is_partitioned": false,
+      "complete_time_ticks": 1766630683187,
+      "user_data": {},
+      "test_doc": 0,
+      "usage": {
+        "access_count": 0,
+        "last_access_time": 1766630683187,
+        "last_accessor_id": "1000330999"
+      }
+    },
+    {
+      "id": "f934e42c-986f-4f8c-85ae-5ac389c7f393",
+      "version": 2,
+      "asset_type": "dataview_visualization",
+      "name": "viz_job_3f5c41cd-ea04-4eec-bf6b-6c4281e8901b_0.json",
+      "mime": "application/json",
+      "datasource_type": "81bafdbd-b7c6-45c5-a4fd-6ec135f66f4e",
+      "creator_id": "1000330999",
+      "create_time": 1769406947754,
+      "size": 0,
+      "is_remote": false,
+      "is_managed": true,
+      "is_referenced": false,
+      "is_object_key_read_only": false,
+      "is_user_provided_path_key": false,
+      "transfer_complete": false,
+      "is_partitioned": false,
+      "complete_time_ticks": 0,
+      "user_data": {},
+      "test_doc": 0,
+      "handle": {
+        "type": "assetfiles",
+        "key": "92223cde-d54c-49c6-8476-af53a4c1d7b6/6862f3ba-81f5-4122-8286-62bb4c5d6543/f934e42c-986f-4f8c-85ae-5ac389c7f393",
+        "upload_id": "aabacef5-ef7e-4bf3-aa6c-0f180bfa50de",
+        "max_part_num": 1
+      },
+      "usage": {
+        "access_count": 0,
+        "last_access_time": 1769406947754,
+        "last_accessor_id": "1000330999"
+      }
+    }
+  ],
+  "href": "/v2/assets/6862f3ba-81f5-4122-8286-62bb4c5d6543?project_id=72d21c1d-499b-4784-a3c7-6f84507f9a20"
+}

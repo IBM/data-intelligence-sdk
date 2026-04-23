@@ -27,10 +27,11 @@ long_description = (this_directory / "README.md").read_text(encoding='utf-8')
 
 setup(
     name="data-intelligence-sdk",
-    version='0.5.3',
+    version='2.0.0',
     author="IBM",
     author_email="Data_Intelligence_SDK@wwpdl.vnet.ibm.com",
-    description="A Python SDK for performing data quality validations on streaming data records and DataFrames",
+    description="A Python SDK for IBM watsonx.data intelligence that provides data quality validation for streaming records and DataFrames, " \
+        "wrapper methods to access Data Product Hub REST API services, ODCS file generation from data catalogs, and data product recommendations from query log analysis.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/IBM/data-intelligence-sdk",
@@ -49,11 +50,15 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     install_requires=[
         "pydantic>=2.12.0",
-        "requests>=2.28.0",
+        "requests>=2.33.1",
         "regex>=2023.0.0",
+        "urllib3>=2.6.3",
+        "python-dateutil>=2.5.3,<3.0.0",
+        "pyyaml>=5.4.0,<7.0.0",
+        "numpy>=1.24.0",
         # Pinned to exact version to avoid CRA bom-generate pip resolver conflict.
         # CRA sees ibm-cloud-sdk-core from both setup.py and requirements.txt and
         # fails with ResolutionImpossible when constraints differ (bare vs >=).
@@ -64,29 +69,33 @@ setup(
             "pytest>=7.0.0",
             "pytest-cov>=4.0.0",
             "pytest-mock>=3.7.0",
+            "responses>=0.20.0",
             "black>=26.3.1",
             "mypy>=1.0.0",
             "flake8>=6.0.0",
+            "pylint>=3.0.0",
         ],
         "pandas": [
-            "pandas>=1.3.0",
+            "pandas>=2.0.0",
         ],
         "spark": [
             "pyspark>=3.0.0",
         ],
         "dataframes": [
-            "pandas>=1.3.0",
+            "pandas>=2.0.0",
             "pyspark>=3.0.0",
         ],
         "all": [
-            "pandas>=1.3.0",
+            "pandas>=2.0.0",
             "pyspark>=3.0.0",
             "pytest>=7.0.0",
             "pytest-cov>=4.0.0",
             "pytest-mock>=3.7.0",
+            "responses>=0.20.0",
             "black>=26.3.1",
             "mypy>=1.0.0",
             "flake8>=6.0.0",
+            "pylint>=3.0.0",
         ],
     },
     entry_points={

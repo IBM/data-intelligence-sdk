@@ -1,0 +1,54 @@
+{
+  "metadata": {
+    "artifact_type": "glossary_term",
+    "artifact_id": "30d1b847-0aa9-4840-a182-dd157fe977a0",
+    "version_id": "bdeef8cc-d9ab-4822-b3df-cef82b4de538_0",
+    "source_repository_id": "1be893e3-d512-4fd8-b449-c953abeedb6c",
+    "global_id": "1be893e3-d512-4fd8-b449-c953abeedb6c_30d1b847-0aa9-4840-a182-dd157fe977a0",
+    "workflow_id": "ce7f65d2-1e18-11f1-ac95-0a580afe2048",
+    "draft_mode": "import_create",
+    "is_target_draft": false,
+    "created_by": "1000330999",
+    "created_at": "2026-03-12T13:38:49.067Z",
+    "modified_by": "1000330999",
+    "modified_at": "2026-03-12T13:38:49.067Z",
+    "revision": "1",
+    "name": "mango",
+    "state": "DRAFT_HISTORY",
+    "tags": [],
+    "steward_ids": [],
+    "steward_group_ids": [],
+    "workflow_state": "Not started",
+    "read_only": false
+  },
+  "entity": {
+    "abbreviations": [],
+    "state": "DRAFT_HISTORY",
+    "default_locale_id": "en-US",
+    "reference_copy": false,
+    "steward_ids": [],
+    "steward_group_ids": [],
+    "custom_attributes": [
+      {
+        "custom_attribute_definition_id": "3d4ca4dd-8853-4575-b88b-adacf5423aba",
+        "name": "Data Type",
+        "values": [],
+        "description": "Indicates what is the specific data type associated with a particular property term.",
+        "read_only": false,
+        "searchable": false,
+        "required": false,
+        "type": "ENUM"
+      },
+      {
+        "custom_attribute_definition_id": "8798e8a3-c495-4d1f-973a-b7f9c9d2e25a",
+        "name": "Cardinality",
+        "values": [],
+        "description": "Indicates what is the cardinality relating to an instance of a property or relationship term.",
+        "read_only": false,
+        "searchable": false,
+        "required": false,
+        "type": "ENUM"
+      }
+    ]
+  }
+}

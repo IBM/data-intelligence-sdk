@@ -13,9 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-# IBM watsonx.data intelligence SDK Version 1.0.0
+# IBM watsonx.data intelligence SDK Version 2.0.0
 
-A comprehensive Python SDK for performing data quality validations on streaming data records (arrays), Pandas DataFrames, and PySpark DataFrames with complete REST API integration for IBM Cloud Pak for Data.
+A comprehensive Python SDK for data intelligence operations including:
+- **Data Quality Validation**: Validate streaming data records, Pandas DataFrames, and PySpark DataFrames
+- **Data Product Hub Services**: Complete Python client for IBM Data Product Hub API
+- **ODCS Generation**: Generate Open Data Contract Standard (ODCS) files from Collibra and Informatica
+- **Data Product Recommendations**: Analyze query logs to identify high-value data products
 
 ## Features
 
@@ -48,7 +52,7 @@ A comprehensive Python SDK for performing data quality validations on streaming 
 ### REST API Integration
 - **GlossaryProvider**: Fetch glossary terms and data quality constraints from IBM Cloud Pak for Data
 - **CamsProvider**: Fetch data assets from CAMS (Catalog Asset Management System)
-- **IssuesProvider**: Manage data quality issues (occurrences, tested records, ignored status)
+- **IssuesProvider**: Manage data quality issues (create single/bulk occurrences, tested records, ignored status, update metrics, ignored status)
 - **DQSearchProvider**: Search for DQ checks and assets by native ID
 - **Thread-Safe**: Concurrent access support with thread-local sessions
 
@@ -57,6 +61,14 @@ A comprehensive Python SDK for performing data quality validations on streaming 
 - **Automatic Protocol Handling**: Environment-specific authentication methods
 - **Type-Safe Configuration**: Full type hints and validation
 - **SSL Control**: Configurable SSL verification for on-premises
+### Additional Modules
+
+For detailed documentation on additional modules, see their respective READMEs:
+
+- **[Data Product Hub Services](src/wxdi/dph_services/README.md)**: Complete Python client for IBM Data Product Hub API
+- **[ODCS Generator](src/wxdi/odcs_generator/README-GENERATE-ODCS-SCRIPT.md)**: Generate ODCS v3.1.0 compliant YAML from Collibra and Informatica
+- **[Data Product Recommender](src/wxdi/data_product_recommender/README.md)**: Analyze query logs to identify high-value data products
+
 
 ## Installation
 
@@ -263,23 +275,37 @@ df_expanded.select('name', 'dq_is_valid', 'dq_score', 'dq_pass_rate').show()
 
 # Write validation report
 spark_validator.write_validation_report(df, output_path='validation_report', format='parquet')
-```
 
-## Core Concepts
-
-### AssetMetadata
-
-Defines the structure of your data asset (table) with column information:
+### Data Product Hub Services
 
 ```python
-metadata = AssetMetadata(
-    table_name='my_table',
-    columns=[
-        ColumnMetadata('id', DataType.INTEGER),
-        ColumnMetadata('name', DataType.STRING, length=100),
-        ColumnMetadata('amount', DataType.DECIMAL, precision=10, scale=2),
-    ]
+from wxdi.dph_services import DphV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+
+# Initialize the service
+authenticator = IAMAuthenticator('your-api-key')
+dph_service = DphV1(authenticator=authenticator)
+dph_service.set_service_url('https://your-dph-instance.com')
+
+# Initialize a container
+container_response = dph_service.initialize(
+    include=['delivery_methods', 'data_product_samples', 'domains_multi_industry']
 )
+
+# Create a data product
+data_product = dph_service.create_data_product(
+    drafts=[{
+        'version': '2.0.0',
+        'name': 'My Data Product',
+        'description': 'A sample data product',
+        'asset': {
+            'id': 'asset-123',
+            'container': {'id': 'container-456'}
+        }
+    }]
+)
+
+print(f"Created data product: {data_product.result['id']}")
 ```
 
 ### ValidationRule
@@ -737,21 +763,33 @@ for column in asset.column_info:
 
 ### IssuesProvider
 
-Manage data quality issues (occurrences, tested records, ignored status).
+Manage data quality issues (create single/bulk create single/bulk occurrences, tested records, ignored status, update metrics, ignored status).
 
 ```python
 from wxdi.dq_validator.provider import IssuesProvider
 
 issues = IssuesProvider(config)
 
-# Update issue occurrences
-issues.update_issue_occurrences(issue_id="issue-123", occurrences=767)
+# Create single issue
+issue_id = issues.create_issue(
+    dq_check_id="check-123",
+    reported_for_id="asset-456",
+    number_of_occurrences=10,
+    number_of_tested_records=100,
+    project_id="project-123"
+)
 
-# Update tested records
-issues.update_tested_records(issue_id="issue-123", tested_records=1000)
-
-# Set ignored status
-issues.set_issue_ignored(issue_id="issue-123", ignored=True)
+# Create multiple issues in bulk
+bulk_payload = {
+    "issues": [...],
+    "assets": [...],
+    "existing_checks": [...]
+}
+response = issues.create_issues_bulk(
+    payload=bulk_payload,
+    project_id="project-123",
+    incremental_reporting=False
+)
 
 # Update issue metrics
 issues.update_issue_values(
@@ -819,18 +857,19 @@ from wxdi.dq_validator.provider import ChecksProvider
 
 checks = ChecksProvider(config)
 
-# Create a new check
+# Create a new check (returns check ID as string)
 check_id = checks.create_check(
     name="Format Check",
     native_id="asset-id/column-name",
     check_type="format",
     dimension_id="dimension-id",
-    project_id="project-id"
+    project_id="project-id",
+    parent_id=None  # Optional: for parent-child hierarchy
 )
 
 # Get existing checks
 checks_list = checks.get_checks(
-    asset_id="asset-id",
+    dq_asset_id="asset-id",
     check_type="format",
     project_id="project-id"
 )
@@ -1147,5 +1186,5 @@ For issues, questions, or contributions, please open an issue on GitHub.
 - pytest-cov >= 4.0.0
 - pytest-mock >= 3.7.0
 - black >= 26.3.1
-- mypy >= 1.0.0
-- flake8 >= 6.0.0
+- mypy >= 2.0.0
+
