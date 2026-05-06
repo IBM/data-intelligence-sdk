@@ -27,6 +27,9 @@ This API reference documentation is auto-generated from the source code docstrin
 
    common/index
    dq_validator/index
+   dph_services/index
+   odcs_generator/index
+   data_product_recommender/index
 
 Module Organization
 -------------------
@@ -49,6 +52,36 @@ In-memory data quality validation:
 * :ref:`DataFrame Integration<api_dq_validator_integrations>` - Pandas and PySpark validators
 * :ref:`REST API Providers<api_dq_validator_providers>` - IBM Cloud Pak for Data integration
 * :ref:`Result Consolidation<api_dq_validator_results>` - Result aggregation and analysis
+
+DPH Services Module
+~~~~~~~~~~~~~~~~~~~
+
+Data Product Hub API client:
+
+* :ref:`DphV1 Service<api_dph_services>` - Main service class for Data Product Hub operations
+* Container, data product, draft, release, and domain management
+* Contract terms and template operations
+* Asset visualization
+
+ODCS Generator Module
+~~~~~~~~~~~~~~~~~~~~~
+
+Generate Open Data Contract Standard files:
+
+* :ref:`Collibra Integration<api_odcs_generator>` - CollibraClient and ODCSGenerator classes
+* :ref:`Informatica Integration<api_odcs_generator>` - InformaticaClient and ODCSGenerator classes
+* ODCS v3.1.0 compliant YAML generation
+* Command-line and Python interfaces
+
+Data Product Recommender Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Query log analysis tool for data product recommendations:
+
+* :ref:`DataProductRecommender<api_data_product_recommender>` - Core recommendation engine
+* Platform-specific query log parsers (Snowflake, Databricks, BigQuery, watsonx.data)
+* Scoring and ranking algorithms
+* CLI and Python interfaces
 
 Navigation Tips
 ---------------
