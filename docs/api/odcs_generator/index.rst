@@ -45,9 +45,4 @@ Informatica Integration
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: ODCSGenerator
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. Made with Bob
