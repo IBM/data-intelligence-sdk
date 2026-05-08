@@ -31,27 +31,4 @@ DphV1 Service
    :show-inheritance:
    :inherited-members:
 
-Common Models
--------------
-
-.. autoclass:: wxdi.dph_services.common.DataProduct
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: wxdi.dph_services.common.DataProductDraft
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: wxdi.dph_services.common.ContractTerms
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: wxdi.dph_services.common.Domain
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. Made with Bob
