@@ -18,29 +18,38 @@
 ODCS Generator Reference
 ========================
 
-Class reference for the ODCS Generator module.
+The ODCS generator module provides integrations for generating ODCS YAML from supported catalog platforms.
+
+.. currentmodule:: wxdi.odcs_generator.generate_odcs_from_collibra
 
 Collibra Integration
 --------------------
 
-.. currentmodule:: wxdi.odcs_generator.generate_odcs_from_collibra
+CollibraClient
+~~~~~~~~~~~~~~
 
-.. autoclass:: CollibraClient
+.. autoclass:: wxdi.odcs_generator.generate_odcs_from_collibra.CollibraClient
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: ODCSGenerator
+ODCSGenerator
+~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.odcs_generator.generate_odcs_from_collibra.ODCSGenerator
    :members:
    :undoc-members:
    :show-inheritance:
+
+.. currentmodule:: wxdi.odcs_generator.generate_odcs_from_informatica
 
 Informatica Integration
 -----------------------
 
-.. currentmodule:: wxdi.odcs_generator.generate_odcs_from_informatica
+InformaticaClient
+~~~~~~~~~~~~~~~~~
 
-.. autoclass:: InformaticaClient
+.. autoclass:: wxdi.odcs_generator.generate_odcs_from_informatica.InformaticaClient
    :members:
    :undoc-members:
    :show-inheritance:
