@@ -18,14 +18,17 @@
 Core Classes
 ============
 
-Main service class and data models for Data Product Hub Services.
+The core DPH services API provides the main service client and its available operations.
+
+.. currentmodule:: wxdi.dph_services.dph_v1
 
 DphV1 Service
 -------------
 
-.. currentmodule:: wxdi.dph_services
+DphV1
+~~~~~
 
-.. autoclass:: DphV1
+.. autoclass:: wxdi.dph_services.dph_v1.DphV1
    :members:
    :undoc-members:
    :show-inheritance:

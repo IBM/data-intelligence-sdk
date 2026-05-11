@@ -18,22 +18,25 @@
 DPH Services API
 ================
 
-API reference for the Data Product Hub Services module.
+The DPH services module provides the main client for Data Product Hub Services operations.
 
 .. toctree::
    :maxdepth: 2
 
    core
 
+.. currentmodule:: wxdi.dph_services.dph_v1
+
 Main Service Class
 ------------------
+
+DphV1
+~~~~~
 
 The DphV1 class provides access to all Data Product Hub Services operations.
 For detailed API reference including all methods, see :ref:`api_dph_services_core`.
 
-.. currentmodule:: wxdi.dph_services
-
-.. autoclass:: DphV1
+.. autoclass:: wxdi.dph_services.dph_v1.DphV1
    :members:
    :undoc-members:
    :show-inheritance:

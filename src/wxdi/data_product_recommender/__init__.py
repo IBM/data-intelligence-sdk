@@ -21,4 +21,22 @@ Analyzes query logs from various data platforms to recommend data products
 based on usage patterns, user diversity, and table relationships.
 """
 
+from .recommender import DataProductRecommender
+from .platforms import (
+    SnowflakeQueryParser,
+    DatabricksQueryParser,
+    BigQueryQueryParser,
+    WatsonxDataQueryParser,
+)
+from .base import QueryLogParser
+
+__all__ = [
+    "DataProductRecommender",
+    "SnowflakeQueryParser",
+    "DatabricksQueryParser",
+    "BigQueryQueryParser",
+    "WatsonxDataQueryParser",
+    "QueryLogParser",
+]
+
 __version__ = "0.1.0"

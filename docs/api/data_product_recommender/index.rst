@@ -18,14 +18,12 @@
 Data Product Recommender Reference
 ===================================
 
-Class reference for the Data Product Recommender module.
+The data product recommender module provides query-log analysis and platform-specific parsers.
 
 Core Classes
 ------------
 
-.. currentmodule:: wxdi.data_product_recommender.recommender
-
-.. autoclass:: DataProductRecommender
+.. automodule:: wxdi.data_product_recommender.recommender
    :members:
    :undoc-members:
    :show-inheritance:
@@ -33,24 +31,7 @@ Core Classes
 Platform Parsers
 ----------------
 
-.. currentmodule:: wxdi.data_product_recommender.platforms
-
-.. autoclass:: SnowflakeQueryParser
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: DatabricksQueryParser
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: BigQueryQueryParser
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: WatsonxDataQueryParser
+.. automodule:: wxdi.data_product_recommender.platforms
    :members:
    :undoc-members:
    :show-inheritance:
@@ -58,9 +39,7 @@ Platform Parsers
 Base Classes
 ------------
 
-.. currentmodule:: wxdi.data_product_recommender.base
-
-.. autoclass:: QueryLogParser
+.. automodule:: wxdi.data_product_recommender.base
    :members:
    :undoc-members:
    :show-inheritance:
