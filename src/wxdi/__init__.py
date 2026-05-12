@@ -20,10 +20,83 @@ A comprehensive Python SDK for data quality validation, data intelligence operat
 data product hub services, ODCS generation, and data product recommendations.
 """
 
+# Re-export commonly used modules for convenience
+from wxdi.dq_validator import (
+    # Metadata
+    DataType,
+    ColumnMetadata,
+    AssetMetadata,
+    # Base classes
+    BaseCheck,
+    ValidationError,
+    # Core classes
+    ValidationResult,
+    ValidationResultConsolidated,
+    ValidationRule,
+    Validator,
+    # Checks
+    LengthCheck,
+    ValidValuesCheck,
+    ComparisonCheck,
+    ComparisonOperator,
+    CaseCheck,
+    ColumnCaseEnum,
+    CompletenessCheck,
+    RangeCheck,
+    RegexCheck,
+    DataTypeCheck,
+    FormatCheck,
+    FormatConstraintType,
+    # DateTime Formats
+    DateTimeFormats,
+    # Data Quality Dimensions
+    DataQualityDimension,
+)
+
+from wxdi.common.auth import (
+    AuthConfig,
+    EnvironmentType,
+    GovCloudAuthenticator,
+    AuthProvider,
+)
+
 from .version import __version__
 
 __all__ = [
-    "__version__",
+    # Metadata
+    "DataType",
+    "ColumnMetadata",
+    "AssetMetadata",
+    # Base classes
+    "BaseCheck",
+    "ValidationError",
+    # Core classes
+    "ValidationResult",
+    "ValidationResultConsolidated",
+    "ValidationRule",
+    "Validator",
+    # Checks
+    "LengthCheck",
+    "ValidValuesCheck",
+    "ComparisonCheck",
+    "ComparisonOperator",
+    "CaseCheck",
+    "ColumnCaseEnum",
+    "CompletenessCheck",
+    "RangeCheck",
+    "RegexCheck",
+    "DataTypeCheck",
+    "FormatCheck",
+    "FormatConstraintType",
+    # Authentication
+    "AuthConfig",
+    "EnvironmentType",
+    "GovCloudAuthenticator",
+    "AuthProvider",
+    # DateTime Formats
+    "DateTimeFormats",
+    # Data Quality Dimensions
+    "DataQualityDimension",
 ]
 
 # Note: dph_services, odcs_generator, and data_product_recommender are available as submodules
