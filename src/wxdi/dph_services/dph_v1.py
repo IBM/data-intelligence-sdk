@@ -1392,9 +1392,7 @@ class DphV1(BaseService):
                contract.
         :param List[ContractTemplateSLA] sla: (optional) Service Level Agreement
                details.
-        :param List[ContractTemplateSupportAndCommunication]
-               support_and_communication: (optional) Support and communication details for
-               the contract.
+        :param List[ContractTemplateSupportAndCommunication] support_and_communication: (optional) Support and communication details for the contract.
         :param List[ContractTemplateCustomProperty] custom_properties: (optional)
                Custom properties that are not part of the standard contract.
         :param ContractTest contract_test: (optional) Contains the contract test
