@@ -97,7 +97,12 @@ __all__ = [
     "DateTimeFormats",
     # Data Quality Dimensions
     "DataQualityDimension",
-    "__version__",
 ]
+
+# Note: dph_services, odcs_generator, and data_product_recommender are available as submodules
+# Import them explicitly:
+#   from wxdi.dph_services import DphV1
+#   from wxdi.odcs_generator import CollibraClient, ODCSGenerator, InformaticaClient
+#   from wxdi.data_product_recommender import DataProductRecommender
 
 # Made with Bob
