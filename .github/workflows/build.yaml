@@ -17,10 +17,12 @@ on:
     branches:
       - main
       - sandbox
+      - release/**
   pull_request:
     branches:
       - main
       - sandbox
+      - release/**
   workflow_dispatch:
 
 jobs:
@@ -28,7 +30,7 @@ jobs:
     uses: ./.github/workflows/verify.yaml
 
   publish-release:
-    if: contains(fromJSON('["main", "sandbox"]'), github.ref_name) && (github.event_name != 'pull_request')
+    if: (contains(fromJSON('["main", "sandbox"]'), github.ref_name) || startsWith(github.ref_name, 'release/')) && (github.event_name != 'pull_request')
     needs: build-and-verify
     name: semantic-release
     runs-on: ubuntu-latest
