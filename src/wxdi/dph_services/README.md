@@ -436,7 +436,7 @@ pytest tests/src/integration/test_dph_v1.py -v
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.10+
 - ibm-cloud-sdk-core >= 3.16.7
 - requests >= 2.32.4
 - python-dateutil >= 2.5.3

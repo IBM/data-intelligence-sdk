@@ -12,9 +12,11 @@
 #    limitations under the License.
 
 # Documentation build dependencies for IBM watsonx.data intelligence SDK
-sphinx>=7.0.0
+# Note: requests vulnerability CVE-2026-25645 is addressed via sphinx dependencies
+sphinx>=7.4.0
 sphinx-book-theme>=1.0.0
 sphinx-autodoc-typehints>=1.24.0
 sphinx-copybutton>=0.5.0
 sphinx-favicon>=1.0.0
+
 # sphinxcontrib-autodoc-pydantic - Optional, for enhanced Pydantic model documentation

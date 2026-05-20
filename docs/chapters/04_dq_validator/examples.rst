@@ -28,6 +28,13 @@ Basic Validation
 
 See ``examples/basic_usage.py`` for array-based record validation.
 
+CEL Expression Validation
+--------------------------
+
+* ``examples/cel_usage.py`` - Column-level CEL expressions with batch validation
+* ``examples/table_cel_usage.py`` - Table-level CEL expressions for cross-column validation
+* ``examples/cel_pandas_dataframe_usage.py`` - CEL expressions with Pandas DataFrames
+
 DataFrame Validation
 --------------------
 
