@@ -1,6 +1,6 @@
 {
   "debug": true,
-  "branches": [ "main", {"name": "sandbox", "prerelease": "rc"} ],
+  "branches": [ "main", {"name": "sandbox", "prerelease": "rc"}, {"name": "release/*", "prerelease": "rc"} ],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
