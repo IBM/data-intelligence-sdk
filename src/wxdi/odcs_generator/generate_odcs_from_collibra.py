@@ -21,8 +21,8 @@ Generate ODCS YAML file from Collibra Asset
 This script fetches asset metadata from Collibra and generates an ODCS v3 compliant YAML file.
 
 Usage:
-    python generate_odcs_from_collibra.py <asset_id>
-    python generate_odcs_from_collibra.py 019a57f9-62d2-7aa0-9f22-4fa2cea1180b
+    python -m wxdi.odcs_generator.generate_odcs_from_collibra <asset_id>
+    python -m wxdi.odcs_generator.generate_odcs_from_collibra 019a57f9-62d2-7aa0-9f22-4fa2cea1180b
 
 Environment Variables:
     COLLIBRA_URL: Collibra instance URL (required)

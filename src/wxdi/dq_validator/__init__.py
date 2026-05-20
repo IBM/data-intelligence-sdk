@@ -25,6 +25,7 @@ from .base import BaseCheck, ValidationError
 from .result import ValidationResult
 from .result_consolidator import ValidationResultConsolidated
 from .rule import ValidationRule
+from .table_rule import TableValidationRule
 from .validator import Validator
 from .checks.length_check import LengthCheck
 from .checks.valid_values_check import ValidValuesCheck
@@ -35,8 +36,11 @@ from .checks.range_check import RangeCheck
 from .checks.regex_check import RegexCheck
 from .checks.datatype_check import DataTypeCheck
 from .checks.format_check import FormatCheck, FormatConstraintType
+from .checks.cel_check import CELCheck
+from .checks.table_cel_check import TableCELCheck
 from .datetime_formats import DateTimeFormats
 from .data_quality_dimension import DataQualityDimension
+from .cel_exceptions import CELError, CELCompilationError, CELEvaluationError
 
 # Re-export auth module for backward compatibility
 from wxdi.common.auth import AuthConfig, EnvironmentType, GovCloudAuthenticator, AuthProvider
@@ -54,6 +58,7 @@ __all__ = [
     "ValidationResult",
     "ValidationResultConsolidated",
     "ValidationRule",
+    "TableValidationRule",
     "Validator",
     # Checks
     "LengthCheck",
@@ -68,6 +73,12 @@ __all__ = [
     "DataTypeCheck",
     "FormatCheck",
     "FormatConstraintType",
+    "CELCheck",
+    "TableCELCheck",
+    # CEL Exceptions
+    "CELError",
+    "CELCompilationError",
+    "CELEvaluationError",
     # Authentication
     "AuthConfig",
     "EnvironmentType",

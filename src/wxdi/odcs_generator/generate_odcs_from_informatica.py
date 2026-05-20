@@ -21,8 +21,8 @@ Generate ODCS YAML file from Informatica Asset
 This script fetches asset metadata from Informatica and generates an ODCS v3 compliant YAML file.
 
 Usage:
-    python odcs_generator/generate_odcs_from_informatica.py <asset_id>
-    python odcs_generator/generate_odcs_from_informatica.py 1b5fc805-252d-4ba2-bd90-e943103e411b --cdgc-url https://cdgc.dm-us.informaticacloud.com -u username -p password
+    python -m wxdi.odcs_generator.generate_odcs_from_informatica <asset_id>
+    python -m wxdi.odcs_generator.generate_odcs_from_informatica 1b5fc805-252d-4ba2-bd90-e943103e411b --cdgc-url https://cdgc.dm-us.informaticacloud.com -u username -p password
 
 Environment Variables:
     INFORMATICA_CDGC_URL: Informatica CDGC URL (required, e.g., https://cdgc.dm-us.informaticacloud.com)

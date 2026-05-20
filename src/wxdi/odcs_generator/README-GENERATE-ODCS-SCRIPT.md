@@ -80,8 +80,8 @@ pip install -r requirements.txt
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd data-product-python-sdk
+   git clone https://github.com/IBM/data-intelligence-sdk.git
+   cd data-intelligence-sdk
    ```
 
 2. Install dependencies:
@@ -133,15 +133,15 @@ The user account needs the following permissions:
 
 ### Command-Line Usage
 
-Run the script directly from the `odcs_generator` directory:
+Run the script as an installed module from the project root or your active environment:
 
 ```bash
-python odcs_generator/generate_odcs_from_collibra.py <asset_id>
+python -m wxdi.odcs_generator.generate_odcs_from_collibra <asset_id>
 ```
 
 **Example:**
 ```bash
-python odcs_generator/generate_odcs_from_collibra.py 019a57f9-62d2-7aa0-9f22-4fa2cea1180b
+python -m wxdi.odcs_generator.generate_odcs_from_collibra 019a57f9-62d2-7aa0-9f22-4fa2cea1180b
 ```
 
 This generates a file named `<asset-name>-odcs.yaml` in the current directory.
@@ -151,7 +151,7 @@ This generates a file named `<asset-name>-odcs.yaml` in the current directory.
 Import and use the module in your Python code:
 
 ```python
-from odcs_generator import CollibraClient, ODCSGenerator
+from wxdi.odcs_generator import CollibraClient, ODCSGenerator
 
 # Initialize client
 client = CollibraClient(
@@ -1069,18 +1069,18 @@ Generated YAML files can be validated using standard YAML validators and ODCS sc
 
 ## Project Structure
 
-This script is part of the `data-product-python-sdk` project:
+This script is part of the `data-intelligence-sdk` project:
 
 ```
-data-product-python-sdk/
-├── dph_services/              # Data Product Hub services
-├── odcs_generator/            # ODCS generator module (this script)
+data-intelligence-sdk/
+├── src/
+│   └── wxdi/
+│       ├── dph_services/      # Data Product Hub services
+│       └── odcs_generator/    # ODCS generator module
 ├── examples/                  # Usage examples
-├── test/                      # Test suites
-│   ├── integration/          # Integration tests
-│   └── unit/                 # Unit tests
-├── requirements.txt          # Python dependencies
-└── setup.py                  # Package setup
+├── tests/                     # Test suites
+├── requirements.txt           # Python dependencies
+└── setup.py                   # Package setup
 ```
 
 ## Support

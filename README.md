@@ -1186,5 +1186,5 @@ For issues, questions, or contributions, please open an issue on GitHub.
 - pytest-cov >= 4.0.0
 - pytest-mock >= 3.7.0
 - black >= 26.3.1
-- mypy >= 2.0.0
+- mypy >= 1.0.0
 

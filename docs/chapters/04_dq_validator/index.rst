@@ -33,8 +33,8 @@ Key Capabilities
 **Validation Engine**
    Core validation framework with metadata-driven rules and fluent API
 
-**Nine Check Types**
-   Comprehensive validation coverage including length, format, datatype, range, regex, and more
+**Ten Check Types**
+   Comprehensive validation coverage including length, format, datatype, range, regex, CEL expressions, and more
 
 **Data Quality Dimensions**
    Track validations across 8 standard DQ dimensions (Accuracy, Completeness, Conformity, etc.)
@@ -51,6 +51,7 @@ Key Capabilities
 
    core_concepts
    validation_checks
+   cel_expressions
    dataframe_integration
    rest_api_integration
    examples

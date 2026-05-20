@@ -13,8 +13,11 @@
 #    limitations under the License.
 
 # Core dependencies (defined in setup.py, included here for development convenience)
+# Note: pydantic, requests, regex, urllib3, python-dateutil, PyJWT, pyyaml, numpy are defined in setup.py
+# Note: cel-python is defined in setup.py
 pydantic>=2.12.0
-requests>=2.32.4
+# Uncomment to include
+# requests>=2.33.1
 regex>=2023.0.0
 urllib3>=2.6.3
 python-dateutil>=2.5.3,<3.0.0
@@ -24,10 +27,7 @@ numpy>=1.24.0
 # Note: ibm-cloud-sdk-core is defined in setup.py with exact version pin
 
 # Development dependencies
-pytest>=7.0.0
-pytest-cov>=4.0.0
-pytest-mock>=3.7.0
-responses>=0.20.0
+# pytest and related dependencies are in requirements-dev.txt
 # black is defined in setup.py extras_require['dev'] to avoid BOM conflicts
 mypy>=1.0.0
 flake8>=6.0.0

@@ -157,6 +157,136 @@ Type Safety
 * IDE autocomplete and type checking support
 * Runtime type validation
 
+DPH Services Module
+-------------------
+
+Python client library for IBM Data Product Hub API, providing programmatic access to data product management.
+
+Container Management
+~~~~~~~~~~~~~~~~~~~~
+
+* Initialize and configure data product containers
+* Manage delivery methods and domain structures
+* Service credential management
+* API key operations
+
+Data Product Lifecycle
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Create, update, and delete data products
+* Draft management with version control
+* Publish drafts to releases
+* Retire releases when needed
+* Pagination support for large datasets
+
+Contract Terms
+~~~~~~~~~~~~~~
+
+* Manage contract terms and documents
+* Create reusable contract templates
+* Attach terms and conditions to data products
+* Service level agreement management
+
+Domain Organization
+~~~~~~~~~~~~~~~~~~~
+
+* Create and manage domains and subdomains
+* Organize data products by business area
+* Multi-industry domain support
+* Hierarchical domain structures
+
+Asset Visualization
+~~~~~~~~~~~~~~~~~~~
+
+* Create data asset visualizations
+* Reinitiate visualizations with updated assets
+* Support for multiple assets per visualization
+
+ODCS Generator Module
+---------------------
+
+Automated generation of Open Data Contract Standard (ODCS) v3.1.0 compliant YAML files from data catalog metadata.
+
+Multi-Catalog Support
+~~~~~~~~~~~~~~~~~~~~~
+
+* **Collibra Integration**: Extract metadata from Collibra data catalog
+* **Informatica CDGC**: Extract metadata from Informatica Cloud Data Governance and Catalog
+* Extensible architecture for additional catalog sources
+
+Metadata Extraction
+~~~~~~~~~~~~~~~~~~~
+
+* Automatic asset metadata extraction via REST APIs
+* Column discovery through catalog relations
+* Data type mapping (logical and physical)
+* Classification support via GraphQL (Collibra)
+* Tag integration at asset and column levels
+* Custom attribute preservation
+
+ODCS Generation
+~~~~~~~~~~~~~~~
+
+* ODCS v3.1.0 compliant YAML output
+* Complete schema definition with column metadata
+* Data quality rules integration
+* Service level agreement specifications
+* Governance and ownership information
+
+Data Type Mapping
+~~~~~~~~~~~~~~~~~
+
+* Intelligent mapping of catalog types to ODCS types
+* Support for logical types (string, integer, number, timestamp, boolean)
+* Physical type preservation with precision and scale
+* Custom type mapping support
+
+Data Product Recommender Module
+--------------------------------
+
+Analyze database query logs to identify high-value tables and logical groupings for data product prioritization.
+
+Multi-Platform Support
+~~~~~~~~~~~~~~~~~~~~~~
+
+* **Snowflake**: Query log analysis from ACCOUNT_USAGE.QUERY_HISTORY
+* **Databricks**: Query log analysis from system.query.history
+* **BigQuery**: Query log analysis from INFORMATION_SCHEMA.JOBS_BY_PROJECT
+* **watsonx.data**: Query log analysis from system.runtime.queries
+
+Intelligent Scoring
+~~~~~~~~~~~~~~~~~~~
+
+* Query frequency analysis (37.5% weight)
+* User diversity metrics (37.5% weight)
+* Recency scoring (15% weight)
+* Consistency patterns (10% weight)
+* Customizable scoring weights
+
+Table Grouping
+~~~~~~~~~~~~~~
+
+* Identify tables frequently used together
+* Cohesion analysis for logical groupings
+* User reach metrics across groups
+* Group scoring with multiple factors
+
+Output Formats
+~~~~~~~~~~~~~~
+
+* **Markdown**: Human-readable reports with tables and formatting
+* **JSON**: Machine-readable format for automation and AI agents
+* Star ratings (1-5 stars) for quick assessment
+* Detailed metrics and query pattern analysis
+
+CLI and Python API
+~~~~~~~~~~~~~~~~~~
+
+* Command-line interface for quick analysis
+* Python API for programmatic integration
+* File-based input (CSV and JSON)
+* Configurable output directory and format
+
 Future Modules
 --------------
 
