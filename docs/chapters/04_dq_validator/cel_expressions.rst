@@ -41,6 +41,7 @@ Or install the full SDK which includes CEL support:
 .. code-block:: bash
 
    pip install data-intelligence-sdk
+
 Complete Examples
 -----------------
 
