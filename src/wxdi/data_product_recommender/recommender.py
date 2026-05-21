@@ -944,14 +944,13 @@ class DataProductRecommender:
         """Get star rating and label for a score"""
         if score >= 80:
             return FIVE_STARS, EXCELLENT_CANDIDATE
-        elif score >= 60:
+        if score >= 60:
             return FOUR_STARS, GOOD_CANDIDATE
-        elif score >= 40:
+        if score >= 40:
             return THREE_STARS, FAIR_CANDIDATE
-        elif score >= 20:
+        if score >= 20:
             return TWO_STARS, WEAK_CANDIDATE
-        else:
-            return ONE_STAR, POOR_CANDIDATE
+        return ONE_STAR, POOR_CANDIDATE
 
     def _merge_and_sort_products(self, recommendations: dict) -> list:
         """Merge groups and standalone tables, sorted by score"""
@@ -1126,7 +1125,6 @@ class DataProductRecommender:
 
     def _build_json_metadata(self, recommendations: dict) -> dict:
         """Build metadata section for JSON export"""
-        from datetime import datetime
         return {
             "generated_at": datetime.now().isoformat(),
             "total_queries_analyzed": len(self.query_logs) if self.query_logs is not None else 0,
@@ -1259,8 +1257,6 @@ class DataProductRecommender:
 
     def export_recommendations_json(self, recommendations: dict, output_file: str):
         """Export recommendations to JSON file for agent consumption"""
-        import json
-
         output = {
             "recommendations": [],
             "metadata": self._build_json_metadata(recommendations)
@@ -1280,13 +1276,12 @@ class DataProductRecommender:
         """Convert numeric score to rating label"""
         if score >= 80:
             return "excellent"
-        elif score >= 60:
+        if score >= 60:
             return "good"
-        elif score >= 40:
+        if score >= 40:
             return "fair"
-        elif score >= 20:
+        if score >= 20:
             return "weak"
-        else:
-            return "poor"
+        return "poor"
 
 # Made with Bob
