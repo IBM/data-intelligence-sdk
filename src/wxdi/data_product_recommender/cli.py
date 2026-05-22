@@ -33,6 +33,7 @@ from .recommender import DataProductRecommender
 
 
 def main():
+    """Main entry point for the data product recommender CLI."""
     parser = argparse.ArgumentParser(
         description='Analyze query logs to recommend data products'
     )
