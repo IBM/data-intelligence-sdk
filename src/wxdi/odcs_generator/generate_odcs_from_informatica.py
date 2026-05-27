@@ -21,8 +21,8 @@ Generate ODCS YAML file from Informatica Asset
 This script fetches asset metadata from Informatica and generates an ODCS v3 compliant YAML file.
 
 Usage:
-    python odcs_generator/generate_odcs_from_informatica.py <asset_id>
-    python odcs_generator/generate_odcs_from_informatica.py 1b5fc805-252d-4ba2-bd90-e943103e411b --cdgc-url https://cdgc.dm-us.informaticacloud.com -u username -p password
+    python -m wxdi.odcs_generator.generate_odcs_from_informatica <asset_id>
+    python -m wxdi.odcs_generator.generate_odcs_from_informatica 1b5fc805-252d-4ba2-bd90-e943103e411b --cdgc-url https://cdgc.dm-us.informaticacloud.com -u username -p password
 
 Environment Variables:
     INFORMATICA_CDGC_URL: Informatica CDGC URL (required, e.g., https://cdgc.dm-us.informaticacloud.com)
@@ -72,6 +72,7 @@ SYSTEM_ATTRIBUTES_MAPPING = {
 }
 
 class InformaticaClient:
+    """Client for interacting with Informatica CDGC API."""
 
     CONTENT_TYPE_JSON = "application/json"
     HEADERS_JSON = {"Accept": CONTENT_TYPE_JSON}
@@ -169,6 +170,7 @@ class InformaticaClient:
         return self._fetch_asset(column_id)
 
 def parse_arguments():
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         description='Generate ODCS YAML file from Informatica asset',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -183,6 +185,7 @@ def parse_arguments():
     return parser.parse_args()
 
 def validate_arguments(args):
+    """Validate required command line arguments."""
     if not args.cdgc_url:
         print("Error: Informatica CDGC URL is required. Set INFORMATICA_CDGC_URL environment variable or use --cdgc-url")
         print("Example: --cdgc-url https://cdgc.dm-us.informaticacloud.com")
@@ -361,9 +364,9 @@ def _add_inline_comment_if_needed(line: str) -> str:
     """Add inline comment to server configuration fields if needed"""
     if '  server:' in line and 'CONFIGURE_SERVER_HOSTNAME' in line:
         return line + '  # ⚠️ UPDATE: e.g., prod.snowflake.acme.com'
-    elif '  type:' in line and 'CONFIGURE_SERVER_TYPE' in line:
+    if '  type:' in line and 'CONFIGURE_SERVER_TYPE' in line:
         return line + '  # ⚠️ UPDATE: e.g., snowflake, postgres, bigquery, redshift'
-    elif '  schema:' in line and 'CONFIGURE_SCHEMA_NAME' in line:
+    if '  schema:' in line and 'CONFIGURE_SCHEMA_NAME' in line:
         return line + '  # ⚠️ UPDATE: e.g., public, dbo, my_schema'
     return line
 
@@ -418,6 +421,7 @@ def write_yaml_file(output_file: str, odcs_data: Dict[str, Any]) -> None:
 
 
 def main():
+    """Main entry point for the ODCS generator from Informatica."""
     args = parse_arguments()
     validate_arguments(args)
 

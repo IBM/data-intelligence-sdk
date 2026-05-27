@@ -27,7 +27,7 @@ long_description = (this_directory / "README.md").read_text(encoding='utf-8')
 
 setup(
     name="data-intelligence-sdk",
-    version='2.0.0',
+    version='2.1.0-rc.1',
     author="IBM",
     author_email="Data_Intelligence_SDK@wwpdl.vnet.ibm.com",
     description="A Python SDK for IBM watsonx.data intelligence that provides data quality validation for streaming records and DataFrames, " \
@@ -59,6 +59,7 @@ setup(
         "python-dateutil>=2.5.3,<3.0.0",
         "pyyaml>=5.4.0,<7.0.0",
         "numpy>=1.24.0",
+        "cel-python>=0.5.0",
         # Pinned to exact version to avoid CRA bom-generate pip resolver conflict.
         # CRA sees ibm-cloud-sdk-core from both setup.py and requirements.txt and
         # fails with ResolutionImpossible when constraints differ (bare vs >=).
@@ -66,7 +67,7 @@ setup(
     ],
     extras_require={
         "dev": [
-            "pytest>=7.0.0",
+            "pytest>=9.0.3",
             "pytest-cov>=4.0.0",
             "pytest-mock>=3.7.0",
             "responses>=0.20.0",

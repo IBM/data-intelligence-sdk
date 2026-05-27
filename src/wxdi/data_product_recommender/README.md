@@ -70,8 +70,8 @@ python -m wxdi.data_product_recommender.cli \
 ### Python API
 
 ```python
-from data_product_recommender.platforms import SnowflakeQueryParser
-from data_product_recommender.recommender import DataProductRecommender
+from wxdi.data_product_recommender.platforms import SnowflakeQueryParser
+from wxdi.data_product_recommender.recommender import DataProductRecommender
 
 # Initialize with platform-specific parser
 parser = SnowflakeQueryParser()

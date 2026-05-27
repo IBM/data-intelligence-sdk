@@ -21,8 +21,8 @@ Generate ODCS YAML file from Collibra Asset
 This script fetches asset metadata from Collibra and generates an ODCS v3 compliant YAML file.
 
 Usage:
-    python generate_odcs_from_collibra.py <asset_id>
-    python generate_odcs_from_collibra.py 019a57f9-62d2-7aa0-9f22-4fa2cea1180b
+    python -m wxdi.odcs_generator.generate_odcs_from_collibra <asset_id>
+    python -m wxdi.odcs_generator.generate_odcs_from_collibra 019a57f9-62d2-7aa0-9f22-4fa2cea1180b
 
 Environment Variables:
     COLLIBRA_URL: Collibra instance URL (required)
@@ -563,12 +563,11 @@ class ODCSGenerator:
         # Build type string with parameters
         if scale is not None and precision is not None:
             return f"{base_type}({precision},{scale})"
-        elif precision is not None:
+        if precision is not None:
             return f"{base_type}({precision})"
-        elif size is not None:
+        if size is not None:
             return f"{base_type}({size})"
-        else:
-            return base_type
+        return base_type
 
     @staticmethod
     def _to_int(value: Any) -> Optional[int]:
@@ -687,9 +686,9 @@ def _add_inline_comment_if_needed(line: str) -> str:
     """Add inline comment to server configuration fields if needed"""
     if '  server:' in line and 'CONFIGURE_SERVER_HOSTNAME' in line:
         return line + '  # ⚠️ UPDATE: e.g., prod.snowflake.acme.com'
-    elif '  type:' in line and 'DEFINE_SERVER_TYPE' in line:
+    if '  type:' in line and 'DEFINE_SERVER_TYPE' in line:
         return line + '  # ⚠️ UPDATE: e.g., snowflake, postgres, bigquery, redshift'
-    elif '  schema:' in line and 'CONFIGURE_SCHEMA_NAME' in line:
+    if '  schema:' in line and 'CONFIGURE_SCHEMA_NAME' in line:
         return line + '  # ⚠️ UPDATE: e.g., public, dbo, my_schema'
     return line
 
