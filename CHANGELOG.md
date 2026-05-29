@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/IBM/data-intelligence-sdk/compare/v2.0.0...v2.1.0) (2026-05-29)
+
+
+### Features
+
+* **dq:** Sync from enterprise cf57469 on 2026-05-20 ([8f0474a](https://github.com/IBM/data-intelligence-sdk/commit/8f0474ac4c8890bc1171367f616a32f7c900fdbb))
+
 # [2.1.0-rc.1](https://github.com/IBM/data-intelligence-sdk/compare/v2.0.0...v2.1.0-rc.1) (2026-05-20)
 
 
