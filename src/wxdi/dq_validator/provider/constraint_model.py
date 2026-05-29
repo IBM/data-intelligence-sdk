@@ -17,7 +17,6 @@
 Pydantic models for Data Quality Constraints
 """
 
-from enum import StrEnum
 from typing import List, Optional, Any, Dict
 from datetime import datetime
 from pydantic import BaseModel
@@ -33,6 +32,13 @@ from wxdi.dq_validator.checks.regex_check import RegexCheck
 from wxdi.dq_validator.checks.valid_values_check import ValidValuesCheck
 from wxdi.dq_validator.datatypes import DataType
 
+try:
+    from enum import StrEnum
+except ImportError:
+    # Remove when support for Python 3.10 is removed
+    from enum import Enum
+    class StrEnum(str, Enum):
+        pass
 
 class CheckType(StrEnum):
     """Enumeration of data quality check types"""

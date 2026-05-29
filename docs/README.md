@@ -26,6 +26,7 @@ docs/
 ├── requirements.txt             # Documentation dependencies
 ├── build_docs.py               # Build script
 ├── README.md                   # This file
+├── CONTRIBUTING_TO_DOCS.md     # Documentation contribution guide
 │
 ├── _static/                    # Static assets
 │   ├── css/
@@ -39,11 +40,17 @@ docs/
 │   ├── 02_overview/           # Features and release notes
 │   ├── 03_common_modules/     # Shared authentication
 │   ├── 04_dq_validator/       # DQ Validator module
-│   └── 05_future_modules/     # Future module guidelines
+│   ├── 05_dph_services/       # Data Product Hub Services
+│   ├── 06_odcs_generator/     # ODCS Generator
+│   ├── 07_data_product_recommender/  # Data Product Recommender
+│   └── 08_future_modules/     # Future module guidelines
 │
 └── api/                        # API reference
     ├── common/                # Common modules API
-    └── dq_validator/          # DQ Validator API
+    ├── dq_validator/          # DQ Validator API
+    ├── dph_services/          # DPH Services API
+    ├── odcs_generator/        # ODCS Generator Class Reference
+    └── data_product_recommender/  # Data Product Recommender Class Reference
 ```
 
 ## Building Documentation Locally
@@ -273,4 +280,4 @@ When contributing documentation:
 
 For documentation issues or questions:
 - Open an issue on GitHub
-- Contact: data-intelligence-sdk@ibm.com
+- Contact: Data_Intelligence_SDK@wwpdl.vnet.ibm.com

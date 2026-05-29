@@ -31,8 +31,10 @@ class Metadata(BaseModel):
     version_id: str
     source_repository_id: str
     global_id: str
+    workflow_id: Optional[str] = None
+    draft_mode: Optional[str] = None
     is_target_draft: Optional[bool] = None
-    effective_start_date: datetime
+    effective_start_date: Optional[datetime] = None
     created_by: str
     created_at: datetime
     modified_by: str
@@ -45,6 +47,7 @@ class Metadata(BaseModel):
     tags: Optional[List[str]] = None
     steward_ids: Optional[List[str]] = None
     steward_group_ids: Optional[List[str]] = None
+    workflow_state: Optional[str] = None
     user_access: Optional[bool] = None
 
     @classmethod

@@ -26,6 +26,8 @@ from .range_check import RangeCheck
 from .regex_check import RegexCheck
 from .datatype_check import DataTypeCheck
 from .format_check import FormatCheck, FormatConstraintType
+from .cel_check import CELCheck
+from .table_cel_check import TableCELCheck
 
 __all__ = [
     "LengthCheck",
@@ -40,5 +42,7 @@ __all__ = [
     "DataTypeCheck",
     "FormatCheck",
     "FormatConstraintType",
+    "CELCheck",
+    "TableCELCheck",
 ]
 

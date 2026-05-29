@@ -65,7 +65,7 @@ from wxdi.common.auth import AuthConfig, EnvironmentType, AuthProvider
 def example_ibm_cloud():
     """
     Example: IBM Cloud authentication using IAMAuthenticator
-    
+
     Requirements:
     - api_key: Your IBM Cloud API key
     - url: Not required for production. Provide only for non-production environments.
@@ -73,7 +73,7 @@ def example_ibm_cloud():
     print("=" * 60)
     print("IBM CLOUD AUTHENTICATION")
     print("=" * 60)
-    
+
     # Create environment configuration
     # Required: environment_type, api_key
     # url: Not required for production
@@ -85,28 +85,28 @@ def example_ibm_cloud():
         # url='https://host_name',  # This is not required for production env. For non-default custom add this property.
         # disable_ssl_verification=True  # Optional, default is True
     )
-    
+
     print(f"Environment Type: {config.environment_type.value}")
     print(f"URL: {config.url}")
-    
+
     # Create auth provider
     auth_provider = AuthProvider(config)
     print(f"Authenticator: {type(auth_provider.authenticator).__name__}")
-    
+
     # Get token (uncomment when you have valid credentials)
     # try:
     #     token = auth_provider.get_token()
     #     print(f"Token obtained successfully: {token[:20]}...")
     # except Exception as e:
     #     print(f"Error getting token: {e}")
-    
+
     print()
 
 
 def example_aws_cloud():
     """
     Example: AWS Cloud authentication using MCSPV2Authenticator
-    
+
     Requirements:
     - api_key: Your AWS API key
     - account_id: Your AWS account ID
@@ -115,7 +115,7 @@ def example_aws_cloud():
     print("=" * 60)
     print("AWS CLOUD AUTHENTICATION")
     print("=" * 60)
-    
+
     # Create environment configuration
     # Required: environment_type, api_key, account_id
     # url: Not required for production
@@ -128,29 +128,29 @@ def example_aws_cloud():
         # url='https://host_name',  # This is not required for production env. For non-default custom add this property.
         # disable_ssl_verification=True  # Optional, default is True
     )
-    
+
     print(f"Environment Type: {config.environment_type.value}")
     print(f"URL: {config.url}")
     print(f"Account ID: {config.account_id}")
-    
+
     # Create auth provider
     auth_provider = AuthProvider(config)
     print(f"Authenticator: {type(auth_provider.authenticator).__name__}")
-    
+
     # Get token (uncomment when you have valid credentials)
     # try:
     #     token = auth_provider.get_token()
     #     print(f"Token obtained successfully: {token[:20]}...")
     # except Exception as e:
     #     print(f"Error getting token: {e}")
-    
+
     print()
 
 
 def example_gov_cloud():
     """
     Example: Government Cloud authentication using GovCloudAuthenticator
-    
+
     Requirements:
     - api_key: Your Government Cloud API key
     - url: Not required for production. Provide only for non-production environments.
@@ -158,7 +158,7 @@ def example_gov_cloud():
     print("=" * 60)
     print("GOVERNMENT CLOUD AUTHENTICATION")
     print("=" * 60)
-    
+
     # Create environment configuration
     # Required: environment_type, api_key
     # url: Not required for production environments
@@ -170,39 +170,39 @@ def example_gov_cloud():
         # url='https://host_name',  # This is not required for production env. For non-default custom add this property.
         # disable_ssl_verification=True  # Optional, default is True
     )
-    
+
     print(f"Environment Type: {config.environment_type.value}")
     print(f"URL: {config.url}")
-    
+
     # Create auth provider
     auth_provider = AuthProvider(config)
     print(f"Authenticator: {type(auth_provider.authenticator).__name__}")
-    
+
     # Get token (uncomment when you have valid credentials)
     # try:
     #     token = auth_provider.get_token()
     #     print(f"Token obtained successfully: {token[:20]}...")
     # except Exception as e:
     #     print(f"Error getting token: {e}")
-    
+
     print()
 
 
 def example_on_prem_with_apikey():
     """
     Example: On-Premises authentication using CloudPakForDataAuthenticator with API key
-    
+
     Requirements:
     - url: Your on-premises CP4D URL (required)
     - username: Your username
     - api_key: Your API key
-    
+
     Note: When using api_key, username is required but password should NOT be provided.
     """
     print("=" * 60)
     print("ON-PREMISES AUTHENTICATION (with API Key)")
     print("=" * 60)
-    
+
     # Create environment configuration
     # Required: environment_type, url, username, api_key (or password)
     # Optional: disable_ssl_verification (default: True)
@@ -214,41 +214,41 @@ def example_on_prem_with_apikey():
         api_key='your-cp4d-api-key-here'
         # disable_ssl_verification=True  # Optional, default is True
     )
-    
+
     print(f"Environment Type: {config.environment_type.value}")
     print(f"URL: {config.url}")
     print(f"Username: {config.username}")
     print(f"Authentication Method: API Key")
-    
+
     # Create auth provider
     auth_provider = AuthProvider(config)
     print(f"Authenticator: {type(auth_provider.authenticator).__name__}")
-    
+
     # Get token (uncomment when you have valid credentials)
     # try:
     #     token = auth_provider.get_token()
     #     print(f"Token obtained successfully: {token[:20]}...")
     # except Exception as e:
     #     print(f"Error getting token: {e}")
-    
+
     print()
 
 
 def example_on_prem_with_password():
     """
     Example: On-Premises authentication using CloudPakForDataAuthenticator with password
-    
+
     Requirements:
     - url: Your on-premises CP4D URL (required)
     - username: Your username
     - password: Your password
-    
+
     Note: When using password, api_key should NOT be provided.
     """
     print("=" * 60)
     print("ON-PREMISES AUTHENTICATION (with Username/Password)")
     print("=" * 60)
-    
+
     # Create environment configuration
     # Required: environment_type, url, username, password (or api_key)
     # Optional: disable_ssl_verification (default: True)
@@ -259,37 +259,37 @@ def example_on_prem_with_password():
         password='your-password',
         # disable_ssl_verification=True  # Optional, default is True
     )
-    
+
     print(f"Environment Type: {config.environment_type.value}")
     print(f"URL: {config.url}")
     print(f"Username: {config.username}")
     print(f"Authentication Method: Username/Password")
-    
+
     # Create auth provider
     auth_provider = AuthProvider(config)
     print(f"Authenticator: {type(auth_provider.authenticator).__name__}")
-    
+
     # Get token (uncomment when you have valid credentials)
     # try:
     #     token = auth_provider.get_token()
     #     print(f"Token obtained successfully: {token[:20]}...")
     # except Exception as e:
     #     print(f"Error getting token: {e}")
-    
+
     print()
 
 
 def example_custom_url():
     """
     Example: Using custom URL for non-production environments
-    
+
     Provide url only for non-production environments (staging, preprod, dev).
     For production, omit url and the default production URL will be used automatically.
     """
     print("=" * 60)
     print("NON-production CUSTOM URL EXAMPLE")
     print("=" * 60)
-    
+
     # Provide url only for non-production environments
     # For production, omit url - the default production URL is used automatically
     # Trailing slashes are automatically stripped
@@ -299,14 +299,14 @@ def example_custom_url():
         api_key='your-api-key-here',
         # disable_ssl_verification=True  # Optional, default is True
     )
-    
+
     print(f"Environment Type: {config.environment_type.value}")
     print(f"Custom URL: {config.url}")
-    
+
     # Create auth provider
     auth_provider = AuthProvider(config)
     print(f"Authenticator: {type(auth_provider.authenticator).__name__}")
-    
+
     # Get token (uncomment when you have valid credentials)
     # try:
     #     token = auth_provider.get_token()
@@ -320,13 +320,13 @@ def example_custom_url():
 def example_error_handling():
     """
     Example: Error handling and validation
-    
+
     The AuthConfig validates required fields based on environment type.
     """
     print("=" * 60)
     print("ERROR HANDLING EXAMPLES")
     print("=" * 60)
-    
+
     # Example 1: Missing API key for IBM_CLOUD
     print("\n1. Missing API key for IBM_CLOUD:")
     try:
@@ -336,7 +336,7 @@ def example_error_handling():
         )
     except ValueError as e:
         print(f"   ✓ Caught error: {e}")
-    
+
     # Example 2: Missing account_id for AWS_CLOUD
     print("\n2. Missing account_id for AWS_CLOUD:")
     try:
@@ -347,7 +347,7 @@ def example_error_handling():
         )
     except ValueError as e:
         print(f"   ✓ Caught error: {e}")
-    
+
     # Example 3: Missing username for ON_PREM
     print("\n3. Missing username for ON_PREM:")
     try:
@@ -359,7 +359,7 @@ def example_error_handling():
         )
     except ValueError as e:
         print(f"   ✓ Caught error: {e}")
-    
+
     # Example 4: Missing URL for ON_PREM
     print("\n4. Missing URL for ON_PREM:")
     try:
@@ -371,7 +371,7 @@ def example_error_handling():
         )
     except ValueError as e:
         print(f"   ✓ Caught error: {e}")
-    
+
     print()
 
 
@@ -379,7 +379,7 @@ if __name__ == "__main__":
     print("\n" + "=" * 60)
     print("AUTHPROVIDER USAGE EXAMPLES")
     print("=" * 60 + "\n")
-    
+
     # Run all examples
     example_ibm_cloud()
     example_aws_cloud()
@@ -388,7 +388,7 @@ if __name__ == "__main__":
     example_on_prem_with_password()
     example_custom_url()
     example_error_handling()
-    
+
     print("=" * 60)
     print("All examples completed!")
     print("=" * 60)

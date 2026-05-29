@@ -209,24 +209,32 @@ class IssueReporter:
     def create_check(
         self,
         asset_id: str,
-        column_name: str,
         check_obj: BaseCheck,
+        column_name: Optional[str] = None,
         project_id: Optional[str] = None,
-        catalog_id: Optional[str] = None
-    ) -> str:
+        catalog_id: Optional[str] = None,
+        parent_id: Optional[str] = None,
+    ) -> dict:
         """
         Create a data quality check.
         
         Args:
-            cams_asset_id: Data asset ID
-            column_name: Name of the column
+            asset_id: Data asset ID
+            column_name: Name of the column (required if parent_id is provided)
             check_obj: BaseCheck instance to extract check details from
             project_id: Project ID (optional)
             catalog_id: Catalog ID (optional)
+            parent_id: Parent check ID (optional). If provided, native_id includes column details
         
         Returns:
-            str: The created check ID
+            dict: The full check response body from the API
+        
+        Raises:
+            ValueError: If parent_id is provided but column_name is None
         """
+        # Validate: column_name is required when parent_id is provided
+        if parent_id is not None and column_name is None:
+            raise ValueError("column_name is required when parent_id is provided")
         # Extract check details from check object
         check_name = check_obj.get_check_name()
         dimension_name = check_obj.get_dimension().name
@@ -243,7 +251,7 @@ class IssueReporter:
         
         # Special handling for comparison check to get operator
         native_id_suffix = ""
-        if check_name == "comparison_check":
+        if check_name == "comparison_check" and parent_id is not None:
             from .checks.comparison_check import ComparisonCheck
             
             if isinstance(check_obj, ComparisonCheck):
@@ -263,21 +271,232 @@ class IssueReporter:
         # Get dimension ID from dimension name
         dimension_id = self.dimension_provider.search_dimension(dimension_name)
         
-        # Build native_id with the suffix
-        column_name_lower = column_name.lower()
-        native_id = f"{asset_id}/{check_type}/{column_name_lower}/{native_id_suffix}"
+        # Build native_id based on whether parent_id is provided
+        if parent_id is not None:
+            # With parent: detailed format with column name and suffix
+            # column_name is guaranteed to be not None due to validation at line 236
+            assert column_name is not None
+            column_name_lower = column_name.lower()
+            native_id = f"{asset_id}/{check_type}/{column_name_lower}/{native_id_suffix}"
+        else:
+            # No parent: simple format with dimension name
+            native_id = f"{asset_id}/{check_type}/{dimension_name.capitalize()}"
         
-        # Create the check and return the check_id
-        check_id = self.check_provider.create_check(
+        # Create the check and return the full check body
+        check_body = self.check_provider._create_check_full(
             name=cpd_name,
             dimension_id=dimension_id,
             native_id=native_id,
             check_type=check_type,
             project_id=project_id,
-            catalog_id=catalog_id
+            catalog_id=catalog_id,
+            parent_check_id=parent_id
         )
         
-        return check_id
+        return check_body
+    
+    def handle_parent(
+        self,
+        asset_id: str,
+        check_obj: BaseCheck,
+        project_id: Optional[str] = None,
+        catalog_id: Optional[str] = None
+    ) -> dict:
+        """
+        Search for parent check using search_dq_check method.
+        If not found, create the parent check.
+        
+        Args:
+            asset_id: Data asset ID
+            check_obj: BaseCheck instance to extract check details from
+            project_id: Project ID (optional)
+            catalog_id: Catalog ID (optional)
+        
+        Returns:
+            dict: The full parent check body (found or created)
+        
+        Raises:
+            Exception: If parent check creation fails (not search failure, but actual creation failure)
+        """
+        # Extract check details from check object
+        check_name = check_obj.get_check_name()
+        dimension_name = check_obj.get_dimension().name
+        
+        # Map check_name to check_type
+        check_type = self.map_check_name_to_check_type(check_name) or check_name
+
+        # Construct native_id
+        native_id = f"{asset_id}/{check_type}/{dimension_name.capitalize()}"
+        
+        try:
+            # Search for the check using search_dq_check
+            check_response = self.search_provider.search_dq_check(
+                native_id=native_id,
+                check_type=check_type,
+                project_id=project_id,
+                catalog_id=catalog_id,
+                include_children=False
+            )
+            
+            # Extract and return the check ID
+            return check_response
+        except Exception:
+            # Check not found during search - this is expected, so we'll try to create it
+            # Now attempt to create the parent check
+            try:
+                parent_check = self.create_check(
+                    asset_id=asset_id,
+                    column_name=None,
+                    check_obj=check_obj,
+                    project_id=project_id,
+                    catalog_id=catalog_id,
+                    parent_id=None
+                )
+                # Mark that this check was newly created
+                parent_check["_newly_created"] = True
+                return parent_check
+            except Exception as creation_error:
+                # Parent check creation failed - raise a more specific exception
+                raise RuntimeError(
+                    f"Failed to create parent check for asset_id='{asset_id}', "
+                    f"check_type='{check_type}', dimension='{dimension_name}'. "
+                    f"Original error: {str(creation_error)}"
+                ) from creation_error
+    
+    def create_bulk_issues(
+        self,
+        parent_check: dict,
+        child_check: dict,
+        column_name: str,
+        assets_map: Dict[str, Dict],
+        number_of_occurrences: int,
+        total_records: int,
+        project_id: str
+    ) -> dict:
+        """
+        Create bulk issues for parent and child checks in a single API call.
+        
+        Args:
+            parent_check: Parent check body (table-level)
+            child_check: Child check body (column-level)
+            column_name: Name of the column
+            assets_map: Map of asset names to full asset objects (includes both data_asset and columns)
+            number_of_occurrences: Number of failed occurrences
+            total_records: Total number of records
+            project_id: Project ID
+        
+        Returns:
+            dict: Response from the bulk issue creation API
+        """
+        # Fetch column asset from map
+        column_asset = assets_map.get(column_name)
+        if not column_asset:
+            raise ValueError(f"Column asset not found for column: {column_name}")
+        
+        # Get parent asset ID from column asset
+        parent_asset_id = column_asset.get("parent", {}).get("id")
+        if not parent_asset_id:
+            raise ValueError(f"Parent asset ID not found in column asset for column: {column_name}")
+        
+        # Find parent asset in the map by searching for asset with matching ID
+        parent_asset = None
+        for asset_name, asset_body in assets_map.items():
+            if asset_body.get("id") == parent_asset_id:
+                parent_asset = asset_body
+                break
+        
+        if not parent_asset:
+            raise ValueError(f"Parent asset not found in assets_map for ID: {parent_asset_id}")
+        
+        # Extract native_id from parent asset
+        parent_native_id = parent_asset.get("native_id")
+        if not parent_native_id:
+            raise ValueError("Parent asset native_id not found")
+        
+        # Build issues array
+        issues = [
+            {
+                "check": {
+                    "native_id": parent_check.get("native_id"),
+                    "type": parent_check.get("type")
+                },
+                "reported_for": {
+                    "native_id": parent_native_id,
+                    "type": "data_asset"
+                },
+                "number_of_occurrences": number_of_occurrences,
+                "number_of_tested_records": total_records,
+                "status": "aggregation",
+                "ignored": False
+            },
+            {
+                "check": {
+                    "native_id": child_check.get("native_id"),
+                    "type": child_check.get("type")
+                },
+                "reported_for": {
+                    "native_id": column_asset.get("native_id"),
+                    "type": "column"
+                },
+                "number_of_occurrences": number_of_occurrences,
+                "number_of_tested_records": total_records,
+                "status": "actual",
+                "ignored": False
+            }
+        ]
+        
+        # Build assets array
+        assets = [
+            {
+                "name": parent_asset.get("name"),
+                "type": "data_asset",
+                "native_id": parent_native_id,
+                "weight": parent_asset.get("weight", 1)
+            },
+            {
+                "name": column_asset.get("name"),
+                "type": "column",
+                "native_id": column_asset.get("native_id"),
+                "parent": {
+                    "native_id": parent_native_id,
+                    "type": "data_asset"
+                },
+                "weight": column_asset.get("weight", 1)
+            }
+        ]
+        
+        # Build existing_checks array
+        existing_checks = [
+            {
+                "native_id": parent_check.get("native_id"),
+                "type": parent_check.get("type")
+            },
+            {
+                "native_id": child_check.get("native_id"),
+                "type": child_check.get("type")
+            }
+        ]
+        
+        # Construct the bulk payload
+        bulk_payload = {
+            "issues": issues,
+            "assets": assets,
+            "existing_checks": existing_checks
+        }
+        
+        # Call the bulk issue creation API
+        try:
+            response = self.issues_provider.create_issues_bulk(
+                payload=bulk_payload,
+                project_id=project_id,
+                incremental_reporting=False,
+                refresh_assets=False
+            )
+            print(f"Bulk issues created successfully: {len(issues)} issues")
+            return response
+        except Exception as e:
+            print(f"Failed to create bulk issues: {str(e)}")
+            raise
     
     def _validate_and_prepare_check_data(
         self,
@@ -285,7 +504,7 @@ class IssueReporter:
         check_name: str,
         stats: Dict[str, int],
         data_asset_entity,
-        column_id_map: Dict[str, str],
+        assets_map: Dict[str, Dict],
         validator: Validator
     ) -> Optional[Tuple[str, str, BaseCheck, int, int]]:
         """
@@ -296,7 +515,7 @@ class IssueReporter:
             check_name: Name of the check
             stats: Statistics dictionary with 'failed' and 'total' keys
             data_asset_entity: Data asset entity from CAMS
-            column_id_map: Map of column names to column asset IDs
+            assets_map: Map of asset names to full column asset objects
             validator: Validator instance
         
         Returns:
@@ -319,8 +538,13 @@ class IssueReporter:
         if not (data_asset_entity.column_info and column_name in data_asset_entity.column_info):
             return None
         
-        # Guard: Skip if column asset ID not found
-        column_id = column_id_map.get(column_name)
+        # Guard: Skip if column asset not found
+        column_asset = assets_map.get(column_name)
+        if not column_asset:
+            return None
+        
+        # Extract column ID from asset
+        column_id = column_asset.get('id')
         if not column_id:
             return None
         
@@ -331,6 +555,138 @@ class IssueReporter:
         
         return (check_type, column_id, check_obj, number_of_occurrences, total_records)
     
+    def _find_existing_check(
+        self,
+        column_id: str,
+        check_type: str,
+        project_id: str
+    ) -> Optional[Tuple[str, Optional[str]]]:
+        """
+        Find an existing check by column ID and check type.
+        
+        Args:
+            column_id: Column asset ID
+            check_type: Type of check (e.g., "format", "completeness")
+            project_id: Project ID
+        
+        Returns:
+            Tuple of (check_id, native_id) if found, None otherwise
+        """
+        try:
+            checks = self.check_provider.get_checks(
+                dq_asset_id=column_id,
+                check_type=check_type,
+                project_id=project_id
+            )
+            
+            for check in checks:
+                if check.get("type") == check_type:
+                    return (check.get("id"), check.get("native_id"))
+            
+            return None
+        except ValueError as e:
+            print(f"Warning: Failed to get existing checks: {e}")
+            return None
+    
+    def _update_existing_check_metrics(
+        self,
+        existing_check_native_id: Optional[str],
+        number_of_occurrences: int,
+        total_records: int,
+        column_name: str,
+        check_type: str,
+        project_id: str
+    ) -> bool:
+        """
+        Update metrics for an existing check.
+        
+        Args:
+            existing_check_native_id: Native ID of the existing check
+            number_of_occurrences: Number of failed occurrences
+            total_records: Total number of records
+            column_name: Name of the column
+            check_type: Type of check
+            project_id: Project ID
+        
+        Returns:
+            True if update successful, False otherwise
+        """
+        try:
+            self.issues_provider.update_issue_metrics(
+                occurrences=number_of_occurrences,
+                tested_records=total_records,
+                column_name=column_name,
+                check_type=check_type,
+                project_id=project_id,
+                asset_type="column",
+                operation="add",
+                check_native_id=existing_check_native_id
+            )
+            return True
+        except ValueError:
+            return False
+    
+    def _handle_409_conflict(
+        self,
+        column_id: str,
+        check_type: str,
+        number_of_occurrences: int,
+        total_records: int,
+        column_name: str,
+        check_name: str,
+        asset_id: str,
+        project_id: str
+    ) -> bool:
+        """
+        Handle 409 conflict by finding and updating existing check.
+        
+        Args:
+            column_id: Column asset ID
+            check_type: Type of check
+            number_of_occurrences: Number of failed occurrences
+            total_records: Total number of records
+            column_name: Name of the column
+            check_name: Name of the check
+            asset_id: CAMS asset ID
+            project_id: Project ID
+        
+        Returns:
+            True if conflict handled successfully, False otherwise
+        """
+        existing_check = self._find_existing_check(column_id, check_type, project_id)
+        
+        if not existing_check:
+            print(f"Warning: Check already exists but could not be found for column '{column_name}', check '{check_name}'")
+            return False
+        
+        existing_check_id, existing_check_native_id = existing_check
+        
+        update_success = self._update_existing_check_metrics(
+            existing_check_native_id,
+            number_of_occurrences,
+            total_records,
+            column_name,
+            check_type,
+            project_id
+        )
+        
+        if update_success:
+            return True
+        
+        # If update fails, try to create the issue
+        self._handle_update_failure(
+            ValueError("Update failed"),
+            asset_id,
+            check_type,
+            column_name,
+            column_id,
+            number_of_occurrences,
+            total_records,
+            project_id,
+            dq_check_id=existing_check_id
+        )
+        return True
+
     def _create_check_and_issue(
         self,
         asset_id: str,
@@ -340,7 +696,8 @@ class IssueReporter:
         check_obj: BaseCheck,
         number_of_occurrences: int,
         total_records: int,
-        project_id: str
+        project_id: str,
+        assets_map: Dict[str, Dict]
     ) -> bool:
         """
         Create a check and its associated issue.
@@ -355,6 +712,7 @@ class IssueReporter:
             number_of_occurrences: Number of failed occurrences
             total_records: Total number of records
             project_id: Project ID
+            assets_map: Map of asset names to full asset objects
         
         Returns:
             True if successful, False if creation failed
@@ -366,88 +724,84 @@ class IssueReporter:
             return False
         
         try:
-            check_id = self.create_check(
+            # Get parent check - may raise exception if parent creation fails
+            parent_check = self.handle_parent(
                 asset_id=asset_id,
-                column_name=column_name,
                 check_obj=check_obj,
                 project_id=project_id
             )
-            # Create the issue directly using the issues provider
-            self.issues_provider.create_issue(
-                check_id=check_id,
-                reported_for_id=column_id,
-                number_of_occurrences=number_of_occurrences,
-                number_of_tested_records=total_records,
+            
+            # Extract parent ID from parent check
+            parent_id = parent_check.get("id")
+            
+            # Check if parent was newly created
+            parent_was_created = parent_check.get("_newly_created", False)
+            
+            # Create child check
+            check = self.create_check(
+                asset_id=asset_id,
+                column_name=column_name,
+                check_obj=check_obj,
                 project_id=project_id,
-                catalog_id=None
+                parent_id=parent_id
             )
+            check_id = check.get("id")
+            if not check_id:
+                raise ValueError("Check ID not found in response")
+            
+            # If parent was newly created, use bulk issue creation
+            if parent_was_created and parent_check:
+                self.create_bulk_issues(
+                    parent_check=parent_check,
+                    child_check=check,
+                    column_name=column_name,
+                    assets_map=assets_map,
+                    number_of_occurrences=number_of_occurrences,
+                    total_records=total_records,
+                    project_id=project_id
+                )
+            else:
+                # Create the issue directly using the issues provider
+                self.issues_provider.create_issue(
+                    dq_check_id=check_id,
+                    reported_for_id=column_id,
+                    number_of_occurrences=number_of_occurrences,
+                    number_of_tested_records=total_records,
+                    project_id=project_id,
+                    catalog_id=None
+                )
             return True
-        except ValueError as e:
+        except Exception as e:
             error_msg = str(e)
             # If 409 conflict (check already exists), try to find and update it
             if "409" in error_msg or "already exists" in error_msg:
-                try:
-                    # Get existing checks for this column asset filtered by check type
-                    checks = self.check_provider.get_checks(
-                        asset_id=column_id,
-                        check_type=check_type,
-                        project_id=project_id
-                    )
-                    
-                    # Find the check with matching type
-                    existing_check_id = None
-                    existing_check_native_id = None
-                    for check in checks:
-                        if check.get("type") == check_type:
-                            existing_check_id = check.get("id")
-                            existing_check_native_id = check.get("native_id")
-                            break
-                    
-                    if existing_check_id:
-                        # Update issue metrics for the existing check
-                        try:
-                            self.issues_provider.update_issue_metrics(
-                                occurrences=number_of_occurrences,
-                                tested_records=total_records,
-                                column_name=column_name,
-                                check_type=check_type,
-                                project_id=project_id,
-                                asset_type="column",
-                                operation="add",
-                                check_native_id=existing_check_native_id
-                            )
-                            return True
-                        except ValueError as update_error:
-                            # If update fails, try to create the issue
-                            self._handle_update_failure(
-                                update_error, asset_id, existing_check_id, check_type,
-                                column_name, check_name, column_id,
-                                number_of_occurrences, total_records, project_id
-                            )
-                            return True
-                    else:
-                        print(f"Warning: Check already exists but could not be found for column '{column_name}', check '{check_name}'")
-                        return False
-                except ValueError as get_error:
-                    print(f"Warning: Failed to get existing checks for column '{column_name}', check '{check_name}': {get_error}")
-                    return False
+                return self._handle_409_conflict(
+                    column_id=column_id,
+                    check_type=check_type,
+                    number_of_occurrences=number_of_occurrences,
+                    total_records=total_records,
+                    column_name=column_name,
+                    check_name=check_name,
+                    asset_id=asset_id,
+                    project_id=project_id
+                )
             else:
-                # Different error - log and return False
-                print(f"Warning: Failed to create check for column '{column_name}', check '{check_name}': {e}")
+                # Any other error (including parent check creation failure) - log and return False
+                print(f"Error: Failed to create check and issue for column '{column_name}', check '{check_name}': {e}")
                 return False
     
     def _handle_update_failure(
         self,
         error: ValueError,
         asset_id: str,
-        cams_check_id: str,
         check_type: str,
         column_name: str,
-        check_name: str,
         column_id: str,
         number_of_occurrences: int,
         total_records: int,
-        project_id: str
+        project_id: str,
+        check_id: Optional[str] = None,
+        dq_check_id: Optional[str] = None
     ) -> bool:
         """
         Handle failure when updating issue metrics.
@@ -455,32 +809,42 @@ class IssueReporter:
         Args:
             error: The ValueError that was raised
             asset_id: CAMS asset ID
-            cams_check_id: CAMS check ID
             check_type: Type of the check
             column_name: Name of the column
-            check_name: Name of the check
             column_id: Column asset ID
             number_of_occurrences: Number of failed occurrences
             total_records: Total number of records
             project_id: Project ID
+            check_id: Check ID (optional)
+            dq_check_id: DQ check ID (optional, if provided will be used directly)
         
         Returns:
             True (always, to indicate error was handled)
         """
+        # Validate that at least one check ID is provided
+        if not dq_check_id and not check_id:
+            print(f"Warning: Neither dq_check_id nor check_id provided for column '{column_name}', of check_type '{check_type}'. Cannot handle update failure.")
+            return False
+        
         error_msg = str(error)
         
         # If issue not found, try to create it
         if "Issue not found" in error_msg or "Issue ID not found" in error_msg:
-            check_id = self.get_check_id(
-                check_native_id=f"{asset_id}/{cams_check_id}",
-                check_type=check_type,
-                project_id=project_id
-            )
+            # Use provided dq_check_id or fetch it
+            check_id_to_use = dq_check_id
             
-            if check_id:
+            if not check_id_to_use:
+                # Only fetch check_id if dq_check_id is not provided
+                check_id_to_use = self.get_check_id(
+                    check_native_id=f"{asset_id}/{check_id}",
+                    check_type=check_type,
+                    project_id=project_id
+                )
+            
+            if check_id_to_use:
                 # Create the issue directly using the issues provider
                 self.issues_provider.create_issue(
-                    check_id=cams_check_id,
+                    dq_check_id=check_id_to_use,
                     reported_for_id=column_id,
                     number_of_occurrences=number_of_occurrences,
                     number_of_tested_records=total_records,
@@ -488,10 +852,10 @@ class IssueReporter:
                     catalog_id=None
                 )
             else:
-                print(f"Warning: Could not find check_id for column '{column_name}', check '{check_name}'. Issue not created.")
+                print(f"Warning: Could not find check_id for column '{column_name}', of check_type '{check_type}'. Issue not created.")
         else:
             # Different error - log and continue
-            print(f"Warning: Failed to update issue metrics for column '{column_name}', check '{check_name}': {error}")
+            print(f"Warning: Failed to update issue metrics for column '{column_name}', of check_type '{check_type}': {error}")
         
         return True
     
@@ -501,7 +865,6 @@ class IssueReporter:
         check_type: str,
         asset_id: str,
         column_name: str,
-        check_name: str,
         column_id: str,
         number_of_occurrences: int,
         total_records: int,
@@ -528,15 +891,15 @@ class IssueReporter:
             if check.metadata.type != check_type:
                 continue
             
-            cams_check_id = check.metadata.check_id
-            if not cams_check_id:
+            check_id = check.metadata.check_id
+            if not check_id:
                 continue
             
             # Try to update existing issue metrics
             try:
                 self.issues_provider.update_issue_metrics(
-                    cams_asset_id=asset_id,
-                    cams_check_id=cams_check_id,
+                    asset_id=asset_id,
+                    check_id=check_id,
                     occurrences=number_of_occurrences,
                     tested_records=total_records,
                     column_name=column_name,
@@ -548,9 +911,15 @@ class IssueReporter:
                 return True
             except ValueError as e:
                 self._handle_update_failure(
-                    e, asset_id, cams_check_id, check_type,
-                    column_name, check_name, column_id,
-                    number_of_occurrences, total_records, project_id
+                    e,
+                    asset_id,
+                    check_type,
+                    column_name,
+                    column_id,
+                    number_of_occurrences,
+                    total_records,
+                    project_id,
+                    check_id=check_id
                 )
                 return True
         
@@ -607,14 +976,14 @@ class IssueReporter:
         data_asset_entity = data_asset.entity
         
         # Fetch all column assets once and build a lookup map for efficiency
-        assets_response = self.asset_provider.get_assets(project_id=project_id, asset_type="column")
-        column_id_map = {asset['name']: asset['id'] for asset in assets_response.get('assets', [])}
+        assets_response = self.asset_provider.get_assets(project_id=project_id)
+        assets_map = {asset['name']: asset for asset in assets_response.get('assets', [])}
         
         # Iterate over combined statistics
         for (column_name, check_name), individual_stats in combined_stats.items():
             # Validate and prepare data
             validated_data = self._validate_and_prepare_check_data(
-                column_name, check_name, individual_stats, data_asset_entity, column_id_map, validator
+                column_name, check_name, individual_stats, data_asset_entity, assets_map, validator
             )
             if not validated_data:
                 continue
@@ -627,19 +996,21 @@ class IssueReporter:
             if not column_info.column_checks:
                 self._create_check_and_issue(
                     asset_id, column_name, column_id, check_name,
-                    check_obj, number_of_occurrences, total_records, project_id
+                    check_obj, number_of_occurrences, total_records, project_id,
+                    assets_map
                 )
                 continue
             
             # Try to handle existing check
             check_handled = self._handle_existing_check(
-                column_info, check_type, asset_id, column_name, check_name,
-                column_id, number_of_occurrences, total_records, project_id
+                column_info, check_type, asset_id, column_name, column_id,
+                number_of_occurrences, total_records, project_id
             )
             
             # If check not found, create it
             if not check_handled:
                 self._create_check_and_issue(
                     asset_id, column_name, column_id, check_name,
-                    check_obj, number_of_occurrences, total_records, project_id
+                    check_obj, number_of_occurrences, total_records, project_id,
+                    assets_map
                 )
