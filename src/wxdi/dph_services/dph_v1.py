@@ -134,14 +134,14 @@ class DphV1(BaseService):
         """
         Get resource initialization status.
 
-        Use this API to get the status of resource initialization in Data Product
-        Hub.<br/><br/>If the data product catalog exists but has never been initialized,
-        the status will be "not_started".<br/><br/>If the data product catalog exists and
-        has been or is being initialized, the response will contain the status of the last
-        or current initialization. If the initialization failed, the "errors" and "trace"
-        fields will contain the error(s) encountered during the initialization, including
-        the ID to trace the error(s).<br/><br/>If the data product catalog doesn't exist,
-        an HTTP 404 response is returned.
+        Use this API to get the status of resource initialization in Data Product Hub.
+        If the data product catalog exists but has never been initialized, the status will
+        be "not_started".
+        If the data product catalog exists and has been or is being initialized, the
+        response will contain the status of the last or current initialization. If the
+        initialization failed, the "errors" and "trace" fields will contain the error(s)
+        encountered during the initialization, including the ID to trace the error(s).
+        If the data product catalog doesn't exist, an HTTP 404 response is returned.
 
         :param str container_id: (optional) Container ID of the data product
                catalog. If not supplied, the data product catalog is looked up by using
@@ -206,27 +206,30 @@ class DphV1(BaseService):
         """
         Initialize resources.
 
-        Use this API to initialize default assets for data product hub. <br/><br/>You can
-        initialize: <br/><ul><li>`delivery_methods` - Methods through which data product
-        parts can be delivered to consumers of the data product
-        hub</li><li>`domains_multi_industry` - Taxonomy of domains and use cases
-        applicable to multiple industries</li><li>`data_product_samples` - Sample data
-        products used to illustrate capabilities of the data product
-        hub</li><li>`workflows` - Workflows to enable restricted data
-        products</li><li>`project` - A default project for exporting data assets to
-        files</li><li>`catalog_configurations` - Catalog configurations for the default
-        data product catalog</li></ul><br/><br/>If a resource depends on resources that
-        are not specified in the request, these dependent resources will be automatically
-        initialized. E.g., initializing `data_product_samples` will also initialize
-        `domains_multi_industry` and `delivery_methods` even if they are not specified in
-        the request because it depends on them.<br/><br/>If initializing the data product
-        hub for the first time, do not specify a container. The default data product
-        catalog will be created.<br/>For first time initialization, it is recommended that
-        at least `delivery_methods` and `domains_multi_industry` is included in the
-        initialize operation.<br/><br/>If the data product hub has already been
-        initialized, you may call this API again to initialize new resources, such as new
-        delivery methods. In this case, specify the default data product catalog container
-        information.
+        Use this API to initialize default assets for data product hub.
+        You can initialize:
+        <ul><li>`delivery_methods` - Methods through which data product parts can be
+        delivered to consumers of the data product hub</li><li>`domains_multi_industry` -
+        Taxonomy of domains and use cases applicable to multiple
+        industries</li><li>`data_product_samples` - Sample data products used to
+        illustrate capabilities of the data product hub</li><li>`workflows` - Workflows to
+        enable restricted data products</li><li>`project` - A default project for
+        exporting data assets to files</li><li>`catalog_configurations` - Catalog
+        configurations for the default data product catalog</li><li>`gen_ai_onboarding` -
+        Enable GenAI capabilities for the data product catalog and onboard the associated
+        project</li></ul>
+        If a resource depends on resources that are not specified in the request, these
+        dependent resources will be automatically initialized. E.g., initializing
+        `data_product_samples` will also initialize `domains_multi_industry` and
+        `delivery_methods` even if they are not specified in the request because it
+        depends on them.
+        If initializing the data product hub for the first time, do not specify a
+        container. The default data product catalog will be created. For first time
+        initialization, it is recommended that at least `delivery_methods` and
+        `domains_multi_industry` is included in the initialize operation.
+        If the data product hub has already been initialized, you may call this API again
+        to initialize new resources, such as new delivery methods. In this case, specify
+        the default data product catalog container information.
 
         :param ContainerReference container: (optional) Container reference.
         :param List[str] include: (optional) List of configuration options to
@@ -299,9 +302,11 @@ class DphV1(BaseService):
         Create visualization asset and initialize profiling for the provided data assets.
 
         Use this API to create visualization asset and initialize profiling for the
-        provided data assets<br/><br/>Provide the below required fields<br/><br/>Required
-        fields:<br/><br/>- catalog_id<br/>- Collection of assetId with it's related asset
-        id<br/><br/>.
+        provided data assets
+        Provide the below required fields
+        Required fields:
+        - catalog_id
+        - Collection of assetId with it's related asset id.
 
         :param List[DataAssetRelationship] assets: (optional) Data product hub
                asset and it's related part asset.
@@ -352,10 +357,10 @@ class DphV1(BaseService):
         """
         Reinitiate visualization for an asset.
 
-        Use this API to Reinitiate visualization for an asset which is in below
-        scenarios<br/><br/>- Previous bucket got deleted and new bucket is created.<br/>-
-        Data visualization attachment is missing in asset details.<br/>- Visualization
-        asset reference is missing in related asset details.<br/><br/>.
+        Use this API to Reinitiate visualization for an asset which is in below scenarios
+        - Previous bucket got deleted and new bucket is created.
+        - Data visualization attachment is missing in asset details.
+        - Visualization asset reference is missing in related asset details.
 
         :param List[DataAssetRelationship] assets: (optional) Data product hub
                asset and it's related part asset.
@@ -451,10 +456,13 @@ class DphV1(BaseService):
         """
         Create a new data product.
 
-        Use this API to create a new data product.<br/><br/>Provide the initial draft of
-        the data product.<br/><br/>Required fields:<br/><br/>- name<br/>-
-        container<br/><br/>If `version` is not specified, the default version **1.0.0**
-        will be used.<br/><br/>The `domain` is optional.
+        Use this API to create a new data product.
+        Provide the initial draft of the data product.
+        Required fields:
+        - name
+        - container
+        If `version` is not specified, the default version **1.0.0** will be used.
+        The `domain` is optional.
 
         :param List[DataProductDraftPrototype] drafts: Collection of data products
                drafts to add to data product.
@@ -1016,11 +1024,13 @@ class DphV1(BaseService):
 
         Use this API to update the properties of a data product draft identified by a
         valid ID. Use '-' for the `data_product_id` to skip specifying the data product ID
-        explicitly.<br/><br/>Specify patch operations using http://jsonpatch.com/
-        syntax.<br/><br/>Supported patch operations include:<br/><br/>- Update the
-        properties of a data product<br/><br/>- Add/Remove parts from a data product (up
-        to 20 parts)<br/><br/>- Add/Remove use cases from a data product<br/><br/>- Update
-        the data product state<br/><br/>.
+        explicitly.
+        Specify patch operations using http://jsonpatch.com/ syntax.
+        Supported patch operations include:
+        - Update the properties of a data product
+        - Add/Remove parts from a data product (up to 20 parts)
+        - Add/Remove use cases from a data product
+        - Update the data product state.
 
         :param str data_product_id: Data product ID. Use '-' to skip specifying the
                data product ID explicitly.
@@ -1209,9 +1219,9 @@ class DphV1(BaseService):
         Supported patch operations include:
         - Update the url of document if it does not have an attachment.
         - Update the type of the document.
-        <br/><br/>Contract terms documents can only be updated if the associated data
-        product version is in DRAFT state. Use '-' for the `data_product_id` to skip
-        specifying the data product ID explicitly.
+        Contract terms documents can only be updated if the associated data product
+        version is in DRAFT state. Use '-' for the `data_product_id` to skip specifying
+        the data product ID explicitly.
 
         :param str data_product_id: Data product ID. Use '-' to skip specifying the
                data product ID explicitly.
@@ -1501,8 +1511,8 @@ class DphV1(BaseService):
         Specify patch operations using http://jsonpatch.com/ syntax.
         Supported patch operations include:
         - Update the contract terms properties.
-        <br/><br/>Contract terms can only be updated if the associated data product
-        version is in DRAFT state.
+        Contract terms can only be updated if the associated data product version is in
+        DRAFT state.
 
         :param str data_product_id: Data product ID. Use '-' to skip specifying the
                data product ID explicitly.
@@ -1755,10 +1765,12 @@ class DphV1(BaseService):
 
         Use this API to update the properties of a data product release identified by a
         valid ID. Use '-' for the `data_product_id` to skip specifying the data product ID
-        explicitly.<br/><br/>Specify patch operations using http://jsonpatch.com/
-        syntax.<br/><br/>Supported patch operations include:<br/><br/>- Update the
-        properties of a data product<br/><br/>- Add/remove parts from a data product (up
-        to 20 parts)<br/><br/>- Add/remove use cases from a data product<br/><br/>.
+        explicitly.
+        Specify patch operations using http://jsonpatch.com/ syntax.
+        Supported patch operations include:
+        - Update the properties of a data product
+        - Add/remove parts from a data product (up to 20 parts)
+        - Add/remove use cases from a data product.
 
         :param str data_product_id: Data product ID. Use '-' to skip specifying the
                data product ID explicitly.
@@ -1820,12 +1832,12 @@ class DphV1(BaseService):
         Get a contract document.
 
         If the document has a completed attachment, the response contains the `url` to
-        download the attachment.<br/><br/> If the document does not have an attachment,
-        the response contains the `url` which was submitted at document
-        creation.<br/><br/> If the document has an incomplete attachment, an error is
-        returned to prompt the user to upload the document file to complete the
-        attachment. Use '-' for the `data_product_id` to skip specifying the data product
-        ID explicitly.
+        download the attachment.
+        If the document does not have an attachment, the response contains the `url` which
+        was submitted at document creation.
+        If the document has an incomplete attachment, an error is returned to prompt the
+        user to upload the document file to complete the attachment. Use '-' for the
+        `data_product_id` to skip specifying the data product ID explicitly.
 
         :param str data_product_id: Data product ID. Use '-' to skip specifying the
                data product ID explicitly.
@@ -2411,11 +2423,14 @@ class DphV1(BaseService):
         """
         Update the data product contract template identified by ID.
 
-        Use this API to update the properties of a data product contract template
-        identified by a valid ID.<br/><br/>Specify patch operations using
-        http://jsonpatch.com/ syntax.<br/><br/>Supported patch operations
-        include:<br/><br/>- Update the name of a data product contract template<br/><br/>-
-        Update the contract terms of data product contract template<br/><br/>.
+        Use this API to update the properties of a data product contract template identified by a valid ID.
+
+        Specify patch operations using http://jsonpatch.com/ syntax.
+
+        Supported patch operations include:
+
+        - Update the name of a data product contract template
+        - Update the contract terms of data product contract template.
 
         :param str contract_template_id: Data Product Contract Template id.
         :param str container_id: Container ID of the data product catalog.
@@ -2799,10 +2814,12 @@ class DphV1(BaseService):
         Update the data product domain identified by ID.
 
         Use this API to update the properties of a data product domain identified by a
-        valid ID.<br/><br/>Specify patch operations using http://jsonpatch.com/
-        syntax.<br/><br/>Supported patch operations include:<br/><br/>- Update the name of
-        a data product domain<br/><br/>- Update the description of a data product
-        domain<br/><br/>- Update the rov of a data product domain<br/><br/>.
+        valid ID.
+        Specify patch operations using http://jsonpatch.com/ syntax.
+        Supported patch operations include:
+        - Update the name of a data product domain
+        - Update the description of a data product domain
+        - Update the rov of a data product domain.
 
         :param str domain_id: Domain id.
         :param str container_id: Container ID of the data product catalog.
