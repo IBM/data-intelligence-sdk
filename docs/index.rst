@@ -25,6 +25,7 @@ This SDK is designed with a modular architecture, allowing different teams to co
 * **DPH Services**: Python client for IBM Data Product Hub API
 * **ODCS Generator**: Generate Open Data Contract Standard files from data catalogs
 * **Data Product Recommender**: Analyze query logs to identify high-value data products
+* **Data Contracts**: Manage Open Data Contract Standard (ODCS) data contracts via IBM Data Quality REST APIs
 
 The ``IBM watsonx.data intelligence SDK`` is supported on Python 3.8+.
 
@@ -39,6 +40,9 @@ Key Features
 
 **ODCS Generation**
    Automated generation of ODCS v3.1.0 compliant YAML files from Collibra and Informatica catalogs.
+
+**Data Contracts Management**
+   Full CRUD, ODCS schema validation, file upload, and test execution for data contracts across projects and catalogs.
 
 **Intelligent Recommendations**
    Query log analysis to identify high-value tables and logical groupings for data product prioritization.
@@ -64,6 +68,7 @@ Key Features
    chapters/06_odcs_generator/index
    chapters/07_data_product_recommender/index
    chapters/08_future_modules/index
+   chapters/09_data_contracts/index
    api/index
 
 .. Made with Bob

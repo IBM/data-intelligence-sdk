@@ -30,6 +30,7 @@ This API reference documentation is auto-generated from the source code docstrin
    dph_services/index
    odcs_generator/index
    data_product_recommender/index
+   data_contracts/index
 
 Module Organization
 -------------------
@@ -82,6 +83,15 @@ Query log analysis tool for data product recommendations:
 * Platform-specific query log parsers (Snowflake, Databricks, BigQuery, watsonx.data)
 * Scoring and ranking algorithms
 * CLI and Python interfaces
+
+Data Contracts Module
+~~~~~~~~~~~~~~~~~~~~~
+
+Manage Open Data Contract Standard (ODCS) compliant data contracts:
+
+* :ref:`DataContractsProvider<api_data_contracts>` - Full CRUD, ODCS schema validation, file upload, and test execution
+* Project-scoped and catalog-scoped contract management
+* Pydantic v2 request and response models with automatic response shape normalisation
 
 Navigation Tips
 ---------------
