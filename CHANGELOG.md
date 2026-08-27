@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/IBM/data-intelligence-sdk/compare/v2.1.0...v2.2.0) (2026-08-27)
+
+
+### Features
+
+* Merge pull request [#26](https://github.com/IBM/data-intelligence-sdk/issues/26) from IBM/data-contract-sdk ([c49a1a3](https://github.com/IBM/data-intelligence-sdk/commit/c49a1a35ed7e045c40b794af01a2e79df4eefb9e))
+
 # [2.1.0](https://github.com/IBM/data-intelligence-sdk/compare/v2.0.0...v2.1.0) (2026-05-29)
 
 
