@@ -124,7 +124,7 @@ class DataContractsProvider(BaseProvider):
             url,
             headers=headers,
             data=body.data_contract_content,
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -165,7 +165,7 @@ class DataContractsProvider(BaseProvider):
             url,
             headers=headers,
             params={"limit": limit},
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -213,7 +213,7 @@ class DataContractsProvider(BaseProvider):
             headers=headers,
             params={"validate": str(validate).lower()},
             data=self._serialize_prototype(body),
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -253,7 +253,7 @@ class DataContractsProvider(BaseProvider):
             url,
             headers=headers,
             params={"data_contract_ids": data_contract_ids},
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -293,7 +293,7 @@ class DataContractsProvider(BaseProvider):
             f"/data_contracts/{data_contract_id}"
         )
         headers = get_request_headers(self.config.auth_token)
-        response = self.session.get(url, headers=headers, verify=False)
+        response = self.session.get(url, headers=headers, verify=True)
         if not response.ok:
             raise ValueError(
                 f"Failed to get data contract {data_contract_id} in project "
@@ -344,7 +344,7 @@ class DataContractsProvider(BaseProvider):
             headers=headers,
             params={"validate": str(validate).lower()},
             data=self._serialize_prototype(body),
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -409,7 +409,7 @@ class DataContractsProvider(BaseProvider):
             headers=headers,
             data=form_data,
             files=files,
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -459,7 +459,7 @@ class DataContractsProvider(BaseProvider):
             url,
             headers=headers,
             data=body.model_dump_json(exclude_none=True),
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -508,7 +508,7 @@ class DataContractsProvider(BaseProvider):
             url,
             headers=headers,
             params={"include_all_details": str(include_all_details).lower()},
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -545,7 +545,7 @@ class DataContractsProvider(BaseProvider):
             f"/data_contracts/{data_contract_id}/test_results"
         )
         headers = get_request_headers(self.config.auth_token)
-        response = self.session.delete(url, headers=headers, verify=False)
+        response = self.session.delete(url, headers=headers, verify=True)
         if not response.ok:
             raise ValueError(
                 f"Failed to delete test results for data contract {data_contract_id} "
@@ -596,7 +596,7 @@ class DataContractsProvider(BaseProvider):
             url,
             headers=headers,
             params={"include_all_details": str(include_all_details).lower()},
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -643,7 +643,7 @@ class DataContractsProvider(BaseProvider):
             url,
             headers=headers,
             data=body.data_contract_content,
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -683,7 +683,7 @@ class DataContractsProvider(BaseProvider):
             url,
             headers=headers,
             params={"limit": limit},
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -731,7 +731,7 @@ class DataContractsProvider(BaseProvider):
             headers=headers,
             params={"validate": str(validate).lower()},
             data=self._serialize_prototype(body),
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -771,7 +771,7 @@ class DataContractsProvider(BaseProvider):
             url,
             headers=headers,
             params={"data_contract_ids": data_contract_ids},
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -811,7 +811,7 @@ class DataContractsProvider(BaseProvider):
             f"/data_contracts/{data_contract_id}"
         )
         headers = get_request_headers(self.config.auth_token)
-        response = self.session.get(url, headers=headers, verify=False)
+        response = self.session.get(url, headers=headers, verify=True)
         if not response.ok:
             raise ValueError(
                 f"Failed to get data contract {data_contract_id} in catalog "
@@ -862,7 +862,7 @@ class DataContractsProvider(BaseProvider):
             headers=headers,
             params={"validate": str(validate).lower()},
             data=self._serialize_prototype(body),
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
@@ -925,7 +925,7 @@ class DataContractsProvider(BaseProvider):
             headers=headers,
             data=form_data,
             files=files,
-            verify=False,
+            verify=True,
         )
         if not response.ok:
             raise ValueError(
