@@ -287,6 +287,33 @@ CLI and Python API
 * File-based input (CSV and JSON)
 * Configurable output directory and format
 
+Data Contracts Module
+---------------------
+
+Programmatic management of Open Data Contract Standard (ODCS) compliant data contracts via IBM Data Quality REST APIs.
+
+Contract Lifecycle Management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* **Full CRUD Operations**: Create, retrieve, replace (PUT), and delete contracts in both projects and catalogs
+* **ODCS Schema Validation**: Validate raw YAML or JSON contract content against the ODCS specification before persisting
+* **Dual Format Support**: Author contracts using inline YAML (:class:`~wxdi.data_contracts.DataContractPrototypeYaml`) or structured JSON dicts (:class:`~wxdi.data_contracts.DataContractPrototypeJson`)
+* **File Upload**: Upload YAML/JSON contract files directly via multipart form upload
+
+Testing and Verification
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* **Test Execution**: Trigger automated test runs for project-scoped data contracts
+* **Result Inspection**: Retrieve overall run status, per-check pass/fail outcomes, and execution logs
+* **Test History**: List historical test results or fetch specific runs by ID
+
+Enterprise Integration
+~~~~~~~~~~~~~~~~~~~~~~
+
+* **Server Mappings**: Bind logical ODCS servers to IBM Cloud Pak for Data connection assets
+* **Response Normalisation**: Transparently normalises nested CAMS asset responses into flat fields (``id``, ``name``)
+* **Type-Safe Pydantic Models**: Complete Pydantic v2 data models for all requests, responses, and embedded entities
+
 Future Modules
 --------------
 
