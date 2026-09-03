@@ -57,6 +57,7 @@ setup(
         "regex>=2023.0.0",
         "urllib3>=2.6.3",
         "python-dateutil>=2.5.3,<3.0.0",
+        "PyJWT>=2.13.0",
         "pyyaml>=5.4.0,<7.0.0",
         "numpy>=1.24.0",
         "cel-python>=0.5.0",
@@ -64,6 +65,7 @@ setup(
         # CRA sees ibm-cloud-sdk-core from both setup.py and requirements.txt and
         # fails with ResolutionImpossible when constraints differ (bare vs >=).
         "ibm-cloud-sdk-core==3.24.4",
+        "idna>=3.17",
     ],
     extras_require={
         "dev": [
