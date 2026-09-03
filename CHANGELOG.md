@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/IBM/data-intelligence-sdk/compare/v2.2.0...v2.2.1) (2026-09-03)
+
+
+### Bug Fixes
+
+* Patch CVEs for idna and pyjwt ([a973d2e](https://github.com/IBM/data-intelligence-sdk/commit/a973d2e139c93e2d774d076a3cd24ee4e747cb03))
+
 # [2.2.0](https://github.com/IBM/data-intelligence-sdk/compare/v2.1.0...v2.2.0) (2026-08-27)
 
 
