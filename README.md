@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-# IBM watsonx.data intelligence SDK Version 2.2.0
+# IBM watsonx.data intelligence SDK Version 2.2.1
 
 A comprehensive Python SDK for data intelligence operations including:
 - **Data Quality Validation**: Validate streaming data records, Pandas DataFrames, and PySpark DataFrames
@@ -295,7 +295,7 @@ container_response = dph_service.initialize(
 # Create a data product
 data_product = dph_service.create_data_product(
     drafts=[{
-        'version': '2.2.0',
+        'version': '2.2.1',
         'name': 'My Data Product',
         'description': 'A sample data product',
         'asset': {
