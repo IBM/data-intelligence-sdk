@@ -11,7 +11,6 @@ Configuration:
 """
 
 import io
-import json
 import traceback
 
 from wxdi.data_contracts import DataContractsProvider
@@ -20,6 +19,16 @@ from wxdi.data_contracts.models import (
     DataContractPrototypeJson,
     DataContractValidationRequest,
     DataContractTestRequest,
+    DataContractTestResultPrototype,
+    DataContractTestResultJobInfoPrototype,
+    DataContractTestResultJobRunPrototype,
+    DataContractTestResultSummaryPrototype,
+    DataContractTestResultSchemaValidationSummaryPrototype,
+    DataContractTestResultDataQualitySummaryPrototype,
+    DataContractTestResultDataAssetPrototype,
+    DataContractTestResultAssetSchemaValidationPrototype,
+    DataContractTestResultPhysicalTypeCheckPrototype,
+    DataContractTestResultColumnsSummaryPrototype,
 )
 from wxdi.dq_validator.provider import ProviderConfig
 
@@ -36,6 +45,76 @@ CONNECTION_ID = "019fd738-ffce-7799-8720-32deb3447685"
 # Filled in automatically as the smoke tests run
 _created_project_contract_id: str | None = None
 _created_catalog_contract_id: str | None = None
+# Filled in automatically by create_*_data_contract_test_result
+_created_project_test_run_id: str | None = None
+_created_catalog_test_run_id: str | None = None
+
+# A realistic DataContractTestResultPrototype payload
+SAMPLE_TEST_RESULT_PROTOTYPE = DataContractTestResultPrototype(
+    status="completed",
+    start="2025-01-15T08:00:00.000Z",
+    end="2025-01-15T08:03:42.000Z",
+    data_product="BankingDataProduct",
+    run_by="service-account@ibm.com",
+    job=DataContractTestResultJobInfoPrototype(
+        id="job-abc123",
+        run=DataContractTestResultJobRunPrototype(
+            id="run-xyz789",
+            state="Completed",
+        ),
+    ),
+    summary=DataContractTestResultSummaryPrototype(
+        status="completed",
+        schema_validation=DataContractTestResultSchemaValidationSummaryPrototype(
+            status="passed",
+            total_assets=1,
+            passed_assets=1,
+            failed_assets=0,
+            missing_assets_count=0,
+            total_columns=6,
+            passed_columns=6,
+            failed_columns=0,
+            missing_columns_count=0,
+            type_mismatch_count=0,
+            unexpected_columns_count=0,
+        ),
+        data_quality=DataContractTestResultDataQualitySummaryPrototype(
+            status="passed",
+            total_checks=3,
+            passed_checks=3,
+            failed_checks=0,
+            error_checks=0,
+        ),
+    ),
+    data_assets=[
+        DataContractTestResultDataAssetPrototype(
+            id="asset-001",
+            name="BANK_CLIENTS",
+            physical_name="BANK1/BANK_CLIENTS",
+            status="passed",
+            schema_validation=DataContractTestResultAssetSchemaValidationPrototype(
+                status="passed",
+                exists=True,
+                physical_type=DataContractTestResultPhysicalTypeCheckPrototype(
+                    expected="table",
+                    actual="table",
+                    status="passed",
+                ),
+                columns_summary=DataContractTestResultColumnsSummaryPrototype(
+                    expected_count=6,
+                    actual_count=6,
+                    matched_count=6,
+                    missing_count=0,
+                    unexpected_count=0,
+                ),
+                missing_columns=[],
+                unexpected_columns=[],
+            ),
+            columns=[],
+            data_quality_checks=[],
+        )
+    ],
+)
 
 SAMPLE_CONTRACT_YAML = f"""\
 version: 1.0.0
@@ -585,10 +664,13 @@ def get_project_data_contract_test_result():
         print("  SKIPPED — no test runs found")
         return
     run_id = collection.test_results[0].id
+    if not run_id:
+        print("  SKIPPED — test run has no id")
+        return
     result = provider.get_project_data_contract_test_result(
         PROJECT_ID, _created_project_contract_id, run_id
     )
-    print(f"  run_id={result.id}  status={result.status}  run_by={result.run_by}")
+    print(f"  run_id={result.id}  status={result.status}")
 
 
 def delete_project_data_contract_test_results():
@@ -601,6 +683,44 @@ def delete_project_data_contract_test_results():
         PROJECT_ID, _created_project_contract_id
     )
     print("  deleted all test results")
+
+
+def create_project_data_contract_test_result():
+    """POST /data_quality/v4/projects/{project_id}/data_contracts/{id}/test_results  (Internal)"""
+    global _created_project_test_run_id
+    if not _created_project_contract_id:
+        print("  SKIPPED — no project contract created yet (run create first)")
+        return
+    provider = _provider()
+    try:
+        result = provider.create_project_data_contract_test_result(
+            PROJECT_ID, _created_project_contract_id, SAMPLE_TEST_RESULT_PROTOTYPE
+        )
+        _created_project_test_run_id = result.id
+        print(f"  created run_id={result.id}  status={result.status}")
+    except ValueError as exc:
+        print(f"  NOTE (server error): {exc}")
+
+
+def update_project_data_contract_test_result():
+    """PUT /data_quality/v4/projects/{project_id}/data_contracts/{id}/test_results/{run_id}  (Internal)"""
+    if not _created_project_contract_id:
+        print("  SKIPPED — no project contract created yet (run create first)")
+        return
+    if not _created_project_test_run_id:
+        print("  SKIPPED — no test run created yet (run create_project_data_contract_test_result first)")
+        return
+    provider = _provider()
+    updated_body = DataContractTestResultPrototype(
+        **{**SAMPLE_TEST_RESULT_PROTOTYPE.model_dump(exclude_none=True), "status": "failed"}
+    )
+    try:
+        result = provider.update_project_data_contract_test_result(
+            PROJECT_ID, _created_project_contract_id, _created_project_test_run_id, updated_body
+        )
+        print(f"  updated run_id={result.id}  status={result.status}")
+    except ValueError as exc:
+        print(f"  NOTE (server error): {exc}")
 
 
 def delete_project_data_contracts():
@@ -698,6 +818,95 @@ def upload_catalog_data_contract_file():
         print(f"  cleaned up id={contract.id}")
 
 
+def create_catalog_data_contract_test_result():
+    """POST /data_quality/v4/catalogs/{catalog_id}/data_contracts/{id}/test_results"""
+    global _created_catalog_test_run_id
+    if not _created_catalog_contract_id:
+        print("  SKIPPED — no catalog contract created yet (run create first)")
+        return
+    provider = _provider()
+    try:
+        result = provider.create_catalog_data_contract_test_result(
+            CATALOG_ID, _created_catalog_contract_id, SAMPLE_TEST_RESULT_PROTOTYPE
+        )
+        _created_catalog_test_run_id = result.id
+        print(f"  created run_id={result.id}  status={result.status}")
+    except ValueError as exc:
+        print(f"  NOTE (server error): {exc}")
+
+
+def update_catalog_data_contract_test_result():
+    """PUT /data_quality/v4/catalogs/{catalog_id}/data_contracts/{id}/test_results/{run_id}"""
+    if not _created_catalog_contract_id:
+        print("  SKIPPED — no catalog contract created yet (run create first)")
+        return
+    if not _created_catalog_test_run_id:
+        print("  SKIPPED — no test run created yet (run create_catalog_data_contract_test_result first)")
+        return
+    provider = _provider()
+    updated_body = DataContractTestResultPrototype(
+        **{**SAMPLE_TEST_RESULT_PROTOTYPE.model_dump(exclude_none=True), "status": "failed"}
+    )
+    try:
+        result = provider.update_catalog_data_contract_test_result(
+            CATALOG_ID, _created_catalog_contract_id, _created_catalog_test_run_id, updated_body
+        )
+        print(f"  updated run_id={result.id}  status={result.status}")
+    except ValueError as exc:
+        print(f"  NOTE (server error): {exc}")
+
+
+def list_catalog_data_contract_test_results():
+    """GET /data_quality/v4/catalogs/{catalog_id}/data_contracts/{id}/test_results"""
+    if not _created_catalog_contract_id:
+        print("  SKIPPED — no catalog contract created yet (run create first)")
+        return
+    provider = _provider()
+    try:
+        result = provider.list_catalog_data_contract_test_results(
+            CATALOG_ID, _created_catalog_contract_id
+        )
+        print(f"  test_result_count={len(result.test_results)}")
+        for r in result.test_results:
+            print(f"    run_id={r.id}  status={r.status}")
+    except ValueError as exc:
+        # 404 is returned when no test runs exist yet — not an SDK bug.
+        print(f"  SKIPPED (no test results yet): {exc}")
+
+
+def get_catalog_data_contract_test_result():
+    """GET /data_quality/v4/catalogs/{catalog_id}/data_contracts/{id}/test_results/{run_id}"""
+    if not _created_catalog_contract_id:
+        print("  SKIPPED — no catalog contract created yet (run create first)")
+        return
+    if not _created_catalog_test_run_id:
+        print("  SKIPPED — no test run created yet (run create_catalog_data_contract_test_result first)")
+        return
+    provider = _provider()
+    try:
+        result = provider.get_catalog_data_contract_test_result(
+            CATALOG_ID, _created_catalog_contract_id, _created_catalog_test_run_id
+        )
+        print(f"  run_id={result.id}  status={result.status}")
+    except ValueError as exc:
+        print(f"  NOTE (server error): {exc}")
+
+
+def delete_catalog_data_contract_test_results():
+    """DELETE /data_quality/v4/catalogs/{catalog_id}/data_contracts/{id}/test_results"""
+    if not _created_catalog_contract_id:
+        print("  SKIPPED — no catalog contract created yet (run create first)")
+        return
+    provider = _provider()
+    try:
+        provider.delete_catalog_data_contract_test_results(
+            CATALOG_ID, _created_catalog_contract_id
+        )
+        print("  deleted all catalog test results")
+    except ValueError as exc:
+        print(f"  NOTE (server error): {exc}")
+
+
 def delete_catalog_data_contracts():
     """DELETE /data_quality/v4/catalogs/{catalog_id}/data_contracts"""
     if not _created_catalog_contract_id:
@@ -731,6 +940,10 @@ if __name__ == "__main__":
          list_project_data_contract_test_results)
     _run("get_project_data_contract_test_result [Internal]",
          get_project_data_contract_test_result)
+    _run("create_project_data_contract_test_result [Internal]",
+         create_project_data_contract_test_result)
+    _run("update_project_data_contract_test_result [Internal]",
+         update_project_data_contract_test_result)
     _run("delete_project_data_contract_test_results [Internal]",
          delete_project_data_contract_test_results)
     _run("delete_project_data_contracts", delete_project_data_contracts)
@@ -745,6 +958,16 @@ if __name__ == "__main__":
     _run("get_catalog_data_contract", get_catalog_data_contract)
     _run("replace_catalog_data_contract", replace_catalog_data_contract)
     _run("upload_catalog_data_contract_file", upload_catalog_data_contract_file)
+    _run("create_catalog_data_contract_test_result",
+         create_catalog_data_contract_test_result)
+    _run("list_catalog_data_contract_test_results",
+         list_catalog_data_contract_test_results)
+    _run("get_catalog_data_contract_test_result",
+         get_catalog_data_contract_test_result)
+    _run("update_catalog_data_contract_test_result",
+         update_catalog_data_contract_test_result)
+    _run("delete_catalog_data_contract_test_results",
+         delete_catalog_data_contract_test_results)
     _run("delete_catalog_data_contracts", delete_catalog_data_contracts)
 
     print("\n" + "#" * 60)

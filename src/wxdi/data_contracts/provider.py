@@ -35,11 +35,13 @@ from .models import (
     DataContractPrototype,
     DataContractPrototypeJson,
     DataContractPrototypeYaml,
+    DataContractTestRequest,
     DataContractTestResponse,
-    DataContractTestResponseCollection,
+    DataContractTestResult,
+    DataContractTestResultCollection,
+    DataContractTestResultPrototype,
     DataContractValidationRequest,
     DataContractValidationResponse,
-    DataContractTestRequest,
 )
 
 
@@ -478,7 +480,7 @@ class DataContractsProvider(BaseProvider):
         data_contract_id: str,
         *,
         include_all_details: bool = False,
-    ) -> DataContractTestResponseCollection:
+    ) -> DataContractTestResultCollection:
         """List all test run results for a data contract (internal endpoint).
 
         Args:
@@ -488,7 +490,7 @@ class DataContractsProvider(BaseProvider):
                 server mappings, and check results. Defaults to ``False``.
 
         Returns:
-            DataContractTestResponseCollection.
+            DataContractTestResultCollection.
 
         Raises:
             ValueError: If no test runs exist (404) or another non-2xx
@@ -515,7 +517,7 @@ class DataContractsProvider(BaseProvider):
                 f"Failed to list test results for data contract {data_contract_id} "
                 f"in project {project_id}: {response.status_code} {response.text}"
             )
-        return DataContractTestResponseCollection(**response.json())
+        return DataContractTestResultCollection(**response.json())
 
     # ------------------------------------------------------------------
     # DELETE /data_quality/v4/projects/{project_id}/data_contracts/{id}/test_results
@@ -563,7 +565,7 @@ class DataContractsProvider(BaseProvider):
         test_run_id: str,
         *,
         include_all_details: bool = False,
-    ) -> DataContractTestResponse:
+    ) -> DataContractTestResult:
         """Retrieve a specific test run result (internal endpoint).
 
         Args:
@@ -574,7 +576,7 @@ class DataContractsProvider(BaseProvider):
                 mappings, and check results. Defaults to ``False``.
 
         Returns:
-            DataContractTestResponse for the specified test run.
+            DataContractTestResult for the specified test run.
 
         Raises:
             ValueError: If the test run is not found or the server returns a
@@ -604,7 +606,105 @@ class DataContractsProvider(BaseProvider):
                 f"{data_contract_id} in project {project_id}: "
                 f"{response.status_code} {response.text}"
             )
-        return DataContractTestResponse(**response.json())
+        return DataContractTestResult(**response.json())
+
+    # ------------------------------------------------------------------
+    # POST /data_quality/v4/projects/{project_id}/data_contracts/{id}/test_results
+    # ------------------------------------------------------------------
+
+    def create_project_data_contract_test_result(
+        self,
+        project_id: str,
+        data_contract_id: str,
+        body: DataContractTestResultPrototype,
+    ) -> DataContractTestResult:
+        """Create a test result for a data contract (internal endpoint).
+
+        Args:
+            project_id: The project identifier.
+            data_contract_id: The data contract identifier.
+            body: The test result payload.
+
+        Returns:
+            The created DataContractTestResult.
+
+        Raises:
+            ValueError: If the server returns a non-2xx response.
+        """
+        if not project_id:
+            raise ValueError(self._ERR_PROJECT_ID)
+        if not data_contract_id:
+            raise ValueError(self._ERR_CONTRACT_ID)
+
+        url = (
+            f"{self.config.url}/data_quality/v4/projects/{project_id}"
+            f"/data_contracts/{data_contract_id}/test_results"
+        )
+        headers = get_request_headers(self.config.auth_token)
+        response = self.session.post(
+            url,
+            headers=headers,
+            json=body.model_dump(exclude_none=True),
+            verify=False,
+        )
+        if not response.ok:
+            raise ValueError(
+                f"Failed to create test result for data contract {data_contract_id} "
+                f"in project {project_id}: {response.status_code} {response.text}"
+            )
+        return DataContractTestResult(**response.json())
+
+    # ------------------------------------------------------------------
+    # PUT /data_quality/v4/projects/{project_id}/data_contracts/{id}/test_results/{run_id}
+    # ------------------------------------------------------------------
+
+    def update_project_data_contract_test_result(
+        self,
+        project_id: str,
+        data_contract_id: str,
+        test_run_id: str,
+        body: DataContractTestResultPrototype,
+    ) -> DataContractTestResult:
+        """Update an existing test result for a data contract (internal endpoint).
+
+        Args:
+            project_id: The project identifier.
+            data_contract_id: The data contract identifier.
+            test_run_id: The test run identifier to update.
+            body: The updated test result payload.
+
+        Returns:
+            The updated DataContractTestResult.
+
+        Raises:
+            ValueError: If the test run is not found or the server returns a
+                non-2xx response.
+        """
+        if not project_id:
+            raise ValueError(self._ERR_PROJECT_ID)
+        if not data_contract_id:
+            raise ValueError(self._ERR_CONTRACT_ID)
+        if not test_run_id:
+            raise ValueError(self._ERR_TEST_RUN_ID)
+
+        url = (
+            f"{self.config.url}/data_quality/v4/projects/{project_id}"
+            f"/data_contracts/{data_contract_id}/test_results/{test_run_id}"
+        )
+        headers = get_request_headers(self.config.auth_token)
+        response = self.session.put(
+            url,
+            headers=headers,
+            json=body.model_dump(exclude_none=True),
+            verify=False,
+        )
+        if not response.ok:
+            raise ValueError(
+                f"Failed to update test result {test_run_id} for data contract "
+                f"{data_contract_id} in project {project_id}: "
+                f"{response.status_code} {response.text}"
+            )
+        return DataContractTestResult(**response.json())
 
     # ==================================================================
     # CATALOG-SCOPED ENDPOINTS
@@ -933,6 +1033,243 @@ class DataContractsProvider(BaseProvider):
                 f"{response.status_code} {response.text}"
             )
         return DataContract(**response.json())
+
+    # ------------------------------------------------------------------
+    # GET /data_quality/v4/catalogs/{catalog_id}/data_contracts/{id}/test_results
+    # ------------------------------------------------------------------
+
+    def list_catalog_data_contract_test_results(
+        self,
+        catalog_id: str,
+        data_contract_id: str,
+        *,
+        include_all_details: bool = False,
+    ) -> DataContractTestResultCollection:
+        """List all test run results for a data contract in a catalog.
+
+        Args:
+            catalog_id: The catalog identifier.
+            data_contract_id: The data contract identifier.
+            include_all_details: When ``True``, each result includes full logs,
+                server mappings, and check results. Defaults to ``False``.
+
+        Returns:
+            DataContractTestResultCollection.
+
+        Raises:
+            ValueError: If no test runs exist (404) or another non-2xx
+                response is returned.
+        """
+        if not catalog_id:
+            raise ValueError(self._ERR_CATALOG_ID)
+        if not data_contract_id:
+            raise ValueError(self._ERR_CONTRACT_ID)
+
+        url = (
+            f"{self.config.url}/data_quality/v4/catalogs/{catalog_id}"
+            f"/data_contracts/{data_contract_id}/test_results"
+        )
+        headers = get_request_headers(self.config.auth_token)
+        response = self.session.get(
+            url,
+            headers=headers,
+            params={"include_all_details": str(include_all_details).lower()},
+            verify=False,
+        )
+        if not response.ok:
+            raise ValueError(
+                f"Failed to list test results for data contract {data_contract_id} "
+                f"in catalog {catalog_id}: {response.status_code} {response.text}"
+            )
+        payload = response.json()
+        # For catalogs the server returns only the most recent run as a single
+        # test result object instead of a collection. Normalise it so callers
+        # always get a DataContractTestResultCollection.
+        if "test_results" not in payload:
+            return DataContractTestResultCollection(
+                test_results=[DataContractTestResult(**payload)],
+                total_count=1,
+            )
+        return DataContractTestResultCollection(**payload)
+
+    # ------------------------------------------------------------------
+    # GET /data_quality/v4/catalogs/{catalog_id}/data_contracts/{id}/test_results/{run_id}
+    # ------------------------------------------------------------------
+
+    def get_catalog_data_contract_test_result(
+        self,
+        catalog_id: str,
+        data_contract_id: str,
+        test_run_id: str,
+    ) -> DataContractTestResult:
+        """Retrieve a specific test run result for a data contract in a catalog.
+
+        Args:
+            catalog_id: The catalog identifier.
+            data_contract_id: The data contract identifier.
+            test_run_id: The test run identifier.
+
+        Returns:
+            DataContractTestResult for the specified test run.
+
+        Raises:
+            ValueError: If the test run is not found or the server returns a
+                non-2xx response.
+        """
+        if not catalog_id:
+            raise ValueError(self._ERR_CATALOG_ID)
+        if not data_contract_id:
+            raise ValueError(self._ERR_CONTRACT_ID)
+        if not test_run_id:
+            raise ValueError(self._ERR_TEST_RUN_ID)
+
+        url = (
+            f"{self.config.url}/data_quality/v4/catalogs/{catalog_id}"
+            f"/data_contracts/{data_contract_id}/test_results/{test_run_id}"
+        )
+        headers = get_request_headers(self.config.auth_token)
+        response = self.session.get(url, headers=headers, verify=False)
+        if not response.ok:
+            raise ValueError(
+                f"Failed to get test result {test_run_id} for data contract "
+                f"{data_contract_id} in catalog {catalog_id}: "
+                f"{response.status_code} {response.text}"
+            )
+        return DataContractTestResult(**response.json())
+
+    # ------------------------------------------------------------------
+    # DELETE /data_quality/v4/catalogs/{catalog_id}/data_contracts/{id}/test_results
+    # ------------------------------------------------------------------
+
+    def delete_catalog_data_contract_test_results(
+        self,
+        catalog_id: str,
+        data_contract_id: str,
+    ) -> None:
+        """Delete all test results for a data contract in a catalog.
+
+        Args:
+            catalog_id: The catalog identifier.
+            data_contract_id: The data contract identifier.
+
+        Raises:
+            ValueError: If the server returns a non-2xx response.
+        """
+        if not catalog_id:
+            raise ValueError(self._ERR_CATALOG_ID)
+        if not data_contract_id:
+            raise ValueError(self._ERR_CONTRACT_ID)
+
+        url = (
+            f"{self.config.url}/data_quality/v4/catalogs/{catalog_id}"
+            f"/data_contracts/{data_contract_id}/test_results"
+        )
+        headers = get_request_headers(self.config.auth_token)
+        response = self.session.delete(url, headers=headers, verify=False)
+        if not response.ok:
+            raise ValueError(
+                f"Failed to delete test results for data contract {data_contract_id} "
+                f"in catalog {catalog_id}: {response.status_code} {response.text}"
+            )
+
+
+    # ------------------------------------------------------------------
+    # POST /data_quality/v4/catalogs/{catalog_id}/data_contracts/{id}/test_results
+    # ------------------------------------------------------------------
+
+    def create_catalog_data_contract_test_result(
+        self,
+        catalog_id: str,
+        data_contract_id: str,
+        body: DataContractTestResultPrototype,
+    ) -> DataContractTestResult:
+        """Create a test result for a data contract in a catalog.
+
+        Args:
+            catalog_id: The catalog identifier.
+            data_contract_id: The data contract identifier.
+            body: The test result payload.
+
+        Returns:
+            The created DataContractTestResult.
+
+        Raises:
+            ValueError: If the server returns a non-2xx response.
+        """
+        if not catalog_id:
+            raise ValueError(self._ERR_CATALOG_ID)
+        if not data_contract_id:
+            raise ValueError(self._ERR_CONTRACT_ID)
+
+        url = (
+            f"{self.config.url}/data_quality/v4/catalogs/{catalog_id}"
+            f"/data_contracts/{data_contract_id}/test_results"
+        )
+        headers = get_request_headers(self.config.auth_token)
+        response = self.session.post(
+            url,
+            headers=headers,
+            json=body.model_dump(exclude_none=True),
+            verify=False,
+        )
+        if not response.ok:
+            raise ValueError(
+                f"Failed to create test result for data contract {data_contract_id} "
+                f"in catalog {catalog_id}: {response.status_code} {response.text}"
+            )
+        return DataContractTestResult(**response.json())
+
+    # ------------------------------------------------------------------
+    # PUT /data_quality/v4/catalogs/{catalog_id}/data_contracts/{id}/test_results/{run_id}
+    # ------------------------------------------------------------------
+
+    def update_catalog_data_contract_test_result(
+        self,
+        catalog_id: str,
+        data_contract_id: str,
+        test_run_id: str,
+        body: DataContractTestResultPrototype,
+    ) -> DataContractTestResult:
+        """Update an existing test result for a data contract in a catalog.
+
+        Args:
+            catalog_id: The catalog identifier.
+            data_contract_id: The data contract identifier.
+            test_run_id: The test run identifier to update.
+            body: The updated test result payload.
+
+        Returns:
+            The updated DataContractTestResult.
+
+        Raises:
+            ValueError: If the test run is not found or the server returns a
+                non-2xx response.
+        """
+        if not catalog_id:
+            raise ValueError(self._ERR_CATALOG_ID)
+        if not data_contract_id:
+            raise ValueError(self._ERR_CONTRACT_ID)
+        if not test_run_id:
+            raise ValueError(self._ERR_TEST_RUN_ID)
+
+        url = (
+            f"{self.config.url}/data_quality/v4/catalogs/{catalog_id}"
+            f"/data_contracts/{data_contract_id}/test_results/{test_run_id}"
+        )
+        headers = get_request_headers(self.config.auth_token)
+        response = self.session.put(
+            url,
+            headers=headers,
+            json=body.model_dump(exclude_none=True),
+            verify=False,
+        )
+        if not response.ok:
+            raise ValueError(
+                f"Failed to update test result {test_run_id} for data contract "
+                f"{data_contract_id} in catalog {catalog_id}: "
+                f"{response.status_code} {response.text}"
+            )
+        return DataContractTestResult(**response.json())
 
 
 __all__ = ["DataContractsProvider"]

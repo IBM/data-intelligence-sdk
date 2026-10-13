@@ -68,6 +68,14 @@ DataContractTestRequest
    :undoc-members:
    :show-inheritance:
 
+DataContractTestResultPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Response Models
 ---------------
 
@@ -111,10 +119,18 @@ DataContractTestResponse
    :undoc-members:
    :show-inheritance:
 
-DataContractTestResponseCollection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DataContractTestResult
+~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: wxdi.data_contracts.models.DataContractTestResponseCollection
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResult
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultCollection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultCollection
    :members:
    :undoc-members:
    :show-inheritance:
@@ -138,26 +154,340 @@ ServerMapping
    :undoc-members:
    :show-inheritance:
 
-DataContractInfo
+DataContractType
 ~~~~~~~~~~~~~~~~
 
-.. autoclass:: wxdi.data_contracts.models.DataContractInfo
+.. autoclass:: wxdi.data_contracts.models.DataContractType
    :members:
    :undoc-members:
    :show-inheritance:
 
-LogEntry
-~~~~~~~~
+Test Result Sub-Models
+----------------------
 
-.. autoclass:: wxdi.data_contracts.models.LogEntry
+Nested models used inside :class:`~wxdi.data_contracts.models.DataContractTestResult`.
+
+DataContractTestResultJobRun
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultJobRun
    :members:
    :undoc-members:
    :show-inheritance:
 
-CheckResult
-~~~~~~~~~~~
+DataContractTestResultJobInfo
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: wxdi.data_contracts.models.CheckResult
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultJobInfo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultSchemaValidationSummary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultSchemaValidationSummary
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDataQualitySummary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDataQualitySummary
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultSummary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultSummary
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultPhysicalTypeCheck
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultPhysicalTypeCheck
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultColumnsSummary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultColumnsSummary
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultAssetSchemaValidation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultAssetSchemaValidation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultColumnTypeCheck
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultColumnTypeCheck
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultRequiredCheck
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultRequiredCheck
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultPrimaryKeyCheck
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultPrimaryKeyCheck
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultUniqueCheck
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultUniqueCheck
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultColumnSchemaValidation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultColumnSchemaValidation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDqCheckResults
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDqCheckResults
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDqRuleJobRun
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDqRuleJobRun
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDqRuleJob
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDqRuleJob
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDqRuleRef
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDqRuleRef
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDqCheck
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDqCheck
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultColumnResult
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultColumnResult
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDataAsset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDataAsset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Test Result Prototype Sub-Models
+--------------------------------
+
+Nested models used inside :class:`~wxdi.data_contracts.models.DataContractTestResultPrototype`.
+
+DataContractTestResultJobRunPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultJobRunPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultJobInfoPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultJobInfoPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultSchemaValidationSummaryPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultSchemaValidationSummaryPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDataQualitySummaryPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDataQualitySummaryPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultSummaryPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultSummaryPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultPhysicalTypeCheckPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultPhysicalTypeCheckPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultColumnsSummaryPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultColumnsSummaryPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultAssetSchemaValidationPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultAssetSchemaValidationPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultColumnTypeCheckPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultColumnTypeCheckPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultRequiredCheckPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultRequiredCheckPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultPrimaryKeyCheckPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultPrimaryKeyCheckPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultUniqueCheckPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultUniqueCheckPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultColumnSchemaValidationPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultColumnSchemaValidationPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDqCheckResultsPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDqCheckResultsPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDqRuleJobRunPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDqRuleJobRunPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDqRuleJobPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDqRuleJobPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDqRuleRefPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDqRuleRefPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDqCheckPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDqCheckPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultColumnResultPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultColumnResultPrototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DataContractTestResultDataAssetPrototype
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: wxdi.data_contracts.models.DataContractTestResultDataAssetPrototype
    :members:
    :undoc-members:
    :show-inheritance:
