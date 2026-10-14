@@ -109,7 +109,7 @@ All request bodies and response payloads are represented as Pydantic v2 models.
 
 **Sub-models**
 
-* :class:`~wxdi.data_contracts.DataContractType` – enum for the ``type`` field (``contract`` or ``contract_template``).
+* :class:`~wxdi.data_contracts.DataContractType` – enum for the ``type`` field (``contract`` or ``contract_template``). Request bodies accept only these values. On a :class:`~wxdi.data_contracts.DataContract` response, a value the SDK does not know is returned as a plain string instead of raising an error.
 * :class:`~wxdi.data_contracts.ConnectionInfo` – reference to a connection asset.
 * :class:`~wxdi.data_contracts.ServerMapping` – maps a logical server name to a connection.
 * :class:`~wxdi.data_contracts.DataContractValidationError` – a single ODCS schema error.

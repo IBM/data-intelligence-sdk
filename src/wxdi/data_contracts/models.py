@@ -28,7 +28,7 @@ from __future__ import annotations
 
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 
 class DataContractType(str, Enum):
@@ -145,11 +145,22 @@ class DataContract(BaseModel):
 
     id: Optional[str] = None
     name: Optional[str] = None
-    type: Optional[DataContractType] = None
+    # Kept lenient on responses: a value the SDK does not know yet is returned
+    # as a plain string instead of failing the whole call.
+    type: Optional[Union[DataContractType, str]] = None
     data_product_id: Optional[str] = None
     contract_yaml: Optional[str] = None
     contract_json: Optional[Dict[str, Any]] = None
     server_mappings: List[ServerMapping] = []
+
+    @field_validator("type", mode="before")
+    @classmethod
+    def _coerce_type(cls, value: Any) -> Any:
+        """Return a ``DataContractType`` for known values, else the raw value."""
+        try:
+            return DataContractType(value)
+        except ValueError:
+            return value
 
     @model_validator(mode="before")
     @classmethod
@@ -173,6 +184,13 @@ class DataContractCollection(BaseModel):
 
     data_contracts: List[DataContract] = []
     total_count: int = 0
+
+    @model_validator(mode="after")
+    def _default_total_count(self) -> "DataContractCollection":
+        """Use the number of items when the server does not send ``total_count``."""
+        if "total_count" not in self.model_fields_set:
+            self.total_count = len(self.data_contracts)
+        return self
 
 
 # ---------------------------------------------------------------------------
@@ -543,6 +561,13 @@ class DataContractTestResultCollection(BaseModel):
 
     test_results: List[DataContractTestResult] = []
     total_count: int = 0
+
+    @model_validator(mode="after")
+    def _default_total_count(self) -> "DataContractTestResultCollection":
+        """Use the number of items when the server does not send ``total_count``."""
+        if "total_count" not in self.model_fields_set:
+            self.total_count = len(self.test_results)
+        return self
 
 
 # ---------------------------------------------------------------------------
