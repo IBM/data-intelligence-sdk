@@ -36,10 +36,10 @@ from wxdi.dq_validator.provider import ProviderConfig
 # CONFIG — edit these before running
 # ---------------------------------------------------------------------------
 
-CPD_URL      = "https://cpd-wkc.apps.dqqa540dev-10.cp.fyre.ibm.com"
+CPD_URL = "https://cpd-wkc.apps.dqqa540dev-10.cp.fyre.ibm.com"
 BEARER_TOKEN = "Bearer <token>"
-PROJECT_ID   = "6ce47397-abfd-4c4a-8a98-d9db02ca6937"
-CATALOG_ID   = "019fcbf3-d49d-7481-a3dd-15505acd20b8"
+PROJECT_ID = "6ce47397-abfd-4c4a-8a98-d9db02ca6937"
+CATALOG_ID = "019fcbf3-d49d-7481-a3dd-15505acd20b8"
 CONNECTION_ID = "019fd738-ffce-7799-8720-32deb3447685"
 
 # Filled in automatically as the smoke tests run
@@ -298,15 +298,9 @@ SAMPLE_CONTRACT_JSON = {
             "database": "BANK",
             "schema": "BANK1",
             "customProperties": [
-                {
-                    "property": "database",
-                    "value": "BANK"
-                },
-                {
-                    "property": "schema",
-                    "value": "BANK1"
-                }
-            ]
+                {"property": "database", "value": "BANK"},
+                {"property": "schema", "value": "BANK1"},
+            ],
         }
     ],
     "dataProduct": "BankingDataProduct",
@@ -322,21 +316,21 @@ SAMPLE_CONTRACT_JSON = {
                     "type": "sql",
                     "query": "SELECT * FROM BANK1.BANK_CLIENTS;",
                     "mustBe": 5112,
-                    "dimension": "completeness"
+                    "dimension": "completeness",
                 },
                 {
                     "name": "Marital status inconsistent with age",
                     "type": "sql",
                     "query": "SELECT AGE, MARITAL_STATUS FROM BANK1.BANK_CLIENTS WHERE AGE < 16 AND MARITAL_STATUS IN ('married','divorced','widowed');",
-                    "mustBeLessThan": 5
+                    "mustBeLessThan": 5,
                 },
                 {
                     "name": "Contact preference but no phone number",
                     "type": "sql",
                     "query": "SELECT * FROM BANK1.BANK_CLIENTS WHERE REGEXP_LIKE(PHONE1, '[0-9]');",
                     "dimension": "conformity",
-                    "mustBeLessThan": 5220
-                }
+                    "mustBeLessThan": 5220,
+                },
             ],
             "properties": [
                 {
@@ -349,33 +343,27 @@ SAMPLE_CONTRACT_JSON = {
                             "type": "sql",
                             "query": "SELECT * FROM BANK1.BANK_CLIENTS WHERE CCN IS NULL;",
                             "dimension": "accuracy",
-                            "mustBeGreaterThan": 200
+                            "mustBeGreaterThan": 200,
                         },
                         {
                             "name": "Missing Values for Customer IDs",
                             "type": "library",
                             "metric": "missingValues",
                             "arguments": {
-                                "missingValues": [
-                                    "",
-                                    "n/a",
-                                    "N/A",
-                                    "null",
-                                    "NULL"
-                                ]
+                                "missingValues": ["", "n/a", "N/A", "null", "NULL"]
                             },
-                            "mustBeLessThan": 5
+                            "mustBeLessThan": 5,
                         },
                         {
                             "name": "Duplicate customer IDs via library check",
                             "type": "library",
                             "metric": "duplicateValues",
-                            "mustBe": 2
-                        }
+                            "mustBe": 2,
+                        },
                     ],
                     "primaryKey": False,
                     "unique": True,
-                    "required": True
+                    "required": True,
                 },
                 {
                     "name": "ZIP",
@@ -386,21 +374,19 @@ SAMPLE_CONTRACT_JSON = {
                             "name": "Invalid ZIP format",
                             "type": "sql",
                             "query": "SELECT ZIP FROM BANK1.BANK_CLIENTS WHERE ZIP IS NOT NULL AND NOT REGEXP_LIKE(TRIM(ZIP),'^[0-9]{5}$');",
-                            "mustBeLessThan": 3005
+                            "mustBeLessThan": 3005,
                         },
                         {
                             "name": "Invalid ZIP format via Library check",
                             "type": "library",
                             "metric": "invalidValues",
-                            "arguments": {
-                                "pattern": "^[0-9]{5}$"
-                            },
-                            "mustBeLessThan": 2995
-                        }
+                            "arguments": {"pattern": "^[0-9]{5}$"},
+                            "mustBeLessThan": 2995,
+                        },
                     ],
                     "primaryKey": False,
                     "unique": True,
-                    "required": True
+                    "required": True,
                 },
                 {
                     "name": "AGE",
@@ -411,12 +397,12 @@ SAMPLE_CONTRACT_JSON = {
                             "name": "Implausible customer ages",
                             "type": "sql",
                             "query": "SELECT AGE FROM BANK1.BANK_CLIENTS WHERE AGE IS NULL OR AGE < 18 OR AGE > 100;",
-                            "mustBeLessThan": 389
+                            "mustBeLessThan": 389,
                         }
                     ],
                     "primaryKey": False,
                     "unique": True,
-                    "required": True
+                    "required": True,
                 },
                 {
                     "name": "EMAIL",
@@ -427,12 +413,12 @@ SAMPLE_CONTRACT_JSON = {
                             "name": "Invalid email address format",
                             "type": "sql",
                             "query": "SELECT EMAIL FROM BANK1.BANK_CLIENTS WHERE EMAIL IS NOT NULL AND NOT REGEXP_LIKE(TRIM(EMAIL),'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,}$');",
-                            "mustBeLessThan": 5
+                            "mustBeLessThan": 5,
                         }
                     ],
                     "primaryKey": False,
                     "unique": True,
-                    "required": True
+                    "required": True,
                 },
                 {
                     "name": "GENDER",
@@ -443,24 +429,19 @@ SAMPLE_CONTRACT_JSON = {
                             "name": "Invalid gender",
                             "type": "sql",
                             "query": "SELECT GENDER FROM BANK1.BANK_CLIENTS WHERE GENDER NOT IN ('L','F');",
-                            "mustBeLessThan": 3540
+                            "mustBeLessThan": 3540,
                         },
                         {
                             "name": "Invalid gender via library check",
                             "type": "library",
                             "metric": "invalidValues",
-                            "arguments": {
-                                "validValues": [
-                                    "M",
-                                    "B"
-                                ]
-                            },
-                            "mustBeLessThan": 5119
-                        }
+                            "arguments": {"validValues": ["M", "B"]},
+                            "mustBeLessThan": 5119,
+                        },
                     ],
                     "primaryKey": False,
                     "unique": True,
-                    "required": True
+                    "required": True,
                 },
                 {
                     "name": "MARITAL_STATUS",
@@ -471,33 +452,24 @@ SAMPLE_CONTRACT_JSON = {
                             "name": "Invalid marital status codes",
                             "type": "sql",
                             "query": "SELECT MARITAL_STATUS FROM BANK1.BANK_CLIENTS WHERE MARITAL_STATUS NOT IN ('single','married','divorced','separated','unknown');",
-                            "mustBeBetween": [
-                                765,
-                                890
-                            ]
+                            "mustBeBetween": [765, 890],
                         }
                     ],
                     "primaryKey": False,
                     "unique": True,
-                    "required": True
-                }
-            ]
+                    "required": True,
+                },
+            ],
         }
     ],
-    "customProperties": [
-        {
-            "property": "connectionIds",
-            "value": [
-                CONNECTION_ID
-            ]
-        }
-    ]
+    "customProperties": [{"property": "connectionIds", "value": [CONNECTION_ID]}],
 }
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _provider() -> DataContractsProvider:
     config = ProviderConfig(url=CPD_URL, auth_token=BEARER_TOKEN)
@@ -519,6 +491,7 @@ def _run(label: str, fn):
 # ===========================================================================
 # PROJECT-SCOPED EXAMPLES
 # ===========================================================================
+
 
 def validate_project_data_contract():
     """POST /data_quality/v4/projects/{project_id}/data_contracts_validation"""
@@ -555,7 +528,9 @@ def create_project_data_contract_json():
     print(f"  created id={contract.id}  name={contract.name}")
     # Clean up immediately so we don't litter the project
     if contract.id:
-        provider.delete_project_data_contracts(PROJECT_ID, data_contract_ids=contract.id)
+        provider.delete_project_data_contracts(
+            PROJECT_ID, data_contract_ids=contract.id
+        )
         print(f"  cleaned up id={contract.id}")
 
 
@@ -574,7 +549,9 @@ def get_project_data_contract():
         print("  SKIPPED — no contract created yet (run create first)")
         return
     provider = _provider()
-    contract = provider.get_project_data_contract(PROJECT_ID, _created_project_contract_id)
+    contract = provider.get_project_data_contract(
+        PROJECT_ID, _created_project_contract_id
+    )
     print(f"  id={contract.id}  name={contract.name}")
 
 
@@ -610,7 +587,9 @@ def upload_project_data_contract_file():
     print(f"  id={contract.id}  name={contract.name}")
     # Clean up
     if contract.id:
-        provider.delete_project_data_contracts(PROJECT_ID, data_contract_ids=contract.id)
+        provider.delete_project_data_contracts(
+            PROJECT_ID, data_contract_ids=contract.id
+        )
         print(f"  cleaned up id={contract.id}")
 
 
@@ -708,15 +687,23 @@ def update_project_data_contract_test_result():
         print("  SKIPPED — no project contract created yet (run create first)")
         return
     if not _created_project_test_run_id:
-        print("  SKIPPED — no test run created yet (run create_project_data_contract_test_result first)")
+        print(
+            "  SKIPPED — no test run created yet (run create_project_data_contract_test_result first)"
+        )
         return
     provider = _provider()
     updated_body = DataContractTestResultPrototype(
-        **{**SAMPLE_TEST_RESULT_PROTOTYPE.model_dump(exclude_none=True), "status": "failed"}
+        **{
+            **SAMPLE_TEST_RESULT_PROTOTYPE.model_dump(exclude_none=True),
+            "status": "failed",
+        }
     )
     try:
         result = provider.update_project_data_contract_test_result(
-            PROJECT_ID, _created_project_contract_id, _created_project_test_run_id, updated_body
+            PROJECT_ID,
+            _created_project_contract_id,
+            _created_project_test_run_id,
+            updated_body,
         )
         print(f"  updated run_id={result.id}  status={result.status}")
     except ValueError as exc:
@@ -738,6 +725,7 @@ def delete_project_data_contracts():
 # ===========================================================================
 # CATALOG-SCOPED EXAMPLES
 # ===========================================================================
+
 
 def validate_catalog_data_contract():
     """POST /data_quality/v4/catalogs/{catalog_id}/data_contracts_validation"""
@@ -778,7 +766,9 @@ def get_catalog_data_contract():
         print("  SKIPPED — no catalog contract created yet (run create first)")
         return
     provider = _provider()
-    contract = provider.get_catalog_data_contract(CATALOG_ID, _created_catalog_contract_id)
+    contract = provider.get_catalog_data_contract(
+        CATALOG_ID, _created_catalog_contract_id
+    )
     print(f"  id={contract.id}  name={contract.name}")
 
 
@@ -814,7 +804,9 @@ def upload_catalog_data_contract_file():
     print(f"  id={contract.id}  name={contract.name}")
     # Clean up
     if contract.id:
-        provider.delete_catalog_data_contracts(CATALOG_ID, data_contract_ids=contract.id)
+        provider.delete_catalog_data_contracts(
+            CATALOG_ID, data_contract_ids=contract.id
+        )
         print(f"  cleaned up id={contract.id}")
 
 
@@ -841,15 +833,23 @@ def update_catalog_data_contract_test_result():
         print("  SKIPPED — no catalog contract created yet (run create first)")
         return
     if not _created_catalog_test_run_id:
-        print("  SKIPPED — no test run created yet (run create_catalog_data_contract_test_result first)")
+        print(
+            "  SKIPPED — no test run created yet (run create_catalog_data_contract_test_result first)"
+        )
         return
     provider = _provider()
     updated_body = DataContractTestResultPrototype(
-        **{**SAMPLE_TEST_RESULT_PROTOTYPE.model_dump(exclude_none=True), "status": "failed"}
+        **{
+            **SAMPLE_TEST_RESULT_PROTOTYPE.model_dump(exclude_none=True),
+            "status": "failed",
+        }
     )
     try:
         result = provider.update_catalog_data_contract_test_result(
-            CATALOG_ID, _created_catalog_contract_id, _created_catalog_test_run_id, updated_body
+            CATALOG_ID,
+            _created_catalog_contract_id,
+            _created_catalog_test_run_id,
+            updated_body,
         )
         print(f"  updated run_id={result.id}  status={result.status}")
     except ValueError as exc:
@@ -880,7 +880,9 @@ def get_catalog_data_contract_test_result():
         print("  SKIPPED — no catalog contract created yet (run create first)")
         return
     if not _created_catalog_test_run_id:
-        print("  SKIPPED — no test run created yet (run create_catalog_data_contract_test_result first)")
+        print(
+            "  SKIPPED — no test run created yet (run create_catalog_data_contract_test_result first)"
+        )
         return
     provider = _provider()
     try:
@@ -936,16 +938,26 @@ if __name__ == "__main__":
     _run("replace_project_data_contract", replace_project_data_contract)
     _run("upload_project_data_contract_file", upload_project_data_contract_file)
     _run("test_project_data_contract [Internal]", test_project_data_contract)
-    _run("list_project_data_contract_test_results [Internal]",
-         list_project_data_contract_test_results)
-    _run("get_project_data_contract_test_result [Internal]",
-         get_project_data_contract_test_result)
-    _run("create_project_data_contract_test_result [Internal]",
-         create_project_data_contract_test_result)
-    _run("update_project_data_contract_test_result [Internal]",
-         update_project_data_contract_test_result)
-    _run("delete_project_data_contract_test_results [Internal]",
-         delete_project_data_contract_test_results)
+    _run(
+        "list_project_data_contract_test_results [Internal]",
+        list_project_data_contract_test_results,
+    )
+    _run(
+        "get_project_data_contract_test_result [Internal]",
+        get_project_data_contract_test_result,
+    )
+    _run(
+        "create_project_data_contract_test_result [Internal]",
+        create_project_data_contract_test_result,
+    )
+    _run(
+        "update_project_data_contract_test_result [Internal]",
+        update_project_data_contract_test_result,
+    )
+    _run(
+        "delete_project_data_contract_test_results [Internal]",
+        delete_project_data_contract_test_results,
+    )
     _run("delete_project_data_contracts", delete_project_data_contracts)
 
     print("\n" + "#" * 60)
@@ -958,16 +970,23 @@ if __name__ == "__main__":
     _run("get_catalog_data_contract", get_catalog_data_contract)
     _run("replace_catalog_data_contract", replace_catalog_data_contract)
     _run("upload_catalog_data_contract_file", upload_catalog_data_contract_file)
-    _run("create_catalog_data_contract_test_result",
-         create_catalog_data_contract_test_result)
-    _run("list_catalog_data_contract_test_results",
-         list_catalog_data_contract_test_results)
-    _run("get_catalog_data_contract_test_result",
-         get_catalog_data_contract_test_result)
-    _run("update_catalog_data_contract_test_result",
-         update_catalog_data_contract_test_result)
-    _run("delete_catalog_data_contract_test_results",
-         delete_catalog_data_contract_test_results)
+    _run(
+        "create_catalog_data_contract_test_result",
+        create_catalog_data_contract_test_result,
+    )
+    _run(
+        "list_catalog_data_contract_test_results",
+        list_catalog_data_contract_test_results,
+    )
+    _run("get_catalog_data_contract_test_result", get_catalog_data_contract_test_result)
+    _run(
+        "update_catalog_data_contract_test_result",
+        update_catalog_data_contract_test_result,
+    )
+    _run(
+        "delete_catalog_data_contract_test_results",
+        delete_catalog_data_contract_test_results,
+    )
     _run("delete_catalog_data_contracts", delete_catalog_data_contracts)
 
     print("\n" + "#" * 60)
