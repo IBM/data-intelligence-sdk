@@ -290,7 +290,6 @@ matching ``*Prototype`` classes:
         status="completed",
         start="2025-01-15T08:00:00.000Z",
         end="2025-01-15T08:03:42.000Z",
-        run_by="service-account@ibm.com",
         summary=DataContractTestResultSummaryPrototype(
             status="passed",
             data_quality=DataContractTestResultDataQualitySummaryPrototype(

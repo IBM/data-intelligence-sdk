@@ -814,8 +814,7 @@ class DataContractTestResultPrototype(BaseModel):
     Mirrors ``DataContractTestResultPrototype`` in the Java service.
 
     Contains the same fields as :class:`DataContractTestResult` excluding the
-    server-generated ``id`` and ``href``, plus two write-time-only fields:
-    ``data_product`` and ``run_by``.
+    server-generated ``id`` and ``href``.
 
     All nested sub-models use their own ``*Prototype`` variants so that request
     and response types are distinct and can evolve independently.
@@ -836,8 +835,6 @@ class DataContractTestResultPrototype(BaseModel):
     job: Optional[DataContractTestResultJobInfoPrototype] = None
     summary: Optional[DataContractTestResultSummaryPrototype] = None
     data_assets: Optional[List[DataContractTestResultDataAssetPrototype]] = None
-    data_product: Optional[str] = None
-    run_by: Optional[str] = None
 
 
 __all__ = [
