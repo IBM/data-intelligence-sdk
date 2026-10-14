@@ -240,9 +240,9 @@ Running a Test
     )
     print(f"Test run: id={test_run.id}  status={test_run.status}")
 
-:class:`~wxdi.data_contracts.DataContractTestResponse` only identifies the run that was
-started. Its ``id`` can be passed to ``get_project_data_contract_test_result`` to retrieve
-the persisted results.
+``test_project_data_contract`` returns a :class:`~wxdi.data_contracts.DataContractTestResult`
+for the run that was started. Its ``id`` can be passed to
+``get_project_data_contract_test_result`` to retrieve the results once the run has progressed.
 
 Retrieving Test Results
 -----------------------

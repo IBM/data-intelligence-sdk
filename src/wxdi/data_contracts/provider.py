@@ -36,7 +36,6 @@ from .models import (
     DataContractPrototypeJson,
     DataContractPrototypeYaml,
     DataContractTestRequest,
-    DataContractTestResponse,
     DataContractTestResult,
     DataContractTestResultCollection,
     DataContractTestResultPrototype,
@@ -79,9 +78,7 @@ class DataContractsProvider(BaseProvider):
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _serialize_prototype(
-        self, body: DataContractPrototype
-    ) -> str:
+    def _serialize_prototype(self, body: DataContractPrototype) -> str:
         """Serialize a DataContractPrototype to a JSON string for the request body."""
         return body.model_dump_json(exclude_none=True)
 
@@ -397,7 +394,9 @@ class DataContractsProvider(BaseProvider):
         )
         # For multipart uploads we must NOT set Content-Type manually —
         # requests will set the correct multipart boundary automatically.
-        headers = {"Authorization": self.config.auth_token} if self.config.auth_token else {}
+        headers = (
+            {"Authorization": self.config.auth_token} if self.config.auth_token else {}
+        )
 
         form_data: dict = {"name": name, "validate": str(validate).lower()}
         if server_mappings is not None:
@@ -429,7 +428,7 @@ class DataContractsProvider(BaseProvider):
         project_id: str,
         data_contract_id: str,
         body: Optional[DataContractTestRequest] = None,
-    ) -> DataContractTestResponse:
+    ) -> DataContractTestResult:
         """Trigger a test run for a data contract (internal endpoint).
 
         Args:
@@ -439,7 +438,9 @@ class DataContractsProvider(BaseProvider):
                 Defaults to ``DataContractTestRequest()`` if not provided.
 
         Returns:
-            DataContractTestResponse describing the initiated test run.
+            DataContractTestResult describing the initiated test run. Its
+            ``id`` is the test run id and can be passed to
+            ``get_project_data_contract_test_result``.
 
         Raises:
             ValueError: If the server returns a non-2xx response.
@@ -468,7 +469,7 @@ class DataContractsProvider(BaseProvider):
                 f"Failed to trigger test for data contract {data_contract_id} "
                 f"in project {project_id}: {response.status_code} {response.text}"
             )
-        return DataContractTestResponse(**response.json())
+        return DataContractTestResult(**response.json())
 
     # ------------------------------------------------------------------
     # GET /data_quality/v4/projects/{project_id}/data_contracts/{id}/test_results
@@ -1011,7 +1012,9 @@ class DataContractsProvider(BaseProvider):
             f"{self.config.url}/data_quality/v4/catalogs/{catalog_id}"
             "/data_contracts_upload"
         )
-        headers = {"Authorization": self.config.auth_token} if self.config.auth_token else {}
+        headers = (
+            {"Authorization": self.config.auth_token} if self.config.auth_token else {}
+        )
 
         form_data: dict = {"name": name, "validate": str(validate).lower()}
         if server_mappings is not None:
@@ -1082,7 +1085,7 @@ class DataContractsProvider(BaseProvider):
                 f"in catalog {catalog_id}: {response.status_code} {response.text}"
             )
         payload = response.json()
-        # For catalogs the server returns only the most recent run as a single
+        # NOTE: the catalog endpoint returns only the most recent run as a single
         # test result object instead of a collection. Normalise it so callers
         # always get a DataContractTestResultCollection.
         if "test_results" not in payload:
@@ -1171,7 +1174,6 @@ class DataContractsProvider(BaseProvider):
                 f"Failed to delete test results for data contract {data_contract_id} "
                 f"in catalog {catalog_id}: {response.status_code} {response.text}"
             )
-
 
     # ------------------------------------------------------------------
     # POST /data_quality/v4/catalogs/{catalog_id}/data_contracts/{id}/test_results

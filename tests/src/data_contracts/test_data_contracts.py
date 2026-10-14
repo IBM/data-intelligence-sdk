@@ -1,18 +1,19 @@
 """
-   Copyright 2026 IBM Corporation
+Copyright 2026 IBM Corporation
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
+
 """
 Test suite for DataContractsProvider
 """
@@ -29,7 +30,6 @@ from wxdi.data_contracts.models import (
     DataContractPrototypeJson,
     DataContractPrototypeYaml,
     DataContractTestRequest,
-    DataContractTestResponse,
     DataContractTestResult,
     DataContractTestResultCollection,
     DataContractTestResultPrototype,
@@ -37,7 +37,6 @@ from wxdi.data_contracts.models import (
     DataContractValidationResponse,
     DataContractType,
 )
-
 
 # ---------------------------------------------------------------------------
 # Shared fixtures
@@ -53,16 +52,19 @@ TEST_RUN_ID = "7c8d9e0f-1a2b-3c4d-5e6f-7a8b9c0d1e2f"
 
 @pytest.fixture
 def config_with_project():
+    """ProviderConfig scoped to a project."""
     return ProviderConfig(BASE_URL, AUTH_TOKEN, project_id=PROJECT_ID)
 
 
 @pytest.fixture
 def config_with_catalog():
+    """ProviderConfig scoped to a catalog."""
     return ProviderConfig(BASE_URL, AUTH_TOKEN, catalog_id=CATALOG_ID)
 
 
 @pytest.fixture
 def data_contract_json():
+    """A data contract as returned by the API."""
     return {
         "id": CONTRACT_ID,
         "name": "Sales_Data_Contract",
@@ -70,13 +72,17 @@ def data_contract_json():
         "data_product_id": "dp-abc123",
         "contract_yaml": "dataContractSpecification: '1.0.0'\nid: sales-contract",
         "server_mappings": [
-            {"server": "my-postgres", "connection": {"id": "81bafdbd-b7c6-45c5-a4fd-6ec135f66f4e"}}
+            {
+                "server": "my-postgres",
+                "connection": {"id": "81bafdbd-b7c6-45c5-a4fd-6ec135f66f4e"},
+            }
         ],
     }
 
 
 @pytest.fixture
 def data_contract_collection_json(data_contract_json):
+    """A data contract collection as returned by the API."""
     return {
         "data_contracts": [data_contract_json],
         "total_count": 1,
@@ -85,23 +91,29 @@ def data_contract_collection_json(data_contract_json):
 
 @pytest.fixture
 def validation_response_valid_json():
+    """A successful validation response."""
     return {"valid": True, "errors": [], "error_count": 0}
 
 
 @pytest.fixture
 def validation_response_invalid_json():
+    """A validation response containing one error."""
     return {
         "valid": False,
         "error_count": 1,
         "errors": [
-            {"property": "$.info.title", "message": "Required property 'title' is missing", "type": "required"}
+            {
+                "property": "$.info.title",
+                "message": "Required property 'title' is missing",
+                "type": "required",
+            }
         ],
     }
 
 
 @pytest.fixture
 def test_response_json():
-    """Trigger response returned by POST /test (DataContractTestResponse shape)."""
+    """Response returned by POST /test (parsed as DataContractTestResult)."""
     return {
         "id": TEST_RUN_ID,
         "href": f"/data_quality/v4/projects/{PROJECT_ID}/data_contracts/{CONTRACT_ID}/test_results/{TEST_RUN_ID}",
@@ -127,12 +139,14 @@ def test_result_json():
 
 @pytest.fixture
 def test_response_collection_json(test_result_json):
+    """A test result collection as returned by the API."""
     return {"test_results": [test_result_json]}
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _mock_ok_response(mocker, method: str, payload):
     """Return a mock session where session.<method>() returns an ok response."""
@@ -231,8 +245,11 @@ class TestDataContractModelNormalisation:
 
 
 class TestListProjectDataContracts:
+    """Tests for list project data contracts."""
 
-    def test_success_returns_collection(self, config_with_project, data_contract_collection_json, mocker):
+    def test_success_returns_collection(
+        self, config_with_project, data_contract_collection_json, mocker
+    ):
         _mock_ok_response(mocker, "get", data_contract_collection_json)
         provider = DataContractsProvider(config_with_project)
         result = provider.list_project_data_contracts(PROJECT_ID)
@@ -241,17 +258,27 @@ class TestListProjectDataContracts:
         assert len(result.data_contracts) == 1
         assert result.data_contracts[0].id == CONTRACT_ID
 
-    def test_correct_url_and_params(self, config_with_project, data_contract_collection_json, mocker):
-        mock_session_cls = _mock_ok_response(mocker, "get", data_contract_collection_json)
-        DataContractsProvider(config_with_project).list_project_data_contracts(PROJECT_ID, limit=50)
+    def test_correct_url_and_params(
+        self, config_with_project, data_contract_collection_json, mocker
+    ):
+        mock_session_cls = _mock_ok_response(
+            mocker, "get", data_contract_collection_json
+        )
+        DataContractsProvider(config_with_project).list_project_data_contracts(
+            PROJECT_ID, limit=50
+        )
         call_kwargs = mock_session_cls.return_value.get.call_args
         assert f"/projects/{PROJECT_ID}/data_contracts" in call_kwargs[0][0]
         assert call_kwargs[1]["params"]["limit"] == 50
 
-    def test_api_returns_bare_list(self, config_with_project, data_contract_json, mocker):
+    def test_api_returns_bare_list(
+        self, config_with_project, data_contract_json, mocker
+    ):
         # Real API may return a plain JSON array instead of the wrapped object
         _mock_ok_response(mocker, "get", [data_contract_json])
-        result = DataContractsProvider(config_with_project).list_project_data_contracts(PROJECT_ID)
+        result = DataContractsProvider(config_with_project).list_project_data_contracts(
+            PROJECT_ID
+        )
         assert isinstance(result, DataContractCollection)
         assert result.total_count == 1
         assert len(result.data_contracts) == 1
@@ -260,7 +287,9 @@ class TestListProjectDataContracts:
     def test_error_raises_value_error(self, config_with_project, mocker):
         _mock_error_response(mocker, "get", status=404)
         with pytest.raises(ValueError, match=PROJECT_ID):
-            DataContractsProvider(config_with_project).list_project_data_contracts(PROJECT_ID)
+            DataContractsProvider(config_with_project).list_project_data_contracts(
+                PROJECT_ID
+            )
 
     def test_empty_project_id_raises(self, config_with_project):
         with pytest.raises(ValueError, match="project_id"):
@@ -268,19 +297,24 @@ class TestListProjectDataContracts:
 
 
 class TestCreateProjectDataContract:
+    """Tests for create project data contract."""
 
     def test_success_yaml_body(self, config_with_project, data_contract_json, mocker):
         mock_resp = mocker.Mock()
         mock_resp.ok = True
         mock_resp.json.return_value = data_contract_json
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
+        )
         mock_session_cls.return_value.post.return_value = mock_resp
 
         body = DataContractPrototypeYaml(
             name="Sales_Data_Contract",
             contract_yaml="dataContractSpecification: '1.0.0'\nid: sales",
         )
-        result = DataContractsProvider(config_with_project).create_project_data_contract(PROJECT_ID, body)
+        result = DataContractsProvider(
+            config_with_project
+        ).create_project_data_contract(PROJECT_ID, body)
         assert isinstance(result, DataContract)
         assert result.name == "Sales_Data_Contract"
 
@@ -288,17 +322,23 @@ class TestCreateProjectDataContract:
         mock_resp = mocker.Mock()
         mock_resp.ok = True
         mock_resp.json.return_value = data_contract_json
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
+        )
         mock_session_cls.return_value.post.return_value = mock_resp
 
         body = DataContractPrototypeJson(
             name="Sales_Data_Contract",
             contract_json={"dataContractSpecification": "1.0.0"},
         )
-        result = DataContractsProvider(config_with_project).create_project_data_contract(PROJECT_ID, body)
+        result = DataContractsProvider(
+            config_with_project
+        ).create_project_data_contract(PROJECT_ID, body)
         assert isinstance(result, DataContract)
 
-    def test_validate_param_forwarded(self, config_with_project, data_contract_json, mocker):
+    def test_validate_param_forwarded(
+        self, config_with_project, data_contract_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "post", data_contract_json)
         body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1")
         DataContractsProvider(config_with_project).create_project_data_contract(
@@ -307,10 +347,14 @@ class TestCreateProjectDataContract:
         call_kwargs = mock_session_cls.return_value.post.call_args
         assert call_kwargs[1]["params"]["validate"] == "false"
 
-    def test_validate_true_by_default(self, config_with_project, data_contract_json, mocker):
+    def test_validate_true_by_default(
+        self, config_with_project, data_contract_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "post", data_contract_json)
         body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1")
-        DataContractsProvider(config_with_project).create_project_data_contract(PROJECT_ID, body)
+        DataContractsProvider(config_with_project).create_project_data_contract(
+            PROJECT_ID, body
+        )
         call_kwargs = mock_session_cls.return_value.post.call_args
         assert call_kwargs[1]["params"]["validate"] == "true"
 
@@ -318,7 +362,9 @@ class TestCreateProjectDataContract:
         _mock_error_response(mocker, "post", status=400)
         body = DataContractPrototypeYaml(name="c", contract_yaml="bad")
         with pytest.raises(ValueError, match=PROJECT_ID):
-            DataContractsProvider(config_with_project).create_project_data_contract(PROJECT_ID, body)
+            DataContractsProvider(config_with_project).create_project_data_contract(
+                PROJECT_ID, body
+            )
 
     def test_empty_project_id_raises(self, config_with_project):
         with pytest.raises(ValueError, match="project_id"):
@@ -328,22 +374,27 @@ class TestCreateProjectDataContract:
 
 
 class TestDeleteProjectDataContracts:
+    """Tests for delete project data contracts."""
 
     def test_success_no_return(self, config_with_project, mocker):
         mock_resp = mocker.Mock()
         mock_resp.ok = True
         mock_resp.status_code = 204
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
-        mock_session_cls.return_value.delete.return_value = mock_resp
-        result = DataContractsProvider(config_with_project).delete_project_data_contracts(
-            PROJECT_ID, data_contract_ids=CONTRACT_ID
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
         )
+        mock_session_cls.return_value.delete.return_value = mock_resp
+        result = DataContractsProvider(
+            config_with_project
+        ).delete_project_data_contracts(PROJECT_ID, data_contract_ids=CONTRACT_ID)
         assert result is None
 
     def test_ids_forwarded_as_query_param(self, config_with_project, mocker):
         mock_resp = mocker.Mock()
         mock_resp.ok = True
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
+        )
         mock_session_cls.return_value.delete.return_value = mock_resp
         ids = f"{CONTRACT_ID},another-id"
         DataContractsProvider(config_with_project).delete_project_data_contracts(
@@ -373,6 +424,7 @@ class TestDeleteProjectDataContracts:
 
 
 class TestGetProjectDataContract:
+    """Tests for get project data contract."""
 
     def test_success(self, config_with_project, data_contract_json, mocker):
         _mock_ok_response(mocker, "get", data_contract_json)
@@ -384,7 +436,9 @@ class TestGetProjectDataContract:
 
     def test_correct_url(self, config_with_project, data_contract_json, mocker):
         mock_session_cls = _mock_ok_response(mocker, "get", data_contract_json)
-        DataContractsProvider(config_with_project).get_project_data_contract(PROJECT_ID, CONTRACT_ID)
+        DataContractsProvider(config_with_project).get_project_data_contract(
+            PROJECT_ID, CONTRACT_ID
+        )
         url = mock_session_cls.return_value.get.call_args[0][0]
         assert f"/projects/{PROJECT_ID}/data_contracts/{CONTRACT_ID}" in url
 
@@ -397,26 +451,36 @@ class TestGetProjectDataContract:
 
     def test_empty_contract_id_raises(self, config_with_project):
         with pytest.raises(ValueError, match="data_contract_id"):
-            DataContractsProvider(config_with_project).get_project_data_contract(PROJECT_ID, "")
+            DataContractsProvider(config_with_project).get_project_data_contract(
+                PROJECT_ID, ""
+            )
 
 
 class TestReplaceProjectDataContract:
+    """Tests for replace project data contract."""
 
     def test_success(self, config_with_project, data_contract_json, mocker):
         _mock_ok_response(mocker, "put", data_contract_json)
-        body = DataContractPrototypeYaml(name="Sales_Data_Contract", contract_yaml="x: 1")
-        result = DataContractsProvider(config_with_project).replace_project_data_contract(
-            PROJECT_ID, CONTRACT_ID, body
+        body = DataContractPrototypeYaml(
+            name="Sales_Data_Contract", contract_yaml="x: 1"
         )
+        result = DataContractsProvider(
+            config_with_project
+        ).replace_project_data_contract(PROJECT_ID, CONTRACT_ID, body)
         assert isinstance(result, DataContract)
 
-    def test_validate_true_by_default(self, config_with_project, data_contract_json, mocker):
+    def test_validate_true_by_default(
+        self, config_with_project, data_contract_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "put", data_contract_json)
         body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1")
         DataContractsProvider(config_with_project).replace_project_data_contract(
             PROJECT_ID, CONTRACT_ID, body
         )
-        assert mock_session_cls.return_value.put.call_args[1]["params"]["validate"] == "true"
+        assert (
+            mock_session_cls.return_value.put.call_args[1]["params"]["validate"]
+            == "true"
+        )
 
     def test_error_raises_value_error(self, config_with_project, mocker):
         _mock_error_response(mocker, "put", status=400)
@@ -428,41 +492,56 @@ class TestReplaceProjectDataContract:
 
 
 class TestValidateProjectDataContract:
+    """Tests for validate project data contract."""
 
-    def test_valid_contract(self, config_with_project, validation_response_valid_json, mocker):
+    def test_valid_contract(
+        self, config_with_project, validation_response_valid_json, mocker
+    ):
         _mock_ok_response(mocker, "post", validation_response_valid_json)
         body = DataContractValidationRequest(data_contract_content='{"id": "x"}')
-        result = DataContractsProvider(config_with_project).validate_project_data_contract(
-            PROJECT_ID, body
-        )
+        result = DataContractsProvider(
+            config_with_project
+        ).validate_project_data_contract(PROJECT_ID, body)
         assert isinstance(result, DataContractValidationResponse)
         assert result.valid is True
         assert result.error_count == 0
 
-    def test_invalid_contract(self, config_with_project, validation_response_invalid_json, mocker):
+    def test_invalid_contract(
+        self, config_with_project, validation_response_invalid_json, mocker
+    ):
         _mock_ok_response(mocker, "post", validation_response_invalid_json)
-        body = DataContractValidationRequest(data_contract_content='bad yaml')
-        result = DataContractsProvider(config_with_project).validate_project_data_contract(
-            PROJECT_ID, body
-        )
+        body = DataContractValidationRequest(data_contract_content="bad yaml")
+        result = DataContractsProvider(
+            config_with_project
+        ).validate_project_data_contract(PROJECT_ID, body)
         assert result.valid is False
         assert result.error_count == 1
         assert result.errors[0].type == "required"
 
-    def test_correct_url(self, config_with_project, validation_response_valid_json, mocker):
-        mock_session_cls = _mock_ok_response(mocker, "post", validation_response_valid_json)
+    def test_correct_url(
+        self, config_with_project, validation_response_valid_json, mocker
+    ):
+        mock_session_cls = _mock_ok_response(
+            mocker, "post", validation_response_valid_json
+        )
         body = DataContractValidationRequest(data_contract_content="x")
-        DataContractsProvider(config_with_project).validate_project_data_contract(PROJECT_ID, body)
+        DataContractsProvider(config_with_project).validate_project_data_contract(
+            PROJECT_ID, body
+        )
         url = mock_session_cls.return_value.post.call_args[0][0]
         assert f"/projects/{PROJECT_ID}/data_contracts_validation" in url
 
     def test_sends_raw_text_body_with_text_plain_content_type(
         self, config_with_project, validation_response_valid_json, mocker
     ):
-        mock_session_cls = _mock_ok_response(mocker, "post", validation_response_valid_json)
+        mock_session_cls = _mock_ok_response(
+            mocker, "post", validation_response_valid_json
+        )
         content = "id: my-contract\nname: test"
         body = DataContractValidationRequest(data_contract_content=content)
-        DataContractsProvider(config_with_project).validate_project_data_contract(PROJECT_ID, body)
+        DataContractsProvider(config_with_project).validate_project_data_contract(
+            PROJECT_ID, body
+        )
         call_kwargs = mock_session_cls.return_value.post.call_args
         # Body must be the raw string, NOT a JSON-wrapped object
         assert call_kwargs[1]["data"] == content
@@ -472,26 +551,35 @@ class TestValidateProjectDataContract:
         _mock_error_response(mocker, "post", status=500)
         body = DataContractValidationRequest(data_contract_content="x")
         with pytest.raises(ValueError, match=PROJECT_ID):
-            DataContractsProvider(config_with_project).validate_project_data_contract(PROJECT_ID, body)
+            DataContractsProvider(config_with_project).validate_project_data_contract(
+                PROJECT_ID, body
+            )
 
 
 class TestUploadProjectDataContractFile:
+    """Tests for upload project data contract file."""
 
     def test_success_create(self, config_with_project, data_contract_json, mocker):
         mock_resp = mocker.Mock()
         mock_resp.ok = True
         mock_resp.json.return_value = data_contract_json
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
+        )
         mock_session_cls.return_value.post.return_value = mock_resp
 
         file_content = io.BytesIO(b"dataContractSpecification: '1.0.0'")
-        result = DataContractsProvider(config_with_project).upload_project_data_contract_file(
+        result = DataContractsProvider(
+            config_with_project
+        ).upload_project_data_contract_file(
             PROJECT_ID, file_content, name="Sales_Data_Contract"
         )
         assert isinstance(result, DataContract)
 
     def test_correct_url(self, config_with_project, data_contract_json, mocker):
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
+        )
         mock_session_cls.return_value.post.return_value = mocker.Mock(
             ok=True, json=lambda: data_contract_json
         )
@@ -501,8 +589,12 @@ class TestUploadProjectDataContractFile:
         url = mock_session_cls.return_value.post.call_args[0][0]
         assert f"/projects/{PROJECT_ID}/data_contracts_upload" in url
 
-    def test_server_mappings_forwarded(self, config_with_project, data_contract_json, mocker):
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
+    def test_server_mappings_forwarded(
+        self, config_with_project, data_contract_json, mocker
+    ):
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
+        )
         mock_session_cls.return_value.post.return_value = mocker.Mock(
             ok=True, json=lambda: data_contract_json
         )
@@ -513,8 +605,12 @@ class TestUploadProjectDataContractFile:
         form_data = mock_session_cls.return_value.post.call_args[1]["data"]
         assert form_data["server_mappings"] == mappings
 
-    def test_data_contract_id_forwarded_for_update(self, config_with_project, data_contract_json, mocker):
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
+    def test_data_contract_id_forwarded_for_update(
+        self, config_with_project, data_contract_json, mocker
+    ):
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
+        )
         mock_session_cls.return_value.post.return_value = mocker.Mock(
             ok=True, json=lambda: data_contract_json
         )
@@ -527,12 +623,13 @@ class TestUploadProjectDataContractFile:
     def test_error_raises_value_error(self, config_with_project, mocker):
         _mock_error_response(mocker, "post", status=415)
         with pytest.raises(ValueError, match=PROJECT_ID):
-            DataContractsProvider(config_with_project).upload_project_data_contract_file(
-                PROJECT_ID, b"bad", name="c"
-            )
+            DataContractsProvider(
+                config_with_project
+            ).upload_project_data_contract_file(PROJECT_ID, b"bad", name="c")
 
 
 class TestTestProjectDataContract:
+    """Tests for test project data contract."""
 
     def test_success(self, config_with_project, test_response_json, mocker):
         _mock_ok_response(mocker, "post", test_response_json)
@@ -543,18 +640,20 @@ class TestTestProjectDataContract:
         result = DataContractsProvider(config_with_project).test_project_data_contract(
             PROJECT_ID, CONTRACT_ID, body
         )
-        assert isinstance(result, DataContractTestResponse)
+        assert isinstance(result, DataContractTestResult)
         assert result.status == "starting"
         assert result.id == TEST_RUN_ID
         assert result.job.id == "job-abc123"
         assert result.job.run.id == TEST_RUN_ID
 
-    def test_no_body_uses_default(self, config_with_project, test_response_json, mocker):
+    def test_no_body_uses_default(
+        self, config_with_project, test_response_json, mocker
+    ):
         _mock_ok_response(mocker, "post", test_response_json)
         result = DataContractsProvider(config_with_project).test_project_data_contract(
             PROJECT_ID, CONTRACT_ID
         )
-        assert isinstance(result, DataContractTestResponse)
+        assert isinstance(result, DataContractTestResult)
 
     def test_correct_url(self, config_with_project, test_response_json, mocker):
         mock_session_cls = _mock_ok_response(mocker, "post", test_response_json)
@@ -573,18 +672,25 @@ class TestTestProjectDataContract:
 
 
 class TestListProjectDataContractTestResults:
+    """Tests for list project data contract test results."""
 
     def test_success(self, config_with_project, test_response_collection_json, mocker):
         _mock_ok_response(mocker, "get", test_response_collection_json)
-        result = DataContractsProvider(config_with_project).list_project_data_contract_test_results(
-            PROJECT_ID, CONTRACT_ID
-        )
+        result = DataContractsProvider(
+            config_with_project
+        ).list_project_data_contract_test_results(PROJECT_ID, CONTRACT_ID)
         assert isinstance(result, DataContractTestResultCollection)
         assert len(result.test_results) == 1
 
-    def test_include_all_details_forwarded(self, config_with_project, test_response_collection_json, mocker):
-        mock_session_cls = _mock_ok_response(mocker, "get", test_response_collection_json)
-        DataContractsProvider(config_with_project).list_project_data_contract_test_results(
+    def test_include_all_details_forwarded(
+        self, config_with_project, test_response_collection_json, mocker
+    ):
+        mock_session_cls = _mock_ok_response(
+            mocker, "get", test_response_collection_json
+        )
+        DataContractsProvider(
+            config_with_project
+        ).list_project_data_contract_test_results(
             PROJECT_ID, CONTRACT_ID, include_all_details=True
         )
         params = mock_session_cls.return_value.get.call_args[1]["params"]
@@ -593,58 +699,66 @@ class TestListProjectDataContractTestResults:
     def test_error_raises_value_error(self, config_with_project, mocker):
         _mock_error_response(mocker, "get", status=404)
         with pytest.raises(ValueError, match=CONTRACT_ID):
-            DataContractsProvider(config_with_project).list_project_data_contract_test_results(
-                PROJECT_ID, CONTRACT_ID
-            )
+            DataContractsProvider(
+                config_with_project
+            ).list_project_data_contract_test_results(PROJECT_ID, CONTRACT_ID)
 
 
 class TestDeleteProjectDataContractTestResults:
+    """Tests for delete project data contract test results."""
 
     def test_success_no_return(self, config_with_project, mocker):
         mock_resp = mocker.Mock()
         mock_resp.ok = True
         mock_resp.status_code = 204
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
-        mock_session_cls.return_value.delete.return_value = mock_resp
-        result = DataContractsProvider(config_with_project).delete_project_data_contract_test_results(
-            PROJECT_ID, CONTRACT_ID
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
         )
+        mock_session_cls.return_value.delete.return_value = mock_resp
+        result = DataContractsProvider(
+            config_with_project
+        ).delete_project_data_contract_test_results(PROJECT_ID, CONTRACT_ID)
         assert result is None
 
     def test_correct_url(self, config_with_project, mocker):
         mock_resp = mocker.Mock()
         mock_resp.ok = True
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
-        mock_session_cls.return_value.delete.return_value = mock_resp
-        DataContractsProvider(config_with_project).delete_project_data_contract_test_results(
-            PROJECT_ID, CONTRACT_ID
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
         )
+        mock_session_cls.return_value.delete.return_value = mock_resp
+        DataContractsProvider(
+            config_with_project
+        ).delete_project_data_contract_test_results(PROJECT_ID, CONTRACT_ID)
         url = mock_session_cls.return_value.delete.call_args[0][0]
-        assert f"/projects/{PROJECT_ID}/data_contracts/{CONTRACT_ID}/test_results" in url
+        assert (
+            f"/projects/{PROJECT_ID}/data_contracts/{CONTRACT_ID}/test_results" in url
+        )
 
     def test_error_raises_value_error(self, config_with_project, mocker):
         _mock_error_response(mocker, "delete", status=500)
         with pytest.raises(ValueError, match=CONTRACT_ID):
-            DataContractsProvider(config_with_project).delete_project_data_contract_test_results(
-                PROJECT_ID, CONTRACT_ID
-            )
+            DataContractsProvider(
+                config_with_project
+            ).delete_project_data_contract_test_results(PROJECT_ID, CONTRACT_ID)
 
 
 class TestGetProjectDataContractTestResult:
+    """Tests for get project data contract test result."""
 
     def test_success(self, config_with_project, test_result_json, mocker):
         _mock_ok_response(mocker, "get", test_result_json)
-        result = DataContractsProvider(config_with_project).get_project_data_contract_test_result(
-            PROJECT_ID, CONTRACT_ID, TEST_RUN_ID
-        )
+        result = DataContractsProvider(
+            config_with_project
+        ).get_project_data_contract_test_result(PROJECT_ID, CONTRACT_ID, TEST_RUN_ID)
         assert isinstance(result, DataContractTestResult)
         assert result.id == TEST_RUN_ID
 
     def test_correct_url(self, config_with_project, test_result_json, mocker):
         mock_session_cls = _mock_ok_response(mocker, "get", test_result_json)
-        DataContractsProvider(config_with_project).get_project_data_contract_test_result(
-            PROJECT_ID, CONTRACT_ID, TEST_RUN_ID
-        )
+        DataContractsProvider(
+            config_with_project
+        ).get_project_data_contract_test_result(PROJECT_ID, CONTRACT_ID, TEST_RUN_ID)
         url = mock_session_cls.return_value.get.call_args[0][0]
         assert (
             f"/projects/{PROJECT_ID}/data_contracts/{CONTRACT_ID}/test_results/{TEST_RUN_ID}"
@@ -654,22 +768,27 @@ class TestGetProjectDataContractTestResult:
     def test_not_found_raises_value_error(self, config_with_project, mocker):
         _mock_error_response(mocker, "get", status=404)
         with pytest.raises(ValueError, match=TEST_RUN_ID):
-            DataContractsProvider(config_with_project).get_project_data_contract_test_result(
+            DataContractsProvider(
+                config_with_project
+            ).get_project_data_contract_test_result(
                 PROJECT_ID, CONTRACT_ID, TEST_RUN_ID
             )
 
     def test_empty_test_run_id_raises(self, config_with_project):
         with pytest.raises(ValueError, match="test_run_id"):
-            DataContractsProvider(config_with_project).get_project_data_contract_test_result(
-                PROJECT_ID, CONTRACT_ID, ""
-            )
+            DataContractsProvider(
+                config_with_project
+            ).get_project_data_contract_test_result(PROJECT_ID, CONTRACT_ID, "")
 
 
 class TestCreateProjectDataContractTestResult:
+    """Tests for create project data contract test result."""
 
     def test_success(self, config_with_project, test_result_json, mocker):
         _mock_ok_response(mocker, "post", test_result_json)
-        result = DataContractsProvider(config_with_project).create_project_data_contract_test_result(
+        result = DataContractsProvider(
+            config_with_project
+        ).create_project_data_contract_test_result(
             PROJECT_ID, CONTRACT_ID, DataContractTestResultPrototype(status="completed")
         )
         assert isinstance(result, DataContractTestResult)
@@ -677,15 +796,23 @@ class TestCreateProjectDataContractTestResult:
 
     def test_correct_url(self, config_with_project, test_result_json, mocker):
         mock_session_cls = _mock_ok_response(mocker, "post", test_result_json)
-        DataContractsProvider(config_with_project).create_project_data_contract_test_result(
+        DataContractsProvider(
+            config_with_project
+        ).create_project_data_contract_test_result(
             PROJECT_ID, CONTRACT_ID, DataContractTestResultPrototype(status="completed")
         )
         url = mock_session_cls.return_value.post.call_args[0][0]
-        assert f"/projects/{PROJECT_ID}/data_contracts/{CONTRACT_ID}/test_results" in url
+        assert (
+            f"/projects/{PROJECT_ID}/data_contracts/{CONTRACT_ID}/test_results" in url
+        )
 
-    def test_body_serialised_as_json(self, config_with_project, test_result_json, mocker):
+    def test_body_serialised_as_json(
+        self, config_with_project, test_result_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "post", test_result_json)
-        DataContractsProvider(config_with_project).create_project_data_contract_test_result(
+        DataContractsProvider(
+            config_with_project
+        ).create_project_data_contract_test_result(
             PROJECT_ID, CONTRACT_ID, DataContractTestResultPrototype(status="completed")
         )
         body = mock_session_cls.return_value.post.call_args[1]["json"]
@@ -694,37 +821,54 @@ class TestCreateProjectDataContractTestResult:
     def test_error_raises_value_error(self, config_with_project, mocker):
         _mock_error_response(mocker, "post", status=400)
         with pytest.raises(ValueError, match=CONTRACT_ID):
-            DataContractsProvider(config_with_project).create_project_data_contract_test_result(
+            DataContractsProvider(
+                config_with_project
+            ).create_project_data_contract_test_result(
                 PROJECT_ID, CONTRACT_ID, DataContractTestResultPrototype()
             )
 
     def test_empty_project_id_raises(self, config_with_project):
         with pytest.raises(ValueError, match="project_id"):
-            DataContractsProvider(config_with_project).create_project_data_contract_test_result(
+            DataContractsProvider(
+                config_with_project
+            ).create_project_data_contract_test_result(
                 "", CONTRACT_ID, DataContractTestResultPrototype()
             )
 
     def test_empty_contract_id_raises(self, config_with_project):
         with pytest.raises(ValueError, match="data_contract_id"):
-            DataContractsProvider(config_with_project).create_project_data_contract_test_result(
+            DataContractsProvider(
+                config_with_project
+            ).create_project_data_contract_test_result(
                 PROJECT_ID, "", DataContractTestResultPrototype()
             )
 
 
 class TestUpdateProjectDataContractTestResult:
+    """Tests for update project data contract test result."""
 
     def test_success(self, config_with_project, test_result_json, mocker):
         _mock_ok_response(mocker, "put", test_result_json)
-        result = DataContractsProvider(config_with_project).update_project_data_contract_test_result(
-            PROJECT_ID, CONTRACT_ID, TEST_RUN_ID, DataContractTestResultPrototype(status="completed")
+        result = DataContractsProvider(
+            config_with_project
+        ).update_project_data_contract_test_result(
+            PROJECT_ID,
+            CONTRACT_ID,
+            TEST_RUN_ID,
+            DataContractTestResultPrototype(status="completed"),
         )
         assert isinstance(result, DataContractTestResult)
         assert result.id == TEST_RUN_ID
 
     def test_correct_url(self, config_with_project, test_result_json, mocker):
         mock_session_cls = _mock_ok_response(mocker, "put", test_result_json)
-        DataContractsProvider(config_with_project).update_project_data_contract_test_result(
-            PROJECT_ID, CONTRACT_ID, TEST_RUN_ID, DataContractTestResultPrototype(status="completed")
+        DataContractsProvider(
+            config_with_project
+        ).update_project_data_contract_test_result(
+            PROJECT_ID,
+            CONTRACT_ID,
+            TEST_RUN_ID,
+            DataContractTestResultPrototype(status="completed"),
         )
         url = mock_session_cls.return_value.put.call_args[0][0]
         assert (
@@ -732,10 +876,17 @@ class TestUpdateProjectDataContractTestResult:
             in url
         )
 
-    def test_body_serialised_as_json(self, config_with_project, test_result_json, mocker):
+    def test_body_serialised_as_json(
+        self, config_with_project, test_result_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "put", test_result_json)
-        DataContractsProvider(config_with_project).update_project_data_contract_test_result(
-            PROJECT_ID, CONTRACT_ID, TEST_RUN_ID, DataContractTestResultPrototype(status="failed")
+        DataContractsProvider(
+            config_with_project
+        ).update_project_data_contract_test_result(
+            PROJECT_ID,
+            CONTRACT_ID,
+            TEST_RUN_ID,
+            DataContractTestResultPrototype(status="failed"),
         )
         body = mock_session_cls.return_value.put.call_args[1]["json"]
         assert body["status"] == "failed"
@@ -743,25 +894,33 @@ class TestUpdateProjectDataContractTestResult:
     def test_not_found_raises_value_error(self, config_with_project, mocker):
         _mock_error_response(mocker, "put", status=404)
         with pytest.raises(ValueError, match=TEST_RUN_ID):
-            DataContractsProvider(config_with_project).update_project_data_contract_test_result(
+            DataContractsProvider(
+                config_with_project
+            ).update_project_data_contract_test_result(
                 PROJECT_ID, CONTRACT_ID, TEST_RUN_ID, DataContractTestResultPrototype()
             )
 
     def test_empty_project_id_raises(self, config_with_project):
         with pytest.raises(ValueError, match="project_id"):
-            DataContractsProvider(config_with_project).update_project_data_contract_test_result(
+            DataContractsProvider(
+                config_with_project
+            ).update_project_data_contract_test_result(
                 "", CONTRACT_ID, TEST_RUN_ID, DataContractTestResultPrototype()
             )
 
     def test_empty_contract_id_raises(self, config_with_project):
         with pytest.raises(ValueError, match="data_contract_id"):
-            DataContractsProvider(config_with_project).update_project_data_contract_test_result(
+            DataContractsProvider(
+                config_with_project
+            ).update_project_data_contract_test_result(
                 PROJECT_ID, "", TEST_RUN_ID, DataContractTestResultPrototype()
             )
 
     def test_empty_test_run_id_raises(self, config_with_project):
         with pytest.raises(ValueError, match="test_run_id"):
-            DataContractsProvider(config_with_project).update_project_data_contract_test_result(
+            DataContractsProvider(
+                config_with_project
+            ).update_project_data_contract_test_result(
                 PROJECT_ID, CONTRACT_ID, "", DataContractTestResultPrototype()
             )
 
@@ -772,30 +931,51 @@ class TestUpdateProjectDataContractTestResult:
 
 
 class TestListCatalogDataContracts:
+    """Tests for list catalog data contracts."""
 
-    def test_success_returns_collection(self, config_with_catalog, data_contract_collection_json, mocker):
+    def test_success_returns_collection(
+        self, config_with_catalog, data_contract_collection_json, mocker
+    ):
         _mock_ok_response(mocker, "get", data_contract_collection_json)
-        result = DataContractsProvider(config_with_catalog).list_catalog_data_contracts(CATALOG_ID)
+        result = DataContractsProvider(config_with_catalog).list_catalog_data_contracts(
+            CATALOG_ID
+        )
         assert isinstance(result, DataContractCollection)
         assert result.total_count == 1
 
-    def test_url_uses_catalogs_path(self, config_with_catalog, data_contract_collection_json, mocker):
-        mock_session_cls = _mock_ok_response(mocker, "get", data_contract_collection_json)
-        DataContractsProvider(config_with_catalog).list_catalog_data_contracts(CATALOG_ID)
+    def test_url_uses_catalogs_path(
+        self, config_with_catalog, data_contract_collection_json, mocker
+    ):
+        mock_session_cls = _mock_ok_response(
+            mocker, "get", data_contract_collection_json
+        )
+        DataContractsProvider(config_with_catalog).list_catalog_data_contracts(
+            CATALOG_ID
+        )
         url = mock_session_cls.return_value.get.call_args[0][0]
         assert f"/catalogs/{CATALOG_ID}/data_contracts" in url
         assert "/projects/" not in url
 
-    def test_limit_forwarded(self, config_with_catalog, data_contract_collection_json, mocker):
-        mock_session_cls = _mock_ok_response(mocker, "get", data_contract_collection_json)
-        DataContractsProvider(config_with_catalog).list_catalog_data_contracts(CATALOG_ID, limit=100)
+    def test_limit_forwarded(
+        self, config_with_catalog, data_contract_collection_json, mocker
+    ):
+        mock_session_cls = _mock_ok_response(
+            mocker, "get", data_contract_collection_json
+        )
+        DataContractsProvider(config_with_catalog).list_catalog_data_contracts(
+            CATALOG_ID, limit=100
+        )
         params = mock_session_cls.return_value.get.call_args[1]["params"]
         assert params["limit"] == 100
 
-    def test_api_returns_bare_list(self, config_with_catalog, data_contract_json, mocker):
+    def test_api_returns_bare_list(
+        self, config_with_catalog, data_contract_json, mocker
+    ):
         # Real API may return a plain JSON array instead of the wrapped object
         _mock_ok_response(mocker, "get", [data_contract_json])
-        result = DataContractsProvider(config_with_catalog).list_catalog_data_contracts(CATALOG_ID)
+        result = DataContractsProvider(config_with_catalog).list_catalog_data_contracts(
+            CATALOG_ID
+        )
         assert isinstance(result, DataContractCollection)
         assert result.total_count == 1
         assert len(result.data_contracts) == 1
@@ -803,7 +983,9 @@ class TestListCatalogDataContracts:
     def test_error_raises_value_error(self, config_with_catalog, mocker):
         _mock_error_response(mocker, "get", status=500)
         with pytest.raises(ValueError, match=CATALOG_ID):
-            DataContractsProvider(config_with_catalog).list_catalog_data_contracts(CATALOG_ID)
+            DataContractsProvider(config_with_catalog).list_catalog_data_contracts(
+                CATALOG_ID
+            )
 
     def test_empty_catalog_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="catalog_id"):
@@ -811,53 +993,74 @@ class TestListCatalogDataContracts:
 
 
 class TestCreateCatalogDataContract:
+    """Tests for create catalog data contract."""
 
     def test_success(self, config_with_catalog, data_contract_json, mocker):
         _mock_ok_response(mocker, "post", data_contract_json)
-        body = DataContractPrototypeYaml(name="Sales_Data_Contract", contract_yaml="x: 1")
-        result = DataContractsProvider(config_with_catalog).create_catalog_data_contract(
-            CATALOG_ID, body
+        body = DataContractPrototypeYaml(
+            name="Sales_Data_Contract", contract_yaml="x: 1"
         )
+        result = DataContractsProvider(
+            config_with_catalog
+        ).create_catalog_data_contract(CATALOG_ID, body)
         assert isinstance(result, DataContract)
 
-    def test_url_uses_catalogs_path(self, config_with_catalog, data_contract_json, mocker):
+    def test_url_uses_catalogs_path(
+        self, config_with_catalog, data_contract_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "post", data_contract_json)
         body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1")
-        DataContractsProvider(config_with_catalog).create_catalog_data_contract(CATALOG_ID, body)
+        DataContractsProvider(config_with_catalog).create_catalog_data_contract(
+            CATALOG_ID, body
+        )
         url = mock_session_cls.return_value.post.call_args[0][0]
         assert f"/catalogs/{CATALOG_ID}/data_contracts" in url
         assert "/projects/" not in url
 
-    def test_validate_true_by_default(self, config_with_catalog, data_contract_json, mocker):
+    def test_validate_true_by_default(
+        self, config_with_catalog, data_contract_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "post", data_contract_json)
         body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1")
-        DataContractsProvider(config_with_catalog).create_catalog_data_contract(CATALOG_ID, body)
-        assert mock_session_cls.return_value.post.call_args[1]["params"]["validate"] == "true"
+        DataContractsProvider(config_with_catalog).create_catalog_data_contract(
+            CATALOG_ID, body
+        )
+        assert (
+            mock_session_cls.return_value.post.call_args[1]["params"]["validate"]
+            == "true"
+        )
 
     def test_error_raises_value_error(self, config_with_catalog, mocker):
         _mock_error_response(mocker, "post", status=400)
         body = DataContractPrototypeYaml(name="c", contract_yaml="bad")
         with pytest.raises(ValueError, match=CATALOG_ID):
-            DataContractsProvider(config_with_catalog).create_catalog_data_contract(CATALOG_ID, body)
+            DataContractsProvider(config_with_catalog).create_catalog_data_contract(
+                CATALOG_ID, body
+            )
 
 
 class TestDeleteCatalogDataContracts:
+    """Tests for delete catalog data contracts."""
 
     def test_success_no_return(self, config_with_catalog, mocker):
         mock_resp = mocker.Mock()
         mock_resp.ok = True
         mock_resp.status_code = 204
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
-        mock_session_cls.return_value.delete.return_value = mock_resp
-        result = DataContractsProvider(config_with_catalog).delete_catalog_data_contracts(
-            CATALOG_ID, data_contract_ids=CONTRACT_ID
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
         )
+        mock_session_cls.return_value.delete.return_value = mock_resp
+        result = DataContractsProvider(
+            config_with_catalog
+        ).delete_catalog_data_contracts(CATALOG_ID, data_contract_ids=CONTRACT_ID)
         assert result is None
 
     def test_url_uses_catalogs_path(self, config_with_catalog, mocker):
         mock_resp = mocker.Mock()
         mock_resp.ok = True
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
+        )
         mock_session_cls.return_value.delete.return_value = mock_resp
         DataContractsProvider(config_with_catalog).delete_catalog_data_contracts(
             CATALOG_ID, data_contract_ids=CONTRACT_ID
@@ -875,6 +1078,7 @@ class TestDeleteCatalogDataContracts:
 
 
 class TestGetCatalogDataContract:
+    """Tests for get catalog data contract."""
 
     def test_success(self, config_with_catalog, data_contract_json, mocker):
         _mock_ok_response(mocker, "get", data_contract_json)
@@ -884,9 +1088,13 @@ class TestGetCatalogDataContract:
         assert isinstance(result, DataContract)
         assert result.id == CONTRACT_ID
 
-    def test_url_uses_catalogs_path(self, config_with_catalog, data_contract_json, mocker):
+    def test_url_uses_catalogs_path(
+        self, config_with_catalog, data_contract_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "get", data_contract_json)
-        DataContractsProvider(config_with_catalog).get_catalog_data_contract(CATALOG_ID, CONTRACT_ID)
+        DataContractsProvider(config_with_catalog).get_catalog_data_contract(
+            CATALOG_ID, CONTRACT_ID
+        )
         url = mock_session_cls.return_value.get.call_args[0][0]
         assert f"/catalogs/{CATALOG_ID}/data_contracts/{CONTRACT_ID}" in url
 
@@ -899,20 +1107,25 @@ class TestGetCatalogDataContract:
 
     def test_empty_contract_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="data_contract_id"):
-            DataContractsProvider(config_with_catalog).get_catalog_data_contract(CATALOG_ID, "")
+            DataContractsProvider(config_with_catalog).get_catalog_data_contract(
+                CATALOG_ID, ""
+            )
 
 
 class TestReplaceCatalogDataContract:
+    """Tests for replace catalog data contract."""
 
     def test_success(self, config_with_catalog, data_contract_json, mocker):
         _mock_ok_response(mocker, "put", data_contract_json)
         body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1")
-        result = DataContractsProvider(config_with_catalog).replace_catalog_data_contract(
-            CATALOG_ID, CONTRACT_ID, body
-        )
+        result = DataContractsProvider(
+            config_with_catalog
+        ).replace_catalog_data_contract(CATALOG_ID, CONTRACT_ID, body)
         assert isinstance(result, DataContract)
 
-    def test_url_uses_catalogs_path(self, config_with_catalog, data_contract_json, mocker):
+    def test_url_uses_catalogs_path(
+        self, config_with_catalog, data_contract_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "put", data_contract_json)
         body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1")
         DataContractsProvider(config_with_catalog).replace_catalog_data_contract(
@@ -932,19 +1145,28 @@ class TestReplaceCatalogDataContract:
 
 
 class TestValidateCatalogDataContract:
+    """Tests for validate catalog data contract."""
 
-    def test_valid_contract(self, config_with_catalog, validation_response_valid_json, mocker):
+    def test_valid_contract(
+        self, config_with_catalog, validation_response_valid_json, mocker
+    ):
         _mock_ok_response(mocker, "post", validation_response_valid_json)
         body = DataContractValidationRequest(data_contract_content='{"id": "x"}')
-        result = DataContractsProvider(config_with_catalog).validate_catalog_data_contract(
-            CATALOG_ID, body
-        )
+        result = DataContractsProvider(
+            config_with_catalog
+        ).validate_catalog_data_contract(CATALOG_ID, body)
         assert result.valid is True
 
-    def test_url_uses_catalogs_path(self, config_with_catalog, validation_response_valid_json, mocker):
-        mock_session_cls = _mock_ok_response(mocker, "post", validation_response_valid_json)
+    def test_url_uses_catalogs_path(
+        self, config_with_catalog, validation_response_valid_json, mocker
+    ):
+        mock_session_cls = _mock_ok_response(
+            mocker, "post", validation_response_valid_json
+        )
         body = DataContractValidationRequest(data_contract_content="x")
-        DataContractsProvider(config_with_catalog).validate_catalog_data_contract(CATALOG_ID, body)
+        DataContractsProvider(config_with_catalog).validate_catalog_data_contract(
+            CATALOG_ID, body
+        )
         url = mock_session_cls.return_value.post.call_args[0][0]
         assert f"/catalogs/{CATALOG_ID}/data_contracts_validation" in url
         assert "/projects/" not in url
@@ -952,10 +1174,14 @@ class TestValidateCatalogDataContract:
     def test_sends_raw_text_body_with_text_plain_content_type(
         self, config_with_catalog, validation_response_valid_json, mocker
     ):
-        mock_session_cls = _mock_ok_response(mocker, "post", validation_response_valid_json)
+        mock_session_cls = _mock_ok_response(
+            mocker, "post", validation_response_valid_json
+        )
         content = "id: my-contract\nname: test"
         body = DataContractValidationRequest(data_contract_content=content)
-        DataContractsProvider(config_with_catalog).validate_catalog_data_contract(CATALOG_ID, body)
+        DataContractsProvider(config_with_catalog).validate_catalog_data_contract(
+            CATALOG_ID, body
+        )
         call_kwargs = mock_session_cls.return_value.post.call_args
         assert call_kwargs[1]["data"] == content
         assert call_kwargs[1]["headers"]["Content-Type"] == "text/plain"
@@ -964,23 +1190,34 @@ class TestValidateCatalogDataContract:
         _mock_error_response(mocker, "post", status=500)
         body = DataContractValidationRequest(data_contract_content="x")
         with pytest.raises(ValueError, match=CATALOG_ID):
-            DataContractsProvider(config_with_catalog).validate_catalog_data_contract(CATALOG_ID, body)
+            DataContractsProvider(config_with_catalog).validate_catalog_data_contract(
+                CATALOG_ID, body
+            )
 
 
 class TestUploadCatalogDataContractFile:
+    """Tests for upload catalog data contract file."""
 
     def test_success(self, config_with_catalog, data_contract_json, mocker):
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
+        )
         mock_session_cls.return_value.post.return_value = mocker.Mock(
             ok=True, json=lambda: data_contract_json
         )
-        result = DataContractsProvider(config_with_catalog).upload_catalog_data_contract_file(
+        result = DataContractsProvider(
+            config_with_catalog
+        ).upload_catalog_data_contract_file(
             CATALOG_ID, b"contract content", name="Sales_Data_Contract"
         )
         assert isinstance(result, DataContract)
 
-    def test_url_uses_catalogs_path(self, config_with_catalog, data_contract_json, mocker):
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
+    def test_url_uses_catalogs_path(
+        self, config_with_catalog, data_contract_json, mocker
+    ):
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
+        )
         mock_session_cls.return_value.post.return_value = mocker.Mock(
             ok=True, json=lambda: data_contract_json
         )
@@ -994,12 +1231,16 @@ class TestUploadCatalogDataContractFile:
     def test_error_raises_value_error(self, config_with_catalog, mocker):
         _mock_error_response(mocker, "post", status=413)
         with pytest.raises(ValueError, match=CATALOG_ID):
-            DataContractsProvider(config_with_catalog).upload_catalog_data_contract_file(
-                CATALOG_ID, b"too-big", name="c"
-            )
+            DataContractsProvider(
+                config_with_catalog
+            ).upload_catalog_data_contract_file(CATALOG_ID, b"too-big", name="c")
 
-    def test_data_contract_id_forwarded(self, config_with_catalog, data_contract_json, mocker):
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
+    def test_data_contract_id_forwarded(
+        self, config_with_catalog, data_contract_json, mocker
+    ):
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
+        )
         mock_session_cls.return_value.post.return_value = mocker.Mock(
             ok=True, json=lambda: data_contract_json
         )
@@ -1025,7 +1266,9 @@ class TestTypeField:
     # ------------------------------------------------------------------
 
     def test_yaml_prototype_type_included_in_serialization(self):
-        body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1", type=DataContractType.CONTRACT)
+        body = DataContractPrototypeYaml(
+            name="c", contract_yaml="x: 1", type=DataContractType.CONTRACT
+        )
         payload = json.loads(body.model_dump_json(exclude_none=True))
         assert payload["type"] == "contract"
 
@@ -1074,52 +1317,75 @@ class TestTypeField:
     # End-to-end: type flows through create request body
     # ------------------------------------------------------------------
 
-    def test_type_sent_in_create_project_request_body(self, config_with_project, data_contract_json, mocker):
+    def test_type_sent_in_create_project_request_body(
+        self, config_with_project, data_contract_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "post", data_contract_json)
-        body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1", type=DataContractType.CONTRACT)
-        DataContractsProvider(config_with_project).create_project_data_contract(PROJECT_ID, body)
+        body = DataContractPrototypeYaml(
+            name="c", contract_yaml="x: 1", type=DataContractType.CONTRACT
+        )
+        DataContractsProvider(config_with_project).create_project_data_contract(
+            PROJECT_ID, body
+        )
         sent = json.loads(mock_session_cls.return_value.post.call_args[1]["data"])
         assert sent["type"] == "contract"
 
-    def test_type_sent_in_replace_project_request_body(self, config_with_project, data_contract_json, mocker):
+    def test_type_sent_in_replace_project_request_body(
+        self, config_with_project, data_contract_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "put", data_contract_json)
-        body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1", type=DataContractType.CONTRACT)
+        body = DataContractPrototypeYaml(
+            name="c", contract_yaml="x: 1", type=DataContractType.CONTRACT
+        )
         DataContractsProvider(config_with_project).replace_project_data_contract(
             PROJECT_ID, CONTRACT_ID, body
         )
         sent = json.loads(mock_session_cls.return_value.put.call_args[1]["data"])
         assert sent["type"] == "contract"
 
-    def test_type_sent_in_create_catalog_request_body(self, config_with_catalog, data_contract_json, mocker):
+    def test_type_sent_in_create_catalog_request_body(
+        self, config_with_catalog, data_contract_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "post", data_contract_json)
-        body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1", type=DataContractType.CONTRACT)
-        DataContractsProvider(config_with_catalog).create_catalog_data_contract(CATALOG_ID, body)
+        body = DataContractPrototypeYaml(
+            name="c", contract_yaml="x: 1", type=DataContractType.CONTRACT
+        )
+        DataContractsProvider(config_with_catalog).create_catalog_data_contract(
+            CATALOG_ID, body
+        )
         sent = json.loads(mock_session_cls.return_value.post.call_args[1]["data"])
         assert sent["type"] == "contract"
 
-    def test_type_sent_in_replace_catalog_request_body(self, config_with_catalog, data_contract_json, mocker):
+    def test_type_sent_in_replace_catalog_request_body(
+        self, config_with_catalog, data_contract_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "put", data_contract_json)
-        body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1", type=DataContractType.CONTRACT)
+        body = DataContractPrototypeYaml(
+            name="c", contract_yaml="x: 1", type=DataContractType.CONTRACT
+        )
         DataContractsProvider(config_with_catalog).replace_catalog_data_contract(
             CATALOG_ID, CONTRACT_ID, body
         )
         sent = json.loads(mock_session_cls.return_value.put.call_args[1]["data"])
         assert sent["type"] == "contract"
 
-    def test_type_returned_in_response(self, config_with_project, data_contract_json, mocker):
+    def test_type_returned_in_response(
+        self, config_with_project, data_contract_json, mocker
+    ):
         _mock_ok_response(mocker, "get", data_contract_json)
         result = DataContractsProvider(config_with_project).get_project_data_contract(
             PROJECT_ID, CONTRACT_ID
         )
         assert result.type == DataContractType.CONTRACT
 
-
     # ------------------------------------------------------------------
     # data_product_id field
     # ------------------------------------------------------------------
 
     def test_yaml_prototype_data_product_id_included_in_serialization(self):
-        body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1", data_product_id="dp-abc123")
+        body = DataContractPrototypeYaml(
+            name="c", contract_yaml="x: 1", data_product_id="dp-abc123"
+        )
         payload = json.loads(body.model_dump_json(exclude_none=True))
         assert payload["data_product_id"] == "dp-abc123"
 
@@ -1129,7 +1395,9 @@ class TestTypeField:
         assert "data_product_id" not in payload
 
     def test_json_prototype_data_product_id_included_in_serialization(self):
-        body = DataContractPrototypeJson(name="c", contract_json={"id": "x"}, data_product_id="dp-abc123")
+        body = DataContractPrototypeJson(
+            name="c", contract_json={"id": "x"}, data_product_id="dp-abc123"
+        )
         payload = json.loads(body.model_dump_json(exclude_none=True))
         assert payload["data_product_id"] == "dp-abc123"
 
@@ -1150,8 +1418,12 @@ class TestTypeField:
         self, config_with_project, data_contract_json, mocker
     ):
         mock_session_cls = _mock_ok_response(mocker, "post", data_contract_json)
-        body = DataContractPrototypeYaml(name="c", contract_yaml="x: 1", data_product_id="dp-abc123")
-        DataContractsProvider(config_with_project).create_project_data_contract(PROJECT_ID, body)
+        body = DataContractPrototypeYaml(
+            name="c", contract_yaml="x: 1", data_product_id="dp-abc123"
+        )
+        DataContractsProvider(config_with_project).create_project_data_contract(
+            PROJECT_ID, body
+        )
         sent = json.loads(mock_session_cls.return_value.post.call_args[1]["data"])
         assert sent["data_product_id"] == "dp-abc123"
 
@@ -1164,28 +1436,42 @@ class TestTypeField:
         )
         assert result.data_product_id == "dp-abc123"
 
+
 class TestCreateCatalogDataContractTestResult:
+    """Tests for create catalog data contract test result."""
 
     def test_success(self, config_with_catalog, test_result_json, mocker):
         _mock_ok_response(mocker, "post", test_result_json)
-        result = DataContractsProvider(config_with_catalog).create_catalog_data_contract_test_result(
+        result = DataContractsProvider(
+            config_with_catalog
+        ).create_catalog_data_contract_test_result(
             CATALOG_ID, CONTRACT_ID, DataContractTestResultPrototype(status="completed")
         )
         assert isinstance(result, DataContractTestResult)
         assert result.id == TEST_RUN_ID
 
-    def test_url_uses_catalogs_path(self, config_with_catalog, test_result_json, mocker):
+    def test_url_uses_catalogs_path(
+        self, config_with_catalog, test_result_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "post", test_result_json)
-        DataContractsProvider(config_with_catalog).create_catalog_data_contract_test_result(
+        DataContractsProvider(
+            config_with_catalog
+        ).create_catalog_data_contract_test_result(
             CATALOG_ID, CONTRACT_ID, DataContractTestResultPrototype(status="completed")
         )
         url = mock_session_cls.return_value.post.call_args[0][0]
-        assert f"/catalogs/{CATALOG_ID}/data_contracts/{CONTRACT_ID}/test_results" in url
+        assert (
+            f"/catalogs/{CATALOG_ID}/data_contracts/{CONTRACT_ID}/test_results" in url
+        )
         assert "/projects/" not in url
 
-    def test_body_serialised_as_json(self, config_with_catalog, test_result_json, mocker):
+    def test_body_serialised_as_json(
+        self, config_with_catalog, test_result_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "post", test_result_json)
-        DataContractsProvider(config_with_catalog).create_catalog_data_contract_test_result(
+        DataContractsProvider(
+            config_with_catalog
+        ).create_catalog_data_contract_test_result(
             CATALOG_ID, CONTRACT_ID, DataContractTestResultPrototype(status="completed")
         )
         body = mock_session_cls.return_value.post.call_args[1]["json"]
@@ -1194,37 +1480,56 @@ class TestCreateCatalogDataContractTestResult:
     def test_error_raises_value_error(self, config_with_catalog, mocker):
         _mock_error_response(mocker, "post", status=400)
         with pytest.raises(ValueError, match=CONTRACT_ID):
-            DataContractsProvider(config_with_catalog).create_catalog_data_contract_test_result(
+            DataContractsProvider(
+                config_with_catalog
+            ).create_catalog_data_contract_test_result(
                 CATALOG_ID, CONTRACT_ID, DataContractTestResultPrototype()
             )
 
     def test_empty_catalog_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="catalog_id"):
-            DataContractsProvider(config_with_catalog).create_catalog_data_contract_test_result(
+            DataContractsProvider(
+                config_with_catalog
+            ).create_catalog_data_contract_test_result(
                 "", CONTRACT_ID, DataContractTestResultPrototype()
             )
 
     def test_empty_contract_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="data_contract_id"):
-            DataContractsProvider(config_with_catalog).create_catalog_data_contract_test_result(
+            DataContractsProvider(
+                config_with_catalog
+            ).create_catalog_data_contract_test_result(
                 CATALOG_ID, "", DataContractTestResultPrototype()
             )
 
 
 class TestUpdateCatalogDataContractTestResult:
+    """Tests for update catalog data contract test result."""
 
     def test_success(self, config_with_catalog, test_result_json, mocker):
         _mock_ok_response(mocker, "put", test_result_json)
-        result = DataContractsProvider(config_with_catalog).update_catalog_data_contract_test_result(
-            CATALOG_ID, CONTRACT_ID, TEST_RUN_ID, DataContractTestResultPrototype(status="completed")
+        result = DataContractsProvider(
+            config_with_catalog
+        ).update_catalog_data_contract_test_result(
+            CATALOG_ID,
+            CONTRACT_ID,
+            TEST_RUN_ID,
+            DataContractTestResultPrototype(status="completed"),
         )
         assert isinstance(result, DataContractTestResult)
         assert result.id == TEST_RUN_ID
 
-    def test_url_uses_catalogs_path(self, config_with_catalog, test_result_json, mocker):
+    def test_url_uses_catalogs_path(
+        self, config_with_catalog, test_result_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "put", test_result_json)
-        DataContractsProvider(config_with_catalog).update_catalog_data_contract_test_result(
-            CATALOG_ID, CONTRACT_ID, TEST_RUN_ID, DataContractTestResultPrototype(status="completed")
+        DataContractsProvider(
+            config_with_catalog
+        ).update_catalog_data_contract_test_result(
+            CATALOG_ID,
+            CONTRACT_ID,
+            TEST_RUN_ID,
+            DataContractTestResultPrototype(status="completed"),
         )
         url = mock_session_cls.return_value.put.call_args[0][0]
         assert (
@@ -1233,10 +1538,17 @@ class TestUpdateCatalogDataContractTestResult:
         )
         assert "/projects/" not in url
 
-    def test_body_serialised_as_json(self, config_with_catalog, test_result_json, mocker):
+    def test_body_serialised_as_json(
+        self, config_with_catalog, test_result_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "put", test_result_json)
-        DataContractsProvider(config_with_catalog).update_catalog_data_contract_test_result(
-            CATALOG_ID, CONTRACT_ID, TEST_RUN_ID, DataContractTestResultPrototype(status="failed")
+        DataContractsProvider(
+            config_with_catalog
+        ).update_catalog_data_contract_test_result(
+            CATALOG_ID,
+            CONTRACT_ID,
+            TEST_RUN_ID,
+            DataContractTestResultPrototype(status="failed"),
         )
         body = mock_session_cls.return_value.put.call_args[1]["json"]
         assert body["status"] == "failed"
@@ -1244,62 +1556,85 @@ class TestUpdateCatalogDataContractTestResult:
     def test_not_found_raises_value_error(self, config_with_catalog, mocker):
         _mock_error_response(mocker, "put", status=404)
         with pytest.raises(ValueError, match=TEST_RUN_ID):
-            DataContractsProvider(config_with_catalog).update_catalog_data_contract_test_result(
+            DataContractsProvider(
+                config_with_catalog
+            ).update_catalog_data_contract_test_result(
                 CATALOG_ID, CONTRACT_ID, TEST_RUN_ID, DataContractTestResultPrototype()
             )
 
     def test_empty_catalog_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="catalog_id"):
-            DataContractsProvider(config_with_catalog).update_catalog_data_contract_test_result(
+            DataContractsProvider(
+                config_with_catalog
+            ).update_catalog_data_contract_test_result(
                 "", CONTRACT_ID, TEST_RUN_ID, DataContractTestResultPrototype()
             )
 
     def test_empty_contract_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="data_contract_id"):
-            DataContractsProvider(config_with_catalog).update_catalog_data_contract_test_result(
+            DataContractsProvider(
+                config_with_catalog
+            ).update_catalog_data_contract_test_result(
                 CATALOG_ID, "", TEST_RUN_ID, DataContractTestResultPrototype()
             )
 
     def test_empty_test_run_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="test_run_id"):
-            DataContractsProvider(config_with_catalog).update_catalog_data_contract_test_result(
+            DataContractsProvider(
+                config_with_catalog
+            ).update_catalog_data_contract_test_result(
                 CATALOG_ID, CONTRACT_ID, "", DataContractTestResultPrototype()
             )
 
 
 class TestListCatalogDataContractTestResults:
+    """Tests for list catalog data contract test results."""
 
     def test_success(self, config_with_catalog, test_response_collection_json, mocker):
         _mock_ok_response(mocker, "get", test_response_collection_json)
-        result = DataContractsProvider(config_with_catalog).list_catalog_data_contract_test_results(
-            CATALOG_ID, CONTRACT_ID
-        )
+        result = DataContractsProvider(
+            config_with_catalog
+        ).list_catalog_data_contract_test_results(CATALOG_ID, CONTRACT_ID)
         assert isinstance(result, DataContractTestResultCollection)
         assert len(result.test_results) == 1
 
-    def test_single_result_object_wrapped_into_collection(self, config_with_catalog, test_result_json, mocker):
+    def test_single_result_object_wrapped_into_collection(
+        self, config_with_catalog, test_result_json, mocker
+    ):
         # For catalogs the server returns only the latest run, as a bare test result.
         _mock_ok_response(mocker, "get", test_result_json)
-        result = DataContractsProvider(config_with_catalog).list_catalog_data_contract_test_results(
-            CATALOG_ID, CONTRACT_ID
-        )
+        result = DataContractsProvider(
+            config_with_catalog
+        ).list_catalog_data_contract_test_results(CATALOG_ID, CONTRACT_ID)
         assert isinstance(result, DataContractTestResultCollection)
         assert len(result.test_results) == 1
         assert result.test_results[0].id == TEST_RUN_ID
         assert result.total_count == 1
 
-    def test_url_uses_catalogs_path(self, config_with_catalog, test_response_collection_json, mocker):
-        mock_session_cls = _mock_ok_response(mocker, "get", test_response_collection_json)
-        DataContractsProvider(config_with_catalog).list_catalog_data_contract_test_results(
-            CATALOG_ID, CONTRACT_ID
+    def test_url_uses_catalogs_path(
+        self, config_with_catalog, test_response_collection_json, mocker
+    ):
+        mock_session_cls = _mock_ok_response(
+            mocker, "get", test_response_collection_json
         )
+        DataContractsProvider(
+            config_with_catalog
+        ).list_catalog_data_contract_test_results(CATALOG_ID, CONTRACT_ID)
         url = mock_session_cls.return_value.get.call_args[0][0]
-        assert f"/catalogs/{CATALOG_ID}/data_contracts/{CONTRACT_ID}/test_results" in url
+        assert (
+            f"/catalogs/{CATALOG_ID}/data_contracts/{CONTRACT_ID}/test_results" in url
+        )
         assert "/projects/" not in url
 
-    def test_include_all_details_forwarded(self, config_with_catalog, test_response_collection_json, mocker):
-        mock_session_cls = _mock_ok_response(mocker, "get", test_response_collection_json)
-        DataContractsProvider(config_with_catalog).list_catalog_data_contract_test_results(
+    def test_include_all_details_forwarded(
+        self, config_with_catalog, test_response_collection_json, mocker
+    ):
+        mock_session_cls = _mock_ok_response(
+            mocker, "get", test_response_collection_json
+        )
+        DataContractsProvider(
+            config_with_catalog
+        ).list_catalog_data_contract_test_results(
             CATALOG_ID, CONTRACT_ID, include_all_details=True
         )
         params = mock_session_cls.return_value.get.call_args[1]["params"]
@@ -1308,38 +1643,41 @@ class TestListCatalogDataContractTestResults:
     def test_error_raises_value_error(self, config_with_catalog, mocker):
         _mock_error_response(mocker, "get", status=404)
         with pytest.raises(ValueError, match=CONTRACT_ID):
-            DataContractsProvider(config_with_catalog).list_catalog_data_contract_test_results(
-                CATALOG_ID, CONTRACT_ID
-            )
+            DataContractsProvider(
+                config_with_catalog
+            ).list_catalog_data_contract_test_results(CATALOG_ID, CONTRACT_ID)
 
     def test_empty_catalog_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="catalog_id"):
-            DataContractsProvider(config_with_catalog).list_catalog_data_contract_test_results(
-                "", CONTRACT_ID
-            )
+            DataContractsProvider(
+                config_with_catalog
+            ).list_catalog_data_contract_test_results("", CONTRACT_ID)
 
     def test_empty_contract_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="data_contract_id"):
-            DataContractsProvider(config_with_catalog).list_catalog_data_contract_test_results(
-                CATALOG_ID, ""
-            )
+            DataContractsProvider(
+                config_with_catalog
+            ).list_catalog_data_contract_test_results(CATALOG_ID, "")
 
 
 class TestGetCatalogDataContractTestResult:
+    """Tests for get catalog data contract test result."""
 
     def test_success(self, config_with_catalog, test_result_json, mocker):
         _mock_ok_response(mocker, "get", test_result_json)
-        result = DataContractsProvider(config_with_catalog).get_catalog_data_contract_test_result(
-            CATALOG_ID, CONTRACT_ID, TEST_RUN_ID
-        )
+        result = DataContractsProvider(
+            config_with_catalog
+        ).get_catalog_data_contract_test_result(CATALOG_ID, CONTRACT_ID, TEST_RUN_ID)
         assert isinstance(result, DataContractTestResult)
         assert result.id == TEST_RUN_ID
 
-    def test_url_uses_catalogs_path(self, config_with_catalog, test_result_json, mocker):
+    def test_url_uses_catalogs_path(
+        self, config_with_catalog, test_result_json, mocker
+    ):
         mock_session_cls = _mock_ok_response(mocker, "get", test_result_json)
-        DataContractsProvider(config_with_catalog).get_catalog_data_contract_test_result(
-            CATALOG_ID, CONTRACT_ID, TEST_RUN_ID
-        )
+        DataContractsProvider(
+            config_with_catalog
+        ).get_catalog_data_contract_test_result(CATALOG_ID, CONTRACT_ID, TEST_RUN_ID)
         url = mock_session_cls.return_value.get.call_args[0][0]
         assert (
             f"/catalogs/{CATALOG_ID}/data_contracts/{CONTRACT_ID}/test_results/{TEST_RUN_ID}"
@@ -1350,72 +1688,81 @@ class TestGetCatalogDataContractTestResult:
     def test_not_found_raises_value_error(self, config_with_catalog, mocker):
         _mock_error_response(mocker, "get", status=404)
         with pytest.raises(ValueError, match=TEST_RUN_ID):
-            DataContractsProvider(config_with_catalog).get_catalog_data_contract_test_result(
+            DataContractsProvider(
+                config_with_catalog
+            ).get_catalog_data_contract_test_result(
                 CATALOG_ID, CONTRACT_ID, TEST_RUN_ID
             )
 
     def test_empty_catalog_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="catalog_id"):
-            DataContractsProvider(config_with_catalog).get_catalog_data_contract_test_result(
-                "", CONTRACT_ID, TEST_RUN_ID
-            )
+            DataContractsProvider(
+                config_with_catalog
+            ).get_catalog_data_contract_test_result("", CONTRACT_ID, TEST_RUN_ID)
 
     def test_empty_contract_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="data_contract_id"):
-            DataContractsProvider(config_with_catalog).get_catalog_data_contract_test_result(
-                CATALOG_ID, "", TEST_RUN_ID
-            )
+            DataContractsProvider(
+                config_with_catalog
+            ).get_catalog_data_contract_test_result(CATALOG_ID, "", TEST_RUN_ID)
 
     def test_empty_test_run_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="test_run_id"):
-            DataContractsProvider(config_with_catalog).get_catalog_data_contract_test_result(
-                CATALOG_ID, CONTRACT_ID, ""
-            )
+            DataContractsProvider(
+                config_with_catalog
+            ).get_catalog_data_contract_test_result(CATALOG_ID, CONTRACT_ID, "")
 
 
 class TestDeleteCatalogDataContractTestResults:
+    """Tests for delete catalog data contract test results."""
 
     def test_success_no_return(self, config_with_catalog, mocker):
         mock_resp = mocker.Mock()
         mock_resp.ok = True
         mock_resp.status_code = 204
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
-        mock_session_cls.return_value.delete.return_value = mock_resp
-        result = DataContractsProvider(config_with_catalog).delete_catalog_data_contract_test_results(
-            CATALOG_ID, CONTRACT_ID
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
         )
+        mock_session_cls.return_value.delete.return_value = mock_resp
+        result = DataContractsProvider(
+            config_with_catalog
+        ).delete_catalog_data_contract_test_results(CATALOG_ID, CONTRACT_ID)
         assert result is None
 
     def test_url_uses_catalogs_path(self, config_with_catalog, mocker):
         mock_resp = mocker.Mock()
         mock_resp.ok = True
-        mock_session_cls = mocker.patch("wxdi.dq_validator.provider.base_provider.Session")
-        mock_session_cls.return_value.delete.return_value = mock_resp
-        DataContractsProvider(config_with_catalog).delete_catalog_data_contract_test_results(
-            CATALOG_ID, CONTRACT_ID
+        mock_session_cls = mocker.patch(
+            "wxdi.dq_validator.provider.base_provider.Session"
         )
+        mock_session_cls.return_value.delete.return_value = mock_resp
+        DataContractsProvider(
+            config_with_catalog
+        ).delete_catalog_data_contract_test_results(CATALOG_ID, CONTRACT_ID)
         url = mock_session_cls.return_value.delete.call_args[0][0]
-        assert f"/catalogs/{CATALOG_ID}/data_contracts/{CONTRACT_ID}/test_results" in url
+        assert (
+            f"/catalogs/{CATALOG_ID}/data_contracts/{CONTRACT_ID}/test_results" in url
+        )
         assert "/projects/" not in url
 
     def test_error_raises_value_error(self, config_with_catalog, mocker):
         _mock_error_response(mocker, "delete", status=500)
         with pytest.raises(ValueError, match=CONTRACT_ID):
-            DataContractsProvider(config_with_catalog).delete_catalog_data_contract_test_results(
-                CATALOG_ID, CONTRACT_ID
-            )
+            DataContractsProvider(
+                config_with_catalog
+            ).delete_catalog_data_contract_test_results(CATALOG_ID, CONTRACT_ID)
 
     def test_empty_catalog_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="catalog_id"):
-            DataContractsProvider(config_with_catalog).delete_catalog_data_contract_test_results(
-                "", CONTRACT_ID
-            )
+            DataContractsProvider(
+                config_with_catalog
+            ).delete_catalog_data_contract_test_results("", CONTRACT_ID)
 
     def test_empty_contract_id_raises(self, config_with_catalog):
         with pytest.raises(ValueError, match="data_contract_id"):
-            DataContractsProvider(config_with_catalog).delete_catalog_data_contract_test_results(
-                CATALOG_ID, ""
-            )
+            DataContractsProvider(
+                config_with_catalog
+            ).delete_catalog_data_contract_test_results(CATALOG_ID, "")
 
 
 # Made with Bob

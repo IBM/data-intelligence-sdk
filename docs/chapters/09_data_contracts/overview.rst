@@ -104,13 +104,12 @@ All request bodies and response payloads are represented as Pydantic v2 models.
 * :class:`~wxdi.data_contracts.DataContract` – a persisted contract asset.
 * :class:`~wxdi.data_contracts.DataContractCollection` – paginated list of contracts.
 * :class:`~wxdi.data_contracts.DataContractValidationResponse` – validation result with error details.
-* :class:`~wxdi.data_contracts.DataContractTestResponse` – returned immediately when a test run is triggered. Its ``id`` is the test run ID.
-* :class:`~wxdi.data_contracts.DataContractTestResult` – a persisted test result with a summary and per-asset and per-column results.
+* :class:`~wxdi.data_contracts.DataContractTestResult` – a test result with a summary and per-asset and per-column results. Returned by ``test_project_data_contract`` (the run that was started) and by the test-result endpoints.
 * :class:`~wxdi.data_contracts.DataContractTestResultCollection` – list of test results.
 
 **Sub-models**
 
-* :class:`~wxdi.data_contracts.models.DataContractType` – enum for the ``type`` field (``contract`` or ``contract_template``).
+* :class:`~wxdi.data_contracts.DataContractType` – enum for the ``type`` field (``contract`` or ``contract_template``).
 * :class:`~wxdi.data_contracts.ConnectionInfo` – reference to a connection asset.
 * :class:`~wxdi.data_contracts.ServerMapping` – maps a logical server name to a connection.
 * :class:`~wxdi.data_contracts.DataContractValidationError` – a single ODCS schema error.

@@ -42,6 +42,7 @@ class DataContractType(str, Enum):
 # Shared sub-models
 # ---------------------------------------------------------------------------
 
+
 class ConnectionInfo(BaseModel):
     """Reference to a connection asset (mirrors ServerMapping.ConnectionID)."""
 
@@ -65,6 +66,7 @@ class ServerMapping(BaseModel):
 # ---------------------------------------------------------------------------
 # Request bodies
 # ---------------------------------------------------------------------------
+
 
 class DataContractPrototypeYaml(BaseModel):
     """Prototype for creating/replacing a data contract using YAML content."""
@@ -119,6 +121,7 @@ class DataContractTestRequest(BaseModel):
 # ---------------------------------------------------------------------------
 # Response models — data contract asset
 # ---------------------------------------------------------------------------
+
 
 class DataContract(BaseModel):
     """A persisted data contract asset.
@@ -176,6 +179,7 @@ class DataContractCollection(BaseModel):
 # Response models — validation
 # ---------------------------------------------------------------------------
 
+
 class DataContractValidationError(BaseModel):
     """A single validation error from the ODCS schema check.
 
@@ -203,39 +207,9 @@ class DataContractValidationResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Response models — test trigger
-# ---------------------------------------------------------------------------
-
-class DataContractTestResponse(BaseModel):
-    """Response returned immediately after triggering a data contract test run.
-
-    This is the object returned by the POST /test endpoint — it identifies the
-    initiated test run, not the final results.  ``id`` is the test run id and
-    can be passed directly to ``get_project_data_contract_test_result`` /
-    ``get_catalog_data_contract_test_result``.  Use
-    :class:`DataContractTestResult` to represent the persisted results.
-    """
-
-    model_config = ConfigDict(extra="allow")
-
-    id: Optional[str] = None
-    href: Optional[str] = None
-    status: Optional[str] = None
-    data_contract_id: Optional[str] = None
-    data_contract_name: Optional[str] = None
-    data_contract_version: Optional[str] = None
-    start_time: Optional[str] = None
-    run_by: Optional[str] = None
-    message: Optional[str] = None
-    server_mappings: List[ServerMapping] = []
-    is_scheduled: Optional[bool] = None
-    job: Optional["DataContractTestResultJobInfo"] = None
-    schema_validation_failures: Optional[Dict[str, List[Any]]] = None
-
-
-# ---------------------------------------------------------------------------
 # Response models — test results (structured, from DataContractTestResult)
 # ---------------------------------------------------------------------------
+
 
 class DataContractTestResultJobRun(BaseModel):
     """Job-run reference nested inside a job info block.
@@ -568,7 +542,7 @@ class DataContractTestResultCollection(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     test_results: List[DataContractTestResult] = []
-    total_count: Optional[int] = None
+    total_count: int = 0
 
 
 # ---------------------------------------------------------------------------
@@ -579,6 +553,7 @@ class DataContractTestResultCollection(BaseModel):
 # but carries a "Prototype" suffix so that request bodies and response bodies
 # are distinct types and can evolve independently.
 # ---------------------------------------------------------------------------
+
 
 class DataContractTestResultJobRunPrototype(BaseModel):
     """Prototype variant of :class:`DataContractTestResultJobRun`."""
@@ -634,7 +609,9 @@ class DataContractTestResultSummaryPrototype(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     status: Optional[str] = None
-    schema_validation: Optional[DataContractTestResultSchemaValidationSummaryPrototype] = None
+    schema_validation: Optional[
+        DataContractTestResultSchemaValidationSummaryPrototype
+    ] = None
     data_quality: Optional[DataContractTestResultDataQualitySummaryPrototype] = None
 
 
@@ -804,7 +781,9 @@ class DataContractTestResultColumnResultPrototype(BaseModel):
     name: Optional[str] = None
     physical_name: Optional[str] = None
     status: Optional[str] = None
-    schema_validation: Optional[DataContractTestResultColumnSchemaValidationPrototype] = None
+    schema_validation: Optional[
+        DataContractTestResultColumnSchemaValidationPrototype
+    ] = None
     data_quality_checks: List[DataContractTestResultDqCheckPrototype] = []
 
 
@@ -817,7 +796,9 @@ class DataContractTestResultDataAssetPrototype(BaseModel):
     name: Optional[str] = None
     physical_name: Optional[str] = None
     status: Optional[str] = None
-    schema_validation: Optional[DataContractTestResultAssetSchemaValidationPrototype] = None
+    schema_validation: Optional[
+        DataContractTestResultAssetSchemaValidationPrototype
+    ] = None
     columns: List[DataContractTestResultColumnResultPrototype] = []
     data_quality_checks: List[DataContractTestResultDqCheckPrototype] = []
 
@@ -825,6 +806,7 @@ class DataContractTestResultDataAssetPrototype(BaseModel):
 # ---------------------------------------------------------------------------
 # DataContractTestResultPrototype — request body for POST/PUT /test_results
 # ---------------------------------------------------------------------------
+
 
 class DataContractTestResultPrototype(BaseModel):
     """Request body for creating or updating a data contract test result.
@@ -837,6 +819,12 @@ class DataContractTestResultPrototype(BaseModel):
 
     All nested sub-models use their own ``*Prototype`` variants so that request
     and response types are distinct and can evolve independently.
+
+    Note:
+        Unlike the response models, the list fields (``server_mappings`` and
+        ``data_assets``) default to ``None`` rather than ``[]`` so that unset
+        fields are omitted from the request body. Check for ``None`` before
+        iterating over them.
     """
 
     model_config = ConfigDict(extra="allow")
@@ -869,8 +857,6 @@ __all__ = [
     # Validation
     "DataContractValidationError",
     "DataContractValidationResponse",
-    # Test trigger response
-    "DataContractTestResponse",
     # Test result — top level
     "DataContractTestResult",
     "DataContractTestResultCollection",

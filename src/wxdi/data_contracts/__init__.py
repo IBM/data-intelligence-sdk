@@ -32,6 +32,7 @@ Usage:
 from .provider import DataContractsProvider
 from .models import (
     # Shared
+    DataContractType,
     ConnectionInfo,
     ServerMapping,
     # Request bodies
@@ -46,8 +47,6 @@ from .models import (
     # Validation
     DataContractValidationError,
     DataContractValidationResponse,
-    # Test trigger response
-    DataContractTestResponse,
     # Test result — prototype sub-models
     DataContractTestResultJobRunPrototype,
     DataContractTestResultJobInfoPrototype,
@@ -100,6 +99,7 @@ from .models import (
 __all__ = [
     "DataContractsProvider",
     # Shared
+    "DataContractType",
     "ConnectionInfo",
     "ServerMapping",
     # Request bodies
@@ -114,8 +114,6 @@ __all__ = [
     # Validation
     "DataContractValidationError",
     "DataContractValidationResponse",
-    # Test trigger response
-    "DataContractTestResponse",
     # Test result — prototype sub-models
     "DataContractTestResultJobRunPrototype",
     "DataContractTestResultJobInfoPrototype",

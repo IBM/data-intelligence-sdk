@@ -111,14 +111,6 @@ DataContractValidationError
    :undoc-members:
    :show-inheritance:
 
-DataContractTestResponse
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: wxdi.data_contracts.models.DataContractTestResponse
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 DataContractTestResult
 ~~~~~~~~~~~~~~~~~~~~~~
 
