@@ -59,7 +59,7 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     outputs:
-      contract_ids: ${{ steps.create.outputs.contract-ids }}
+      contract_ids: ${{ steps.create.outputs.contract_ids }}
 
     steps:
       - uses: actions/checkout@v4

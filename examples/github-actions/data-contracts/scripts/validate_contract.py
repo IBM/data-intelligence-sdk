@@ -6,7 +6,7 @@ Usage:
     python validate_contract.py <contract_file>
 
 Environment variables (required):
-    URL     - Base URL of the instance (e.g. https://api.dai.dev.cloud.ibm.com)
+    PLATFORM_URL     - Base URL of the instance (e.g. https://api.dai.dev.cloud.ibm.com)
     PLATFORM_API_KEY - IBM Cloud IAM API key; a fresh bearer token is obtained at runtime
 
 Project ID is read exclusively from customProperties.projectId in the contract file.
