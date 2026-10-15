@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/IBM/data-intelligence-sdk/compare/v2.2.1...v2.3.0) (2026-10-15)
+
+
+### Features
+
+* update contract defintions (already merged, missed important change) ([f51abed](https://github.com/IBM/data-intelligence-sdk/commit/f51abed82d925a29e866a637f54d7edff15b9e82))
+
 ## [2.2.1](https://github.com/IBM/data-intelligence-sdk/compare/v2.2.0...v2.2.1) (2026-09-03)
 
 
