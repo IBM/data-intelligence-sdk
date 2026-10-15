@@ -17,6 +17,7 @@
 
 A comprehensive Python SDK for data intelligence operations including:
 - **Data Quality Validation**: Validate streaming data records, Pandas DataFrames, and PySpark DataFrames
+- **Data Contracts**: Manage ODCS-compliant data contracts via IBM Data Quality REST APIs
 - **Data Product Hub Services**: Complete Python client for IBM Data Product Hub API
 - **ODCS Generation**: Generate Open Data Contract Standard (ODCS) files from Collibra and Informatica
 - **Data Product Recommendations**: Analyze query logs to identify high-value data products
@@ -29,7 +30,7 @@ A comprehensive Python SDK for data intelligence operations including:
 - **Fluent API**: Chainable method calls for intuitive rule definition
 - **Score-based Results**: Each validation returns detailed scores and pass rates
 - **Data Quality Dimensions**: Track validation checks by 8 standard DQ dimensions (Accuracy, Completeness, Conformity, Consistency, Coverage, Timeliness, Uniqueness, Validity)
-- **Nine Validation Checks**: Comprehensive validation coverage
+- **Eleven Validation Checks**: Comprehensive validation coverage
   - **LengthCheck**: Validates length of any value (converts to string)
   - **ValidValuesCheck**: Validates against allowed list with case-insensitive option
   - **ComparisonCheck**: Compares values using operators, supports all types
@@ -39,6 +40,8 @@ A comprehensive Python SDK for data intelligence operations including:
   - **RegexCheck**: Validates values match regular expression patterns
   - **FormatCheck**: Validates value formats using intelligent format detection
   - **DataTypeCheck**: Validates data types with intelligent type inference
+  - **CelCheck**: Column-level validation using CEL (Common Expression Language) expressions
+  - **TableCelCheck**: Cross-column / table-level validation using CEL expressions
 - **Type Safety**: Full type hints throughout
 - **Extensible**: Easy to add new checks via BaseCheck
 
@@ -52,7 +55,10 @@ A comprehensive Python SDK for data intelligence operations including:
 ### REST API Integration
 - **GlossaryProvider**: Fetch glossary terms and data quality constraints from IBM Cloud Pak for Data
 - **CamsProvider**: Fetch data assets from CAMS (Catalog Asset Management System)
-- **IssuesProvider**: Manage data quality issues (create single/bulk occurrences, tested records, ignored status, update metrics, ignored status)
+- **DQAssetsProvider**: List and retrieve DQ assets and their associated checks
+- **ChecksProvider**: Manage data quality checks
+- **DimensionsProvider**: Look up and search data quality dimensions
+- **IssuesProvider**: Manage data quality issues (create single/bulk occurrences, tested records, ignored status, update metrics)
 - **DQSearchProvider**: Search for DQ checks and assets by native ID
 - **Thread-Safe**: Concurrent access support with thread-local sessions
 
@@ -1041,13 +1047,25 @@ See complete working examples in the `examples/` directory:
 - `pandas_dataframe_usage.py` - Pandas DataFrame validation example
 - `spark_dataframe_usage.py` - PySpark DataFrame validation example
 - `consolidation_usage.py` - Consolidated statistics and dimension-based reporting
-- `auth_usage.py` - Authentication examples (296 lines)
-- `assets_usage.py` - DQAssetsProvider usage examples (210 lines)
-- `glossary_usage.py` - GlossaryProvider usage examples (250 lines)
-- `checks_usage.py` - ChecksProvider usage examples (272 lines)
-- `dimensions_usage.py` - DimensionsProvider usage examples (146 lines)
-- `issues_usage.py` - IssuesProvider usage examples (124 lines)
-- `dq_workflow_usage.py` - Complete DQ workflow (317 lines)
+- `auth_provider_usage.py` - Authentication provider examples
+- `assets_usage.py` - DQAssetsProvider usage examples
+- `glossary_usage.py` - GlossaryProvider usage examples
+- `checks_usage.py` - ChecksProvider usage examples
+- `dimensions_usage.py` - DimensionsProvider usage examples
+- `issues_usage.py` - IssuesProvider usage examples
+- `cel_usage.py` - CEL expression validation examples
+- `cel_pandas_dataframe_usage.py` - CEL validation with Pandas DataFrames
+- `table_cel_usage.py` - Table-level CEL validation examples
+- `data_contracts_usage.py` - Data Contracts API end-to-end examples
+- `odcs_generator_example.py` - ODCS generation from Collibra
+- `odcs_generator_informatica_example.py` - ODCS generation from Informatica
+- `data_product_recommender_example.py` - Data product recommendations from query logs
+- `dq_workflow_usage.py` - Complete DQ workflow
+- `end_to_end_example.py` - Full end-to-end SDK walkthrough
+
+### GitHub Actions
+
+A ready-to-copy CI/CD pipeline for data contracts is available under [`examples/github-actions/data-contracts/`](examples/github-actions/data-contracts/). It validates, tests, and publishes contracts on every pull request and merge. See the [example README](examples/github-actions/data-contracts/README.md) for setup instructions.
 
 ## Project Structure
 
@@ -1056,71 +1074,114 @@ data-intelligence-sdk/
 ├── src/
 │   └── wxdi/
 │       ├── __init__.py
+│       ├── version.py
 │       ├── common/
-│       │   ├── __init__.py
 │       │   └── auth/
-│       │       ├── __init__.py
 │       │       ├── auth_config.py
 │       │       ├── auth_provider.py
 │       │       ├── gov_cloud_authenticator.py
 │       │       └── gov_cloud_token_manager.py
-│       └── dq_validator/
+│       ├── data_contracts/
+│       │   ├── __init__.py
+│       │   ├── models.py          # Pydantic request/response models
+│       │   └── provider.py        # DataContractsProvider
+│       ├── data_product_recommender/
+│       │   ├── __init__.py
+│       │   ├── base.py
+│       │   ├── cli.py
+│       │   ├── platforms.py
+│       │   └── recommender.py
+│       ├── dph_services/
+│       │   ├── __init__.py
+│       │   ├── common.py
+│       │   ├── common_constants.py
+│       │   ├── dph_v1.py
+│       │   └── version.py
+│       ├── dq_validator/
+│       │   ├── __init__.py
+│       │   ├── base.py                   # BaseCheck, ValidationError
+│       │   ├── cel_context.py
+│       │   ├── cel_exceptions.py
+│       │   ├── data_quality_dimension.py # DataQualityDimension enum
+│       │   ├── datatypes.py              # DataType enum
+│       │   ├── datetime_formats.py
+│       │   ├── format_engine.py
+│       │   ├── inferred_engine.py
+│       │   ├── issue_reporting.py
+│       │   ├── metadata.py               # ColumnMetadata, AssetMetadata
+│       │   ├── result.py                 # ValidationResult
+│       │   ├── result_consolidator.py
+│       │   ├── rule.py                   # ValidationRule
+│       │   ├── rule_loader.py
+│       │   ├── table_rule.py
+│       │   ├── utils.py
+│       │   ├── validator.py              # Validator
+│       │   ├── checks/
+│       │   │   ├── case_check.py
+│       │   │   ├── cel_check.py
+│       │   │   ├── comparison_check.py
+│       │   │   ├── completeness_check.py
+│       │   │   ├── datatype_check.py
+│       │   │   ├── format_check.py
+│       │   │   ├── length_check.py
+│       │   │   ├── range_check.py
+│       │   │   ├── regex_check.py
+│       │   │   ├── table_cel_check.py
+│       │   │   └── valid_values_check.py
+│       │   ├── integrations/
+│       │   │   ├── base.py
+│       │   │   ├── pandas_validator.py
+│       │   │   └── spark_validator.py
+│       │   └── provider/
+│       │       ├── assets.py
+│       │       ├── base_provider.py
+│       │       ├── cams.py
+│       │       ├── checks.py
+│       │       ├── config.py
+│       │       ├── constraint_model.py
+│       │       ├── data_asset_model.py
+│       │       ├── dimensions.py
+│       │       ├── dq_search.py
+│       │       ├── glossary.py
+│       │       ├── issues.py
+│       │       └── response_model.py
+│       └── odcs_generator/
 │           ├── __init__.py
-│           ├── metadata.py               # DataType, ColumnMetadata, AssetMetadata
-│           ├── datatypes.py              # DataType enum
-│           ├── data_quality_dimension.py # DataQualityDimension enum
-│           ├── base.py                   # BaseCheck, ValidationError
-│           ├── result.py                 # ValidationResult
-│           ├── rule.py                   # ValidationRule
-│           ├── validator.py              # Validator
-│           ├── rule_loader.py            # RuleLoader for external providers
-│           ├── inferred_engine.py        # InferredTypeEngine
-│           ├── format_engine.py          # FormatEngine
-│           ├── issue_reporting.py        # Issue reporter utility
-│           ├── datetime_formats.py       # Date/time format definitions
-│           ├── utils.py                  # Utility functions
-│           ├── version.py                # Version information
-│           ├── result_consolidator.py    # Result consolidation
-│           ├── checks/
-│           │   ├── __init__.py
-│           │   ├── length_check.py
-│           │   ├── valid_values_check.py
-│           │   ├── comparison_check.py
-│           │   ├── case_check.py
-│           │   ├── completeness_check.py
-│           │   ├── range_check.py
-│           │   ├── regex_check.py
-│           │   ├── format_check.py
-│           │   └── datatype_check.py
-│           ├── integrations/
-│           │   ├── __init__.py
-│           │   ├── base.py
-│           │   ├── pandas_validator.py
-│           │   └── spark_validator.py
-│           └── provider/
-│               ├── __init__.py
-│               ├── base_provider.py
-│               ├── config.py
-│               ├── glossary.py
-│               ├── cams.py
-│               ├── assets.py
-│               ├── checks.py
-│               ├── dimensions.py
-│               ├── issues.py
-│               ├── dq_search.py
-│               ├── constraint_model.py
-│               ├── data_asset_model.py
-│               └── response_model.py
+│           ├── generate_odcs_from_collibra.py
+│           └── generate_odcs_from_informatica.py
 ├── examples/
 │   ├── basic_usage.py
 │   ├── pandas_dataframe_usage.py
 │   ├── spark_dataframe_usage.py
-│   ├── auth_usage.py
+│   ├── consolidation_usage.py
+│   ├── auth_provider_usage.py
 │   ├── assets_usage.py
+│   ├── cel_usage.py
+│   ├── cel_pandas_dataframe_usage.py
+│   ├── table_cel_usage.py
 │   ├── checks_usage.py
 │   ├── dimensions_usage.py
 │   ├── issues_usage.py
-│   └── dq_workflow_usage.py
+│   ├── glossary_usage.py
+│   ├── data_contracts_usage.py
+│   ├── odcs_generator_example.py
+│   ├── odcs_generator_informatica_example.py
+│   ├── data_product_recommender_example.py
+│   ├── dq_workflow_usage.py
+│   ├── end_to_end_example.py
+│   └── github-actions/
+│       └── data-contracts/        # CI/CD pipeline example (see README)
+│           ├── workflows/
+│           │   └── data-contract.yml
+│           ├── actions/
+│           │   ├── data-contract-validate/
+│           │   ├── data-contract-create/
+│           │   ├── data-contract-test/
+│           │   ├── data-contract-delete/
+│           │   └── data-contract-save-results/
+│           └── scripts/
+├── docs/
+├── tests/
 ├── setup.py
 ├── requirements.txt
 ├── pyproject.toml
@@ -1147,19 +1208,25 @@ For issues, questions, or contributions, please open an issue on GitHub.
 
 ## Documentation
 
-- **README.md**: This file - comprehensive user guide
+- **README.md**: This file — comprehensive user guide
+- **[docs/](docs/)**: Full Sphinx documentation covering all modules (welcome, overview, DQ validator, DPH services, ODCS generator, data product recommender, data contracts)
+- **[src/wxdi/dph_services/README.md](src/wxdi/dph_services/README.md)**: Data Product Hub Services module guide
+- **[src/wxdi/odcs_generator/README-GENERATE-ODCS-SCRIPT.md](src/wxdi/odcs_generator/README-GENERATE-ODCS-SCRIPT.md)**: ODCS generator script guide
+- **[src/wxdi/data_product_recommender/README.md](src/wxdi/data_product_recommender/README.md)**: Data Product Recommender guide
+- **[examples/github-actions/data-contracts/README.md](examples/github-actions/data-contracts/README.md)**: GitHub Actions CI/CD pipeline for data contracts
 
 ## Key Features Summary
 
-✅ **9 Validation Checks** - Comprehensive validation coverage  
-✅ **DataFrame Support** - Pandas and PySpark integration  
-✅ **REST API Integration** - Complete provider module  
-✅ **Multi-Environment Auth** - 4 cloud environments supported  
-✅ **Memory Efficient** - Chunked processing for Pandas  
-✅ **Distributed Processing** - Spark UDF-based validation  
-✅ **Thread-Safe** - Concurrent access support  
-✅ **Type-Safe** - Full type hints throughout  
-✅ **Extensible** - Easy to add new checks  
+✅ **11 Validation Checks** - Comprehensive validation coverage including CEL expressions
+✅ **Data Contracts** - Full CRUD, validation, and test execution via REST API
+✅ **DataFrame Support** - Pandas and PySpark integration
+✅ **REST API Integration** - Complete provider module
+✅ **Multi-Environment Auth** - 4 cloud environments supported
+✅ **Memory Efficient** - Chunked processing for Pandas
+✅ **Distributed Processing** - Spark UDF-based validation
+✅ **Thread-Safe** - Concurrent access support
+✅ **Type-Safe** - Full type hints throughout
+✅ **Extensible** - Easy to add new checks
 ✅ **Production Ready** - 400+ tests, fully documented
 
 ## Python Support

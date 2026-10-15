@@ -1,0 +1,163 @@
+name: Data Contract Validation
+
+on:
+  pull_request:
+    paths:
+      - 'contracts/**'
+      - '.github/workflows/data-contract.yml'
+      - '.github/actions/**'
+      - '.github/scripts/**'
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'contracts/**'
+
+permissions:
+  pull-requests: write
+  contents: read
+  actions: read
+
+jobs:
+  # ════════════════════════════════════════════════════════════════════════════
+  # PR FLOW: validate → create ephemeral → test → delete ephemeral
+  # ════════════════════════════════════════════════════════════════════════════
+
+  # ── Job 1: Validate ─────────────────────────────────────────────────────────
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      changed_files: ${{ steps.changed.outputs.all_changed_files }}
+      any_changed:   ${{ steps.changed.outputs.any_changed }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find changed contract files
+        id: changed
+        uses: tj-actions/changed-files@v44
+        with:
+          files: 'contracts/**'
+
+      - name: Validate contracts
+        if: steps.changed.outputs.any_changed == 'true'
+        uses: ./.github/actions/data-contract-validate
+        with:
+          changed-files: ${{ steps.changed.outputs.all_changed_files }}
+          url:           ${{ secrets.PLATFORM_URL }}
+          api-key:       ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:       ${{ secrets.IAM_TOKEN_URL }}
+          pr-number:     ${{ github.event.pull_request.number }}
+          repository:    ${{ github.repository }}
+          github-token:  ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Job 2: Create temp contracts ────────────────────────────────────────────
+  create-temp-contract:
+    if: github.event_name == 'pull_request' && needs.validate.outputs.any_changed == 'true'
+    needs: validate
+    runs-on: ubuntu-latest
+    outputs:
+      contract_ids: ${{ steps.create.outputs.contract_ids }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create ephemeral contracts (_PR_<number>)
+        id: create
+        uses: ./.github/actions/data-contract-create
+        with:
+          mode:          pr
+          changed-files: ${{ needs.validate.outputs.changed_files }}
+          pr-number:     ${{ github.event.pull_request.number }}
+          url:           ${{ secrets.PLATFORM_URL }}
+          api-key:       ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:       ${{ secrets.IAM_TOKEN_URL }}
+          repository:    ${{ github.repository }}
+          github-token:  ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Job 3: Test temp contracts ───────────────────────────────────────────────
+  test:
+    if: github.event_name == 'pull_request' && needs.create-temp-contract.outputs.contract_ids != ''
+    needs: create-temp-contract
+    runs-on: ubuntu-latest
+    outputs:
+      contract_ids: ${{ needs.create-temp-contract.outputs.contract_ids }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run contract tests
+        uses: ./.github/actions/data-contract-test
+        with:
+          contract-ids:  ${{ needs.create-temp-contract.outputs.contract_ids }}
+          url:           ${{ secrets.PLATFORM_URL }}
+          api-key:       ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:       ${{ secrets.IAM_TOKEN_URL }}
+          pr-number:     ${{ github.event.pull_request.number }}
+          repository:    ${{ github.repository }}
+          github-token:  ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Job 4: Delete temp contracts (always runs after test) ────────────────────
+  delete-temp-contract:
+    if: always() && github.event_name == 'pull_request' && needs.create-temp-contract.outputs.contract_ids != ''
+    needs: [create-temp-contract, test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Delete temp contracts
+        uses: ./.github/actions/data-contract-delete
+        with:
+          contract-ids: ${{ needs.create-temp-contract.outputs.contract_ids }}
+          url:          ${{ secrets.PLATFORM_URL }}
+          api-key:      ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:      ${{ secrets.IAM_TOKEN_URL }}
+          pr-number:    ${{ github.event.pull_request.number }}
+          repository:   ${{ github.repository }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # MERGE FLOW: upsert real contracts after PR is merged to main
+  # ════════════════════════════════════════════════════════════════════════════
+
+  # ── Job 5: Upsert real contracts on merge ────────────────────────────────────
+  upsert-on-merge:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find changed contract files
+        id: changed
+        uses: tj-actions/changed-files@v44
+        with:
+          files: 'contracts/**'
+          since_last_remote_commit: true
+
+      - name: Upsert real contracts
+        id: upsert
+        if: steps.changed.outputs.any_changed == 'true'
+        uses: ./.github/actions/data-contract-create
+        with:
+          mode:          merge
+          changed-files: ${{ steps.changed.outputs.all_changed_files }}
+          url:           ${{ secrets.PLATFORM_URL }}
+          api-key:       ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:       ${{ secrets.IAM_TOKEN_URL }}
+          repository:    ${{ github.repository }}
+          github-token:  ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Save PR test results to the contracts
+        if: steps.upsert.outputs.contract-ids != ''
+        uses: ./.github/actions/data-contract-save-results
+        with:
+          contract-ids: ${{ steps.upsert.outputs.contract-ids }}
+          url:          ${{ secrets.PLATFORM_URL }}
+          api-key:      ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:      ${{ secrets.IAM_TOKEN_URL }}
+          repository:   ${{ github.repository }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,89 @@
+name: 'Data Contract — Validate'
+description: >
+  Validates changed data contract YAML files using the data-intelligence-sdk
+  and posts a PR comment with the results.
+
+inputs:
+  changed-files:
+    description: 'Space-separated list of changed contract file paths'
+    required: true
+  url:
+    description: 'CPD / watsonx base URL'
+    required: true
+  api-key:
+    description: 'IBM Cloud IAM API key'
+    required: true
+  iam-url:
+    description: 'IAM token endpoint (e.g. https://iam.cloud.ibm.com/identity/token). Defaults to the IBM Cloud test IAM endpoint when empty.'
+    required: false
+    default: ''
+  pr-number:
+    description: 'Pull request number to comment on'
+    required: true
+  repository:
+    description: 'Repository in owner/repo format'
+    required: true
+  github-token:
+    description: 'GitHub token for posting PR comments'
+    required: true
+
+outputs:
+  overall:
+    description: '0 = all valid, 1 = one or more failures'
+    value: ${{ steps.validate.outputs.overall }}
+  body:
+    description: 'Markdown summary of validation results'
+    value: ${{ steps.validate.outputs.body }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install data-intelligence-sdk
+      shell: bash
+      run: |
+        pip install "data-intelligence-sdk==2.3.0"
+
+    - name: Validate contracts
+      id: validate
+      shell: bash
+      env:
+        PLATFORM_URL:     ${{ inputs.url }}
+        PLATFORM_API_KEY: ${{ inputs.api-key }}
+        IAM_TOKEN_URL:    ${{ inputs.iam-url }}
+      run: |
+        RESULT_MD="## 🔍 Data Contract Validation\n\n"
+        OVERALL=0
+
+        for f in ${{ inputs.changed-files }}; do
+          # Note: relies on space-separated paths with no spaces in filenames,
+          # consistent with tj-actions/changed-files output format.
+          echo "Validating $f ..."
+          if python3 ${{ github.action_path }}/../../scripts/validate_contract.py "$f" > /tmp/val_out.txt 2>&1; then
+            RESULT_MD+="### ✅ \`$f\` — valid\n\n"
+          else
+            OVERALL=1
+            ERRORS=$(cat /tmp/val_out.txt)
+            RESULT_MD+="### ❌ \`$f\` — validation failed\n\n\`\`\`\n${ERRORS}\n\`\`\`\n\n"
+          fi
+        done
+
+        echo "body<<EOF" >> $GITHUB_OUTPUT
+        printf "%b" "$RESULT_MD" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        echo "overall=$OVERALL" >> $GITHUB_OUTPUT
+
+    - name: Post PR comment
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        BODY:     ${{ steps.validate.outputs.body }}
+      run: |
+        printf "%b" "$BODY" > /tmp/pr_body.md
+        gh pr comment "${{ inputs.pr-number }}" \
+          --body-file /tmp/pr_body.md \
+          --repo "${{ inputs.repository }}"
+
+    - name: Fail if validation failed
+      if: steps.validate.outputs.overall == '1'
+      shell: bash
+      run: exit 1

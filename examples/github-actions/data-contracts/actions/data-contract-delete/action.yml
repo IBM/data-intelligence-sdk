@@ -1,0 +1,89 @@
+name: 'Data Contract — Delete'
+description: >
+  Deletes ephemeral data contracts from a CPD/watsonx project.
+  Used after PR validation to clean up _PR_<pr_number> contracts.
+  Posts a PR comment confirming deletion (or reporting failure).
+
+inputs:
+  contract-ids:
+    description: 'Space-separated list of project_id:contract_id pairs to delete'
+    required: true
+  url:
+    description: 'CPD / watsonx base URL'
+    required: true
+  api-key:
+    description: 'IBM Cloud IAM API key'
+    required: true
+  iam-url:
+    description: 'IAM token endpoint (e.g. https://iam.cloud.ibm.com/identity/token). Defaults to the IBM Cloud test IAM endpoint when empty.'
+    required: false
+    default: ''
+  pr-number:
+    description: 'Pull request number to comment on'
+    required: true
+  repository:
+    description: 'Repository in owner/repo format'
+    required: true
+  github-token:
+    description: 'GitHub token for posting PR comments'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install data-intelligence-sdk
+      shell: bash
+      run: |
+        pip install "data-intelligence-sdk==2.3.0"
+
+    - name: Delete ephemeral contracts
+      id: delete
+      shell: bash
+      env:
+        PLATFORM_URL:     ${{ inputs.url }}
+        PLATFORM_API_KEY: ${{ inputs.api-key }}
+        IAM_TOKEN_URL:    ${{ inputs.iam-url }}
+      run: |
+        python3 ${{ github.action_path }}/../../scripts/delete_contract.py \
+          ${{ inputs.contract-ids }}
+
+    - name: Post PR comment (deleted)
+      if: success()
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        IDS="${{ inputs.contract-ids }}"
+        COUNT=$(echo $IDS | wc -w | tr -d ' ')
+        cat > /tmp/pr_body.md <<EOF
+        ## 🗑️ Ephemeral Contracts Cleaned Up
+
+        $COUNT ephemeral contract(s) deleted after PR validation.
+
+        \`\`\`
+        $IDS
+        \`\`\`
+        EOF
+        gh pr comment "${{ inputs.pr-number }}" \
+          --body-file /tmp/pr_body.md \
+          --repo "${{ inputs.repository }}"
+
+    - name: Post PR comment (delete failed)
+      if: failure()
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        cat > /tmp/pr_body.md <<'MDEOF'
+        ## ⚠️ Ephemeral Contract Cleanup — failed
+
+        One or more ephemeral contracts could not be deleted.
+        Please remove them manually from the project.
+
+        ```
+        See the workflow logs for the full error output.
+        ```
+        MDEOF
+        gh pr comment "${{ inputs.pr-number }}" \
+          --body-file /tmp/pr_body.md \
+          --repo "${{ inputs.repository }}"

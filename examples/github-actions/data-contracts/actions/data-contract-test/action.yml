@@ -1,0 +1,104 @@
+name: 'Data Contract — Test'
+description: >
+  Triggers and polls data contract test runs in a CPD/watsonx project
+  using the data-intelligence-sdk and posts a PR comment with the results.
+
+inputs:
+  contract-ids:
+    description: 'Space-separated list of project_id:contract_id pairs to test'
+    required: true
+  url:
+    description: 'CPD / watsonx base URL'
+    required: true
+  api-key:
+    description: 'IBM Cloud IAM API key'
+    required: true
+  iam-url:
+    description: 'IAM token endpoint (e.g. https://iam.cloud.ibm.com/identity/token). Defaults to the IBM Cloud test IAM endpoint when empty.'
+    required: false
+    default: ''
+  pr-number:
+    description: 'Pull request number to comment on'
+    required: true
+  repository:
+    description: 'Repository in owner/repo format'
+    required: true
+  github-token:
+    description: 'GitHub token for posting PR comments'
+    required: true
+
+outputs:
+  overall:
+    description: '0 = all tests passed, 1 = one or more failures'
+    value: ${{ steps.test.outputs.overall }}
+  body:
+    description: 'Markdown summary of test results'
+    value: ${{ steps.test.outputs.body }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install data-intelligence-sdk
+      shell: bash
+      run: |
+        pip install "data-intelligence-sdk==2.3.0"
+
+    - name: Trigger and poll test runs
+      id: test
+      shell: bash
+      env:
+        PLATFORM_URL:     ${{ inputs.url }}
+        PLATFORM_API_KEY: ${{ inputs.api-key }}
+        IAM_TOKEN_URL:    ${{ inputs.iam-url }}
+        RESULTS_DIR:      ${{ github.workspace }}/test-results
+      run: |
+        python3 ${{ github.action_path }}/../../scripts/test_contract.py \
+          ${{ inputs.contract-ids }}
+
+    - name: Upload test result JSON
+      id: upload
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: data-contract-test-results-pr-${{ inputs.pr-number }}
+        path: ${{ github.workspace }}/test-results/*.json
+        if-no-files-found: ignore
+        overwrite: true
+
+    - name: Post PR comment (success)
+      if: success()
+      shell: bash
+      env:
+        GH_TOKEN:     ${{ inputs.github-token }}
+        BODY:         ${{ steps.test.outputs.body }}
+        ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+      run: |
+        printf "%b" "$BODY" > /tmp/pr_body.md
+        if [ -n "$ARTIFACT_URL" ]; then
+          printf '\n📎 [Download test result JSON](%s)\n' "$ARTIFACT_URL" >> /tmp/pr_body.md
+        fi
+        gh pr comment "${{ inputs.pr-number }}" \
+          --body-file /tmp/pr_body.md \
+          --repo "${{ inputs.repository }}"
+
+    - name: Post PR comment (failure)
+      if: failure()
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        cat > /tmp/pr_body.md <<'MDEOF'
+        ## ❌ Data Contract Test — failed
+
+        ```
+        See the workflow logs for the full error output.
+        ```
+        MDEOF
+        gh pr comment "${{ inputs.pr-number }}" \
+          --body-file /tmp/pr_body.md \
+          --repo "${{ inputs.repository }}"
+
+    - name: Fail if test failed
+      if: steps.test.outputs.overall == '1'
+      shell: bash
+      run: exit 1
