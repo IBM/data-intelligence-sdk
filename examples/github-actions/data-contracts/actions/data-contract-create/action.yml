@@ -1,0 +1,94 @@
+name: 'Data Contract — Create'
+description: >
+  Creates data contracts in a CPD/watsonx project. In PR mode, creates an
+  ephemeral contract named <name>_PR_<pr_number> for CI validation only.
+  In merge mode, upserts the real contract with the canonical name.
+
+inputs:
+  mode:
+    description: "'pr' (ephemeral, for CI) or 'merge' (upsert real contract)"
+    required: true
+  changed-files:
+    description: 'Space-separated list of changed contract file paths'
+    required: true
+  url:
+    description: 'CPD / watsonx base URL'
+    required: true
+  api-key:
+    description: 'IBM Cloud IAM API key'
+    required: true
+  iam-url:
+    description: 'IAM token endpoint (e.g. https://iam.cloud.ibm.com/identity/token). Defaults to the IBM Cloud test IAM endpoint when empty.'
+    required: false
+    default: ''
+  pr-number:
+    description: 'Pull request number — required when mode is pr'
+    required: false
+    default: ''
+  repository:
+    description: 'Repository in owner/repo format'
+    required: true
+  github-token:
+    description: 'GitHub token for posting PR comments'
+    required: true
+
+outputs:
+  contract-ids:
+    description: 'Space-separated list of project_id:contract_id pairs'
+    value: ${{ steps.create.outputs.contract_ids }}
+  body:
+    description: 'Markdown summary of create results'
+    value: ${{ steps.create.outputs.body }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install data-intelligence-sdk
+      shell: bash
+      run: |
+        pip install \
+          --index-url https://test.pypi.org/simple/ \
+          --extra-index-url https://pypi.org/simple/ \
+          "data-intelligence-sdk==2.3.0"
+
+    - name: Create contracts
+      id: create
+      shell: bash
+      env:
+        PLATFORM_URL:     ${{ inputs.url }}
+        PLATFORM_API_KEY: ${{ inputs.api-key }}
+        IAM_TOKEN_URL:    ${{ inputs.iam-url }}
+      run: |
+        python3 ${{ github.action_path }}/../../scripts/create_contract.py \
+          --mode "${{ inputs.mode }}" \
+          --pr-number "${{ inputs.pr-number }}" \
+          ${{ inputs.changed-files }}
+
+    - name: Post PR comment (success)
+      if: success() && inputs.pr-number != ''
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        BODY:     ${{ steps.create.outputs.body }}
+      run: |
+        printf "%b" "$BODY" > /tmp/pr_body.md
+        gh pr comment "${{ inputs.pr-number }}" \
+          --body-file /tmp/pr_body.md \
+          --repo "${{ inputs.repository }}"
+
+    - name: Post PR comment (failure)
+      if: failure() && inputs.pr-number != ''
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        cat > /tmp/pr_body.md <<'MDEOF'
+        ## ❌ Data Contract Create — failed
+
+        ```
+        See the workflow logs for the full error output.
+        ```
+        MDEOF
+        gh pr comment "${{ inputs.pr-number }}" \
+          --body-file /tmp/pr_body.md \
+          --repo "${{ inputs.repository }}"

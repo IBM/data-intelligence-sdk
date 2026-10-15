@@ -1,0 +1,79 @@
+name: 'Data Contract — Save Test Results'
+description: >
+  After a merge, finds the test results saved by the merged PR's test run and
+  stores them against the newly created/updated real contracts using
+  POST /test_results.
+
+inputs:
+  contract-ids:
+    description: 'Space-separated list of project_id:contract_id pairs (from the create action in merge mode)'
+    required: true
+  url:
+    description: 'CPD / watsonx base URL'
+    required: true
+  api-key:
+    description: 'IBM Cloud IAM API key'
+    required: true
+  iam-url:
+    description: 'IAM token endpoint (e.g. https://iam.cloud.ibm.com/identity/token). Defaults to the IBM Cloud test IAM endpoint when empty.'
+    required: false
+    default: ''
+  repository:
+    description: 'Repository in owner/repo format'
+    required: true
+  github-token:
+    description: 'GitHub token used to look up the merged PR and download its artifact (needs actions: read)'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Download test results from the merged PR
+      id: download
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        REPO:     ${{ inputs.repository }}
+        SHA:      ${{ github.sha }}
+      run: |
+        PR=$(gh api "repos/$REPO/commits/$SHA/pulls" --jq '.[0].number // empty')
+        if [ -z "$PR" ]; then
+          echo "No pull request is associated with $SHA — nothing to save."
+          echo "found=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        ARTIFACT_ID=$(gh api "repos/$REPO/actions/artifacts?name=data-contract-test-results-pr-$PR" \
+          --jq '[.artifacts[] | select(.expired == false)] | sort_by(.created_at) | last | .id // empty')
+        if [ -z "$ARTIFACT_ID" ]; then
+          echo "No unexpired test-result artifact found for PR #$PR — nothing to save."
+          echo "found=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        echo "Using artifact $ARTIFACT_ID from PR #$PR"
+        gh api "repos/$REPO/actions/artifacts/$ARTIFACT_ID/zip" > "$RUNNER_TEMP/test-results.zip"
+        mkdir -p "$RUNNER_TEMP/test-results"
+        unzip -o -q "$RUNNER_TEMP/test-results.zip" -d "$RUNNER_TEMP/test-results"
+        echo "found=true" >> "$GITHUB_OUTPUT"
+
+    - name: Install data-intelligence-sdk
+      if: steps.download.outputs.found == 'true'
+      shell: bash
+      run: |
+        pip install \
+          --index-url https://test.pypi.org/simple/ \
+          --extra-index-url https://pypi.org/simple/ \
+          "data-intelligence-sdk==2.3.0"
+
+    - name: Save test results to the contracts
+      if: steps.download.outputs.found == 'true'
+      shell: bash
+      env:
+        PLATFORM_URL:     ${{ inputs.url }}
+        PLATFORM_API_KEY: ${{ inputs.api-key }}
+        IAM_TOKEN_URL:    ${{ inputs.iam-url }}
+      run: |
+        python3 ${{ github.action_path }}/../../scripts/save_test_results.py \
+          --results-dir "$RUNNER_TEMP/test-results" \
+          ${{ inputs.contract-ids }}
