@@ -230,31 +230,87 @@ Running a Test
 
     from wxdi.data_contracts import DataContractTestRequest
 
-    test_body = DataContractTestRequest(retain_dq_objects=False)
+    test_body = DataContractTestRequest(
+        retain_dq_objects=False,
+        schema_validation=True,   # also validate the schema (default: True)
+        job_name="my-contract-test",
+    )
     test_run = provider.test_project_data_contract(
         "my-project-id", "contract-id", test_body
     )
     print(f"Test run: id={test_run.id}  status={test_run.status}")
 
+``test_project_data_contract`` returns a :class:`~wxdi.data_contracts.DataContractTestResult`
+for the run that was started. Its ``id`` can be passed to
+``get_project_data_contract_test_result`` to retrieve the results once the run has progressed.
+
 Retrieving Test Results
 -----------------------
 
+Persisted results are returned as :class:`~wxdi.data_contracts.DataContractTestResult`
+objects, which contain a ``summary`` and per-asset (``data_assets``) and per-column
+(``columns``) results:
+
 .. code-block:: python
 
-    # List all test runs for a contract
+    # List all test results for a contract
     collection = provider.list_project_data_contract_test_results(
         "my-project-id", "contract-id", include_all_details=True
     )
-    for run in collection.test_results:
-        print(f"  run={run.id}  status={run.status}  start={run.start}")
-        for check in run.check_results:
-            status = "✓" if check.passed else "✗"
-            print(f"    {status} {check.check_name}: {check.message}")
+    for result in collection.test_results:
+        print(f"  run={result.id}  status={result.status}  start={result.start}")
+        if result.summary and result.summary.data_quality:
+            dq = result.summary.data_quality
+            print(f"    checks: {dq.passed_checks}/{dq.total_checks} passed")
+        for asset in result.data_assets:
+            print(f"    asset {asset.name}: {asset.status}")
 
-    # Retrieve a specific test run
-    run = provider.get_project_data_contract_test_result(
+    # Retrieve a specific test result
+    result = provider.get_project_data_contract_test_result(
         "my-project-id", "contract-id", run_id, include_all_details=True
     )
+
+Creating and Updating Test Results
+----------------------------------
+
+Test results produced outside the service, for example by a third-party tool, can be
+recorded against a contract with
+:class:`~wxdi.data_contracts.DataContractTestResultPrototype`. Nested objects use the
+matching ``*Prototype`` classes:
+
+.. code-block:: python
+
+    from wxdi.data_contracts import (
+        DataContractTestResultPrototype,
+        DataContractTestResultSummaryPrototype,
+        DataContractTestResultDataQualitySummaryPrototype,
+    )
+
+    body = DataContractTestResultPrototype(
+        status="completed",
+        start="2025-01-15T08:00:00.000Z",
+        end="2025-01-15T08:03:42.000Z",
+        summary=DataContractTestResultSummaryPrototype(
+            status="passed",
+            data_quality=DataContractTestResultDataQualitySummaryPrototype(
+                status="passed", total_checks=3, passed_checks=3,
+                failed_checks=0, error_checks=0,
+            ),
+        ),
+    )
+
+    created = provider.create_project_data_contract_test_result(
+        "my-project-id", "contract-id", body
+    )
+
+    # Replace the stored result
+    body.status = "failed"
+    updated = provider.update_project_data_contract_test_result(
+        "my-project-id", "contract-id", created.id, body
+    )
+
+The catalog equivalents are ``create_catalog_data_contract_test_result`` and
+``update_catalog_data_contract_test_result``.
 
 Deleting Contracts
 ------------------

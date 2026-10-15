@@ -14,7 +14,7 @@
 # See the LICENSE file in the project root for license information.
 
 PYTHON=python
-LINT_DIRS=src/wxdi/dph_services src/wxdi/data_product_recommender src/wxdi/odcs_generator tests/src/data_product_recommender tests/src/dph_services tests/src/odcs_generator tests/src/integration examples
+LINT_DIRS=src/wxdi/dph_services src/wxdi/data_product_recommender src/wxdi/odcs_generator src/wxdi/data_contracts tests/src/data_contracts tests/src/data_product_recommender tests/src/dph_services tests/src/odcs_generator tests/src/integration examples
 
 setup: deps dev_deps install_project
 
@@ -39,7 +39,7 @@ test: test-unit test-int
 test-unit:
 	${PYTHON} -m pytest --cov=src/wxdi/dph_services --cov=src/wxdi/data_product_recommender --cov=src/wxdi/odcs_generator \
       --cov-report=xml:coverage.xml --cov-report=html --cov-report=term tests/src/dph_services tests/src/data_product_recommender \
-      tests/src/odcs_generator tests/src/dq_validator tests/src/auth
+      tests/src/odcs_generator tests/src/dq_validator tests/src/auth tests/src/data_contracts
 
 test-int:
 	${PYTHON} -m pytest tests/src/integration

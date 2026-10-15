@@ -71,14 +71,20 @@ The central class for all API interactions. It extends the shared ``BaseProvider
 +---------------------------------------------------+------------------------------------------+
 | ``get_project_data_contract_test_result``         | GET  …/test_results/{run_id}             |
 +---------------------------------------------------+------------------------------------------+
+| ``create_project_data_contract_test_result``      | POST …/data_contracts/{id}/test_results  |
++---------------------------------------------------+------------------------------------------+
+| ``update_project_data_contract_test_result``      | PUT  …/test_results/{run_id}             |
++---------------------------------------------------+------------------------------------------+
 
 **Catalog-scoped endpoints**
 
-The catalog surface mirrors the project surface (without test endpoints):
-``validate_catalog_data_contract``, ``list_catalog_data_contracts``,
+The catalog surface mirrors the project surface, except that there is no endpoint to trigger a
+test run: ``validate_catalog_data_contract``, ``list_catalog_data_contracts``,
 ``create_catalog_data_contract``, ``delete_catalog_data_contracts``,
 ``get_catalog_data_contract``, ``replace_catalog_data_contract``,
-``upload_catalog_data_contract_file``.
+``upload_catalog_data_contract_file``, ``list_catalog_data_contract_test_results``,
+``get_catalog_data_contract_test_result``, ``delete_catalog_data_contract_test_results``,
+``create_catalog_data_contract_test_result``, ``update_catalog_data_contract_test_result``.
 
 Pydantic Models
 ~~~~~~~~~~~~~~~
@@ -90,24 +96,28 @@ All request bodies and response payloads are represented as Pydantic v2 models.
 * :class:`~wxdi.data_contracts.DataContractPrototypeYaml` – create/replace using inline YAML.
 * :class:`~wxdi.data_contracts.DataContractPrototypeJson` – create/replace using a Python dict.
 * :class:`~wxdi.data_contracts.DataContractValidationRequest` – raw contract content to validate.
-* :class:`~wxdi.data_contracts.DataContractTestRequest` – test configuration (server mappings, ``retain_dq_objects``).
+* :class:`~wxdi.data_contracts.DataContractTestRequest` – test configuration (server mappings, ``retain_dq_objects``, ``schema_validation``, ``job_name``).
+* :class:`~wxdi.data_contracts.DataContractTestResultPrototype` – request body for creating or updating a test result (for example, results produced by a third-party tool).
 
 **Response models**
 
 * :class:`~wxdi.data_contracts.DataContract` – a persisted contract asset.
 * :class:`~wxdi.data_contracts.DataContractCollection` – paginated list of contracts.
 * :class:`~wxdi.data_contracts.DataContractValidationResponse` – validation result with error details.
-* :class:`~wxdi.data_contracts.DataContractTestResponse` – a single test-run result.
-* :class:`~wxdi.data_contracts.DataContractTestResponseCollection` – list of test-run results.
+* :class:`~wxdi.data_contracts.DataContractTestResult` – a test result with a summary and per-asset and per-column results. Returned by ``test_project_data_contract`` (the run that was started) and by the test-result endpoints.
+* :class:`~wxdi.data_contracts.DataContractTestResultCollection` – list of test results.
 
 **Sub-models**
 
+* :class:`~wxdi.data_contracts.DataContractType` – enum for the ``type`` field (``contract`` or ``contract_template``). Request bodies accept only these values. On a :class:`~wxdi.data_contracts.DataContract` response, a value the SDK does not know is returned as a plain string instead of raising an error.
 * :class:`~wxdi.data_contracts.ConnectionInfo` – reference to a connection asset.
 * :class:`~wxdi.data_contracts.ServerMapping` – maps a logical server name to a connection.
 * :class:`~wxdi.data_contracts.DataContractValidationError` – a single ODCS schema error.
-* :class:`~wxdi.data_contracts.DataContractInfo` – brief contract reference embedded in test results.
-* :class:`~wxdi.data_contracts.LogEntry` – a single log line from a test run.
-* :class:`~wxdi.data_contracts.CheckResult` – outcome of one quality check in a test run.
+* ``DataContractTestResult*`` – the nested models inside a test result: summary, data asset, column result, schema validation checks and data quality checks.
+* ``DataContractTestResult*Prototype`` – a parallel set of nested models used inside :class:`~wxdi.data_contracts.DataContractTestResultPrototype`.
+  Request and response types are kept separate so that they can evolve independently.
+
+See :ref:`api_data_contracts` for the full list.
 
 Response Shape Normalisation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

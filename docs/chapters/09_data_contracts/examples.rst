@@ -142,6 +142,45 @@ Running a Test (Project)
     result = provider.test_project_data_contract(PROJECT_ID, contract_id, body)
     print(f"test_run_id={result.id}  status={result.status}")
 
+Creating a Test Result (Project)
+---------------------------------
+
+.. code-block:: python
+
+    from wxdi.data_contracts.models import (
+        DataContractTestResultPrototype,
+        DataContractTestResultSummaryPrototype,
+        DataContractTestResultDataQualitySummaryPrototype,
+    )
+
+    body = DataContractTestResultPrototype(
+        status="completed",
+        start="2025-01-15T08:00:00.000Z",
+        end="2025-01-15T08:03:42.000Z",
+        summary=DataContractTestResultSummaryPrototype(
+            status="passed",
+            data_quality=DataContractTestResultDataQualitySummaryPrototype(
+                status="passed", total_checks=3, passed_checks=3,
+                failed_checks=0, error_checks=0,
+            ),
+        ),
+    )
+    created = provider.create_project_data_contract_test_result(
+        PROJECT_ID, contract_id, body
+    )
+    print(f"created run_id={created.id}  status={created.status}")
+
+Updating a Test Result (Project)
+---------------------------------
+
+.. code-block:: python
+
+    body.status = "failed"
+    updated = provider.update_project_data_contract_test_result(
+        PROJECT_ID, contract_id, created.id, body
+    )
+    print(f"updated run_id={updated.id}  status={updated.status}")
+
 Listing Test Results (Project)
 -------------------------------
 
@@ -150,8 +189,8 @@ Listing Test Results (Project)
     collection = provider.list_project_data_contract_test_results(
         PROJECT_ID, contract_id
     )
-    for run in collection.test_results:
-        print(f"  run_id={run.id}  status={run.status}")
+    for result in collection.test_results:
+        print(f"  run_id={result.id}  status={result.status}")
 
 Getting a Single Test Result (Project)
 ---------------------------------------
@@ -167,7 +206,7 @@ Getting a Single Test Result (Project)
     run = provider.get_project_data_contract_test_result(
         PROJECT_ID, contract_id, run_id
     )
-    print(f"run_id={run.id}  status={run.status}  run_by={run.run_by}")
+    print(f"run_id={run.id}  status={run.status}  start={run.start}  end={run.end}")
 
 Deleting Test Results (Project)
 --------------------------------
