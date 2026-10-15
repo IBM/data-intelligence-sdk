@@ -115,7 +115,7 @@ def main() -> int:
         if not project_id:
             print(f"ERROR: customProperties.projectId not found in {f}.",
                   file=sys.stderr)
-            sys.exit(1)
+            return 1
 
         print(f"[{args.mode}] Using project_id={project_id}, contract name='{name}' for {f}")
 

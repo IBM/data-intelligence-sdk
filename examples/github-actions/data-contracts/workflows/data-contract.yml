@@ -114,7 +114,7 @@ jobs:
           contract-ids: ${{ needs.create-temp-contract.outputs.contract_ids }}
           url:          ${{ secrets.PLATFORM_URL }}
           api-key:      ${{ secrets.PLATFORM_API_KEY }}
-          iam-url:       ${{ secrets.IAM_TOKEN_URL }}
+          iam-url:      ${{ secrets.IAM_TOKEN_URL }}
           pr-number:    ${{ github.event.pull_request.number }}
           repository:   ${{ github.repository }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -158,6 +158,6 @@ jobs:
           contract-ids: ${{ steps.upsert.outputs.contract-ids }}
           url:          ${{ secrets.PLATFORM_URL }}
           api-key:      ${{ secrets.PLATFORM_API_KEY }}
-          iam-url:       ${{ secrets.IAM_TOKEN_URL }}
+          iam-url:      ${{ secrets.IAM_TOKEN_URL }}
           repository:   ${{ github.repository }}
           github-token: ${{ secrets.GITHUB_TOKEN }}

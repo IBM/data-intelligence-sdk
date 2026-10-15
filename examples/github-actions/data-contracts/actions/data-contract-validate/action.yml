@@ -55,6 +55,8 @@ runs:
         OVERALL=0
 
         for f in ${{ inputs.changed-files }}; do
+          # Note: relies on space-separated paths with no spaces in filenames,
+          # consistent with tj-actions/changed-files output format.
           echo "Validating $f ..."
           if python3 ${{ github.action_path }}/../../scripts/validate_contract.py "$f" > /tmp/val_out.txt 2>&1; then
             RESULT_MD+="### ✅ \`$f\` — valid\n\n"
