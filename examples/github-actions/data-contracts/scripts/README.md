@@ -18,10 +18,7 @@ The scripts in this directory are the core logic behind each composite action. T
 ### Install the SDK
 
 ```bash
-pip install \
-  --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ \
-  "data-intelligence-sdk==2.3.0"
+pip install "data-intelligence-sdk==2.3.0"
 ```
 
 ### Environment variables (required by all scripts)

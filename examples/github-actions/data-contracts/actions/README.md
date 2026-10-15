@@ -14,16 +14,13 @@ Each stage of the pipeline is implemented as a reusable [composite action](https
 
 ## SDK Dependency
 
-All four actions install the same package before running:
+All five actions install the same package before running:
 
 ```bash
-pip install \
-  --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ \
-  "data-intelligence-sdk==2.3.0"
+pip install "data-intelligence-sdk==2.3.0"
 ```
 
-To upgrade, update the version string in all four `action.yml` files.
+To upgrade, update the version string in all five `action.yml` files.
 
 ---
 

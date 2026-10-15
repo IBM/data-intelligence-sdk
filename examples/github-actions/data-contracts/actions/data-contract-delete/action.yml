@@ -34,10 +34,7 @@ runs:
     - name: Install data-intelligence-sdk
       shell: bash
       run: |
-        pip install \
-          --index-url https://test.pypi.org/simple/ \
-          --extra-index-url https://pypi.org/simple/ \
-          "data-intelligence-sdk==2.3.0"
+        pip install "data-intelligence-sdk==2.3.0"
 
     - name: Delete ephemeral contracts
       id: delete

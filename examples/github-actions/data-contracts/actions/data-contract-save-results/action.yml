@@ -61,10 +61,7 @@ runs:
       if: steps.download.outputs.found == 'true'
       shell: bash
       run: |
-        pip install \
-          --index-url https://test.pypi.org/simple/ \
-          --extra-index-url https://pypi.org/simple/ \
-          "data-intelligence-sdk==2.3.0"
+        pip install "data-intelligence-sdk==2.3.0"
 
     - name: Save test results to the contracts
       if: steps.download.outputs.found == 'true'
