@@ -13,27 +13,21 @@ The pipeline is defined in [`data-contract.yml`](data-contract.yml) and triggers
 
 When a pull request adds or modifies any file under `contracts/`, four jobs run in sequence. A PR comment is posted after each job so reviewers have full visibility without leaving GitHub.
 
-```
-PR opened / updated (contracts/** changed)
-│
-├─ Job 1: validate
-│      Validates each changed contract file against the platform API.
-│      Fails fast if any contract is invalid — subsequent jobs are skipped.
-│
-├─ Job 2: create-temp-contract         (needs: validate)
-│      Creates an ephemeral copy of each contract named
-│      <filename>_PR_<pr_number> in the target project.
-│      The real production contract is never touched.
-│
-├─ Job 3: test                         (needs: create-temp-contract)
-│      Triggers a test run against each ephemeral contract.
-│      Polls until the run completes, then reports per-rule results.
-│      Uploads each completed run's result as a JSON workflow artifact and
-│      links it from the PR comment.
-│
-└─ Job 4: delete-temp-contract         (needs: create-temp-contract + test)
-       Runs with `if: always()` — executes even if Job 3 failed.
-       Deletes all ephemeral contracts and polls until each is confirmed gone (404).
+```mermaid
+flowchart TD
+    PR([PR opened / updated\ncontracts/** changed])
+    PR --> J1
+
+    J1["**Job 1: validate**\nValidates each changed contract file against the platform API.\nFails fast if any contract is invalid — subsequent jobs are skipped."]
+    J1 --> J2
+
+    J2["**Job 2: create-temp-contract** _(needs: validate)_\nCreates an ephemeral copy of each contract named\n&lt;filename&gt;_PR_&lt;pr_number&gt; in the target project.\nThe real production contract is never touched."]
+    J2 --> J3
+
+    J3["**Job 3: test** _(needs: create-temp-contract)_\nTriggers a test run against each ephemeral contract.\nPolls until the run completes, then reports per-rule results.\nUploads each result as a JSON workflow artifact."]
+    J3 --> J4
+
+    J4["**Job 4: delete-temp-contract** _(needs: create-temp-contract + test)_\nRuns with if: always() — executes even if Job 3 failed.\nDeletes all ephemeral contracts and polls until each is confirmed gone (404)."]
 ```
 
 ### Job conditions

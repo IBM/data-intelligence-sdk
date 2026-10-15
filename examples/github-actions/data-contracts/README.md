@@ -4,11 +4,21 @@ A ready-to-copy GitHub Actions pipeline that validates, tests, and publishes dat
 
 Data contracts are stored as YAML/JSON files under `contracts/`. Every pull request that touches them is validated and tested against the platform. When the PR is merged, the real contracts are upserted and the PR's test results are attached to them.
 
-```
-PR opened / updated            PR merged to main
-        │                              │
-  validate ──► create temp ──► test ──► delete temp        upsert real contracts ──► save PR test results
-  (PR comment after each step)                             (visible in Actions run log)
+```mermaid
+flowchart LR
+    subgraph PR["PR opened / updated"]
+        direction LR
+        V(validate) --> C(create temp)
+        C --> T(test)
+        T --> D(delete temp)
+    end
+
+    subgraph Merge["PR merged to main"]
+        direction LR
+        U(upsert real contracts) --> S(save PR test results)
+    end
+
+    PR -.->|merge| Merge
 ```
 
 ---
