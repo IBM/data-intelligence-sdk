@@ -17,6 +17,9 @@ on:
     tags: ['**']
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     uses: ./.github/workflows/verify.yaml
@@ -77,6 +80,10 @@ jobs:
   build-documentation:
     if: startsWith(github.ref, 'refs/tags/')
     name: Build and deploy documentation
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     uses: ./.github/workflows/docs.yml
         
 #  update-sandbox:
