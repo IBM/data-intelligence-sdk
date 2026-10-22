@@ -100,7 +100,9 @@ your-repo/
 
 Create a `contracts/` folder at the root of your repository and add your data contract files (YAML or JSON in [ODCS](https://bitol-io.github.io/open-data-contract-standard/) format).
 
-Each contract file must declare its target project ID in `customProperties`:
+Each contract file must declare its target project ID in `customProperties`. The contract's file name (without extension) becomes its name on the platform (e.g. `contracts/sales_orders.yaml` is published as `sales_orders`).
+
+**Standard (project) contract**
 
 ```yaml
 # contracts/my_contract.yaml
@@ -109,17 +111,29 @@ customProperties:
     value: <your-cpd-project-id>
 ```
 
-JSON equivalent:
+**DPH catalog contract** — set `isDPH: true` to route the merge-mode upsert to the Data Product Hub catalog instead of the project. The PR validation flow always uses the project regardless.
 
-```json
-{
-  "customProperties": [
-    { "property": "projectId", "value": "<your-cpd-project-id>" }
-  ]
-}
+```yaml
+customProperties:
+  - property: projectId
+    value: <your-cpd-project-id>      # required for PR validation
+  - property: isDPH
+    value: "true"
+  - property: type
+    value: contract                   # "contract" or "contract_template"
+  - property: draftId
+    value: <asset-uuid>@<catalog-uuid> # required when type=contract
+  - property: catalogId
+    value: <catalog-uuid>             # optional; resolved automatically when absent
 ```
 
-The contract's file name (without extension) becomes its name on the platform. For example, `contracts/sales_orders.yaml` is published as `sales_orders`.
+| `customProperties` key | Required | Description |
+|---|---|---|
+| `projectId` | Always | Target project for PR validation and non-DPH merge upsert |
+| `isDPH` | No | Set to `"true"` to route merge upsert to the DPH catalog |
+| `type` | No | `contract` (linked to a draft) or `contract_template`. Defaults to `contract_template` |
+| `draftId` | When `isDPH=true` and `type=contract` | Draft asset ID in `<asset_uuid>@<catalog_uuid>` format |
+| `catalogId` | No | DPH catalog ID. When absent, resolved automatically via the DPH API |
 
 ### Step 3 — Check the trigger branch
 
@@ -179,8 +193,8 @@ When a pull request adds or modifies any file under `contracts/`, four jobs run 
 
 After a PR is merged to `main`, one job runs (`upsert-on-merge`) with two steps:
 
-1. **Upsert real contracts** — detects files changed since the last remote commit and upserts each one using its canonical name (filename without extension). An existing contract is replaced; a new one is created.
-2. **Save PR test results** — downloads the JSON test results uploaded by the merged PR's test job and saves each one to the matching real contract. Contracts with no saved result are skipped.
+1. **Upsert real contracts** — detects files changed since the last remote commit and upserts each one using its canonical name (filename without extension). Non-DPH contracts are upserted in the project; DPH contracts (`isDPH=true`) are upserted in the catalog and linked to their draft.
+2. **Save PR test results** — downloads the JSON test results uploaded by the merged PR's test job and saves each one to the matching real contract (project or catalog). Contracts with no saved result are skipped.
 
 No PR comment is posted on merge — results are visible in the Actions run log.
 
