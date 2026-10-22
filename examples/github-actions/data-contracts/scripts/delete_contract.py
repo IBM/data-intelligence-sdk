@@ -33,10 +33,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from wxdi.data_contracts import DataContractsProvider
 from wxdi.dq_validator.provider.config import ProviderConfig
 
-IAM_TOKEN_URL = (
-    os.environ.get("IAM_TOKEN_URL")
-    or "https://iam.test.cloud.ibm.com/identity/token"
-)
+IAM_TOKEN_URL = "https://iam.test.cloud.ibm.com/identity/token"
 
 # How long to wait for a single contract to be fully removed by the platform.
 # Each contract that has associated DQ rule assets may take a while.

@@ -14,7 +14,6 @@ Triggers test runs for ephemeral contracts, polls until completion, and posts a 
 | `contract-ids` | ✅ | Space-separated `project_id:contract_id` pairs (from the create action) |
 | `url` | ✅ | CPD / watsonx base URL |
 | `api-key` | ✅ | IBM Cloud IAM API key |
-| `iam-url` | ❌ | IAM token endpoint, e.g. `https://iam.cloud.ibm.com/identity/token`. Defaults to the IBM Cloud **test** endpoint (`https://iam.test.cloud.ibm.com/identity/token`) when empty |
 | `pr-number` | ✅ | PR number to post the comment on |
 | `repository` | ✅ | Repository in `owner/repo` format |
 | `github-token` | ✅ | GitHub token for posting PR comments |

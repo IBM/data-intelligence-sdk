@@ -13,10 +13,6 @@ inputs:
   api-key:
     description: 'IBM Cloud IAM API key'
     required: true
-  iam-url:
-    description: 'IAM token endpoint (e.g. https://iam.cloud.ibm.com/identity/token). Defaults to the IBM Cloud test IAM endpoint when empty.'
-    required: false
-    default: ''
   pr-number:
     description: 'Pull request number to comment on'
     required: true
@@ -41,7 +37,10 @@ runs:
     - name: Install data-intelligence-sdk
       shell: bash
       run: |
-        pip install "data-intelligence-sdk==2.3.0"
+        pip install \
+          --index-url https://test.pypi.org/simple/ \
+          --extra-index-url https://pypi.org/simple/ \
+          "data-intelligence-sdk==2.3.0"
 
     - name: Trigger and poll test runs
       id: test
@@ -49,7 +48,6 @@ runs:
       env:
         PLATFORM_URL:     ${{ inputs.url }}
         PLATFORM_API_KEY: ${{ inputs.api-key }}
-        IAM_TOKEN_URL:    ${{ inputs.iam-url }}
         RESULTS_DIR:      ${{ github.workspace }}/test-results
       run: |
         python3 ${{ github.action_path }}/../../scripts/test_contract.py \

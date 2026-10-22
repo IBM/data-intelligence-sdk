@@ -14,10 +14,6 @@ inputs:
   api-key:
     description: 'IBM Cloud IAM API key'
     required: true
-  iam-url:
-    description: 'IAM token endpoint (e.g. https://iam.cloud.ibm.com/identity/token). Defaults to the IBM Cloud test IAM endpoint when empty.'
-    required: false
-    default: ''
   repository:
     description: 'Repository in owner/repo format'
     required: true
@@ -61,7 +57,10 @@ runs:
       if: steps.download.outputs.found == 'true'
       shell: bash
       run: |
-        pip install "data-intelligence-sdk==2.3.0"
+        pip install \
+          --index-url https://test.pypi.org/simple/ \
+          --extra-index-url https://pypi.org/simple/ \
+          "data-intelligence-sdk==2.3.0"
 
     - name: Save test results to the contracts
       if: steps.download.outputs.found == 'true'
@@ -69,7 +68,6 @@ runs:
       env:
         PLATFORM_URL:     ${{ inputs.url }}
         PLATFORM_API_KEY: ${{ inputs.api-key }}
-        IAM_TOKEN_URL:    ${{ inputs.iam-url }}
       run: |
         python3 ${{ github.action_path }}/../../scripts/save_test_results.py \
           --results-dir "$RUNNER_TEMP/test-results" \

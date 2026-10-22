@@ -13,10 +13,6 @@ inputs:
   api-key:
     description: 'IBM Cloud IAM API key'
     required: true
-  iam-url:
-    description: 'IAM token endpoint (e.g. https://iam.cloud.ibm.com/identity/token). Defaults to the IBM Cloud test IAM endpoint when empty.'
-    required: false
-    default: ''
   pr-number:
     description: 'Pull request number to comment on'
     required: true
@@ -41,7 +37,10 @@ runs:
     - name: Install data-intelligence-sdk
       shell: bash
       run: |
-        pip install "data-intelligence-sdk==2.3.0"
+        pip install \
+          --index-url https://test.pypi.org/simple/ \
+          --extra-index-url https://pypi.org/simple/ \
+          "data-intelligence-sdk==2.3.0"
 
     - name: Validate contracts
       id: validate
@@ -49,14 +48,11 @@ runs:
       env:
         PLATFORM_URL:     ${{ inputs.url }}
         PLATFORM_API_KEY: ${{ inputs.api-key }}
-        IAM_TOKEN_URL:    ${{ inputs.iam-url }}
       run: |
         RESULT_MD="## 🔍 Data Contract Validation\n\n"
         OVERALL=0
 
         for f in ${{ inputs.changed-files }}; do
-          # Note: relies on space-separated paths with no spaces in filenames,
-          # consistent with tj-actions/changed-files output format.
           echo "Validating $f ..."
           if python3 ${{ github.action_path }}/../../scripts/validate_contract.py "$f" > /tmp/val_out.txt 2>&1; then
             RESULT_MD+="### ✅ \`$f\` — valid\n\n"
