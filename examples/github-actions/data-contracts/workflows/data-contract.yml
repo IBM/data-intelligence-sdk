@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'contracts/**'
-      - '.github/workflows/validate-data-contract.yml'
+      - '.github/workflows/data-contract.yml'
       - '.github/actions/**'
       - '.github/scripts/**'
 
@@ -48,6 +48,7 @@ jobs:
           changed-files: ${{ steps.changed.outputs.all_changed_files }}
           url:           ${{ secrets.PLATFORM_URL }}
           api-key:       ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:       ${{ secrets.IAM_TOKEN_URL }}
           pr-number:     ${{ github.event.pull_request.number }}
           repository:    ${{ github.repository }}
           github-token:  ${{ secrets.GITHUB_TOKEN }}
@@ -58,7 +59,7 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     outputs:
-      contract_ids: ${{ steps.create.outputs.contract-ids }}
+      contract_ids: ${{ steps.create.outputs.contract_ids }}
 
     steps:
       - uses: actions/checkout@v4
@@ -72,6 +73,7 @@ jobs:
           pr-number:     ${{ github.event.pull_request.number }}
           url:           ${{ secrets.PLATFORM_URL }}
           api-key:       ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:       ${{ secrets.IAM_TOKEN_URL }}
           repository:    ${{ github.repository }}
           github-token:  ${{ secrets.GITHUB_TOKEN }}
 
@@ -92,6 +94,7 @@ jobs:
           contract-ids:  ${{ needs.create-temp-contract.outputs.contract_ids }}
           url:           ${{ secrets.PLATFORM_URL }}
           api-key:       ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:       ${{ secrets.IAM_TOKEN_URL }}
           pr-number:     ${{ github.event.pull_request.number }}
           repository:    ${{ github.repository }}
           github-token:  ${{ secrets.GITHUB_TOKEN }}
@@ -111,6 +114,7 @@ jobs:
           contract-ids: ${{ needs.create-temp-contract.outputs.contract_ids }}
           url:          ${{ secrets.PLATFORM_URL }}
           api-key:      ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:      ${{ secrets.IAM_TOKEN_URL }}
           pr-number:    ${{ github.event.pull_request.number }}
           repository:   ${{ github.repository }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -143,6 +147,7 @@ jobs:
           changed-files: ${{ steps.changed.outputs.all_changed_files }}
           url:           ${{ secrets.PLATFORM_URL }}
           api-key:       ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:       ${{ secrets.IAM_TOKEN_URL }}
           repository:    ${{ github.repository }}
           github-token:  ${{ secrets.GITHUB_TOKEN }}
 
@@ -153,5 +158,6 @@ jobs:
           contract-ids: ${{ steps.upsert.outputs.contract-ids }}
           url:          ${{ secrets.PLATFORM_URL }}
           api-key:      ${{ secrets.PLATFORM_API_KEY }}
+          iam-url:      ${{ secrets.IAM_TOKEN_URL }}
           repository:   ${{ github.repository }}
           github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -16,6 +16,7 @@ Runs only in the merge flow, right after the [create action](../data-contract-cr
 | `contract-ids` | ✅ | Space-separated `project_id:contract_id` pairs from the create action in `merge` mode |
 | `url` | ✅ | CPD / watsonx base URL |
 | `api-key` | ✅ | IBM Cloud IAM API key |
+| `iam-url` | ❌ | IAM token endpoint, e.g. `https://iam.cloud.ibm.com/identity/token`. Defaults to the IBM Cloud **test** endpoint (`https://iam.test.cloud.ibm.com/identity/token`) when empty |
 | `repository` | ✅ | Repository in `owner/repo` format |
 | `github-token` | ✅ | GitHub token used to find the merged PR and download its artifact (the workflow needs `actions: read`) |
 

@@ -18,10 +18,7 @@ The scripts in this directory are the core logic behind each composite action. T
 ### Install the SDK
 
 ```bash
-pip install \
-  --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ \
-  "data-intelligence-sdk==2.3.0"
+pip install "data-intelligence-sdk==2.3.0"
 ```
 
 ### Environment variables (required by all scripts)
@@ -30,10 +27,12 @@ pip install \
 |---|---|
 | `PLATFORM_URL` | Base URL of the CPD / watsonx instance (e.g. `https://api.dai.dev.cloud.ibm.com`) |
 | `PLATFORM_API_KEY` | IBM Cloud IAM API key |
+| `IAM_TOKEN_URL` | *(Optional)* IAM token endpoint. Defaults to `https://iam.test.cloud.ibm.com/identity/token`. Use `https://iam.cloud.ibm.com/identity/token` for production IBM Cloud |
 
 ```bash
 export PLATFORM_URL="https://api.dai.dev.cloud.ibm.com"
 export PLATFORM_API_KEY="your-iam-api-key"
+export IAM_TOKEN_URL="https://iam.cloud.ibm.com/identity/token"   # optional
 ```
 
 ---
@@ -61,7 +60,7 @@ python .github/scripts/validate_contract.py contracts/dc.yaml
 ### Behaviour
 
 1. Reads `projectId` from the contract's `customProperties`.
-2. Exchanges `PLATFORM_API_KEY` for a short-lived IBM Cloud IAM bearer token.
+2. Exchanges `PLATFORM_API_KEY` for a short-lived IBM Cloud IAM bearer token (endpoint from `IAM_TOKEN_URL`).
 3. Calls `DataContractsProvider.validate_project_data_contract()` with the contract content.
 4. Prints `VALID` or `INVALID` with a list of errors.
 

@@ -26,6 +26,7 @@ If a contract with the target name already exists it is replaced (`replace_proje
 | `changed-files` | ✅ | Space-separated list of changed contract file paths |
 | `url` | ✅ | CPD / watsonx base URL |
 | `api-key` | ✅ | IBM Cloud IAM API key |
+| `iam-url` | ❌ | IAM token endpoint, e.g. `https://iam.cloud.ibm.com/identity/token`. Defaults to the IBM Cloud **test** endpoint (`https://iam.test.cloud.ibm.com/identity/token`) when empty |
 | `pr-number` | ❌ | PR number — required when `mode` is `pr` |
 | `repository` | ✅ | Repository in `owner/repo` format |
 | `github-token` | ✅ | GitHub token for posting PR comments |

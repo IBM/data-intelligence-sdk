@@ -14,13 +14,23 @@ Each stage of the pipeline is implemented as a reusable [composite action](https
 
 ## SDK Dependency
 
-All four actions install the same package before running:
+All five actions install the same package before running:
 
 ```bash
-pip install \
-  --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ \
-  "data-intelligence-sdk==2.3.0"
+pip install "data-intelligence-sdk==2.3.0"
 ```
 
-To upgrade, update the version string in all four `action.yml` files.
+To upgrade, update the version string in all five `action.yml` files.
+
+---
+
+## IAM Endpoint
+
+Every action accepts an optional `iam-url` input — the IAM token endpoint used to exchange `api-key` for a bearer token. It is passed to the scripts as the `IAM_TOKEN_URL` environment variable.
+
+| Environment of the API key | `iam-url` |
+|---|---|
+| IBM Cloud test (default when empty) | `https://iam.test.cloud.ibm.com/identity/token` |
+| IBM Cloud production | `https://iam.cloud.ibm.com/identity/token` |
+
+The bundled workflow supplies it from the optional `IAM_TOKEN_URL` repository secret, so switching environments needs no code change.
