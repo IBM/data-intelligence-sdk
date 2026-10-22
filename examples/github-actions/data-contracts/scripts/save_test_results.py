@@ -33,10 +33,7 @@ from wxdi.data_contracts import DataContractsProvider
 from wxdi.data_contracts.models import DataContractTestResultPrototype
 from wxdi.dq_validator.provider.config import ProviderConfig
 
-IAM_TOKEN_URL = (
-    os.environ.get("IAM_TOKEN_URL")
-    or "https://iam.test.cloud.ibm.com/identity/token"
-)
+IAM_TOKEN_URL = "https://iam.test.cloud.ibm.com/identity/token"
 
 
 def get_bearer_token(api_key: str) -> str:
@@ -81,10 +78,24 @@ def main() -> int:
             overall = 1
             continue
 
-        project_id, cid = entry.split(":", 1)
+        # "catalog:<catalog_id>:<contract_id>" for DPH catalog contracts
+        is_catalog = entry.startswith("catalog:")
+        if is_catalog:
+            entry = entry[len("catalog:"):]
+            if ":" not in entry:
+                print(f"ERROR: entry 'catalog:{entry}' is not in catalog:catalog_id:contract_id format.",
+                      file=sys.stderr)
+                overall = 1
+                continue
+        container_id, cid = entry.split(":", 1)
+
+        get_contract = (provider.get_catalog_data_contract if is_catalog
+                        else provider.get_project_data_contract)
+        create_result = (provider.create_catalog_data_contract_test_result if is_catalog
+                         else provider.create_project_data_contract_test_result)
 
         try:
-            name = provider.get_project_data_contract(project_id, cid).name
+            name = get_contract(container_id, cid).name
         except ValueError as exc:
             print(f"ERROR: could not look up contract {cid}: {exc}", file=sys.stderr)
             overall = 1
@@ -103,8 +114,8 @@ def main() -> int:
         data.pop("href", None)
 
         try:
-            created = provider.create_project_data_contract_test_result(
-                project_id, cid, DataContractTestResultPrototype(**data)
+            created = create_result(
+                container_id, cid, DataContractTestResultPrototype(**data)
             )
             print(f"Saved  {name} ({cid}): test result id={created.id} status={created.status}")
         except ValueError as exc:
