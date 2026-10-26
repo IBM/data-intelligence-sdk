@@ -1,3 +1,13 @@
+# [2.4.0](https://github.com/IBM/data-intelligence-sdk/compare/v2.3.0...v2.4.0) (2026-10-26)
+
+
+### Features
+
+* **examples:** add extract_custom_properties, extract_target_info, is_valid_draft_id, get_draft_contract_info to contract_utils.py ([778a37a](https://github.com/IBM/data-intelligence-sdk/commit/778a37a71c8f3f4e80792d8d165a621d13df5d51))
+* **examples:** handle catalog: prefixed contract pairs in save_test_results.py ([67ceed0](https://github.com/IBM/data-intelligence-sdk/commit/67ceed0fa9681295c47d90b06a051a826c85d129))
+* **examples:** route DPH contracts to catalog and link to draft in create_contract.py ([ae20731](https://github.com/IBM/data-intelligence-sdk/commit/ae2073153c9084b03b7883f427f1f0581227e087))
+* **examples:** validate DPH draftId format and draft existence in validate_contract.py ([50ca7ee](https://github.com/IBM/data-intelligence-sdk/commit/50ca7eef1c3e7856ace6e2ac66d0d022d5de0e70))
+
 # [2.3.0](https://github.com/IBM/data-intelligence-sdk/compare/v2.2.1...v2.3.0) (2026-10-15)
 
 
