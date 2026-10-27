@@ -25,11 +25,17 @@ If a contract with the target name already exists it is replaced (`replace_proje
 | `mode` | ✅ | `pr` or `merge` |
 | `changed-files` | ✅ | Space-separated list of changed contract file paths |
 | `url` | ✅ | CPD / watsonx base URL |
-| `api-key` | ✅ | IBM Cloud IAM API key |
-| `iam-url` | ❌ | IAM token endpoint, e.g. `https://iam.cloud.ibm.com/identity/token`. Defaults to the IBM Cloud **test** endpoint (`https://iam.test.cloud.ibm.com/identity/token`) when empty |
+| `environment` | ❌ | Deployment type: `ibm_cloud` (default), `aws_cloud`, `gov_cloud` or `on_prem` |
+| `api-key` | ⚠️ | API key. Required for `ibm_cloud`, `aws_cloud` and `gov_cloud`; for `on_prem` provide it or `username` + `password` |
+| `username` | ❌ | Username (`on_prem` only; required there) |
+| `password` | ❌ | Password (`on_prem` only, when no `api-key` is given) |
+| `account-id` | ❌ | Account ID (`aws_cloud` only; required there) |
+| `iam-url` | ❌ | Token endpoint override for cloud environments, e.g. `https://iam.cloud.ibm.com/identity/token`. When empty, `ibm_cloud` uses the IBM Cloud **test** endpoint (`https://iam.test.cloud.ibm.com/identity/token`) and other cloud types use the SDK default. Ignored for `on_prem` |
 | `pr-number` | ❌ | PR number — required when `mode` is `pr` |
 | `repository` | ✅ | Repository in `owner/repo` format |
 | `github-token` | ✅ | GitHub token for posting PR comments |
+
+⚠️ = conditionally required — see [Authentication](../README.md#authentication) for what each `environment` needs.
 
 ## Outputs
 
@@ -42,7 +48,7 @@ If a contract with the target name already exists it is replaced (`replace_proje
 
 ## Behaviour
 
-1. Installs `data-intelligence-sdk==2.3.0` from TestPyPI.
+1. Installs `data-intelligence-sdk==2.3.0` from PyPI.
 2. Runs `create_contract.py --mode <mode> --pr-number <pr-number> <files...>`.
 3. For each file, reads `projectId` from `customProperties`, lists existing contracts, then creates or replaces.
 4. Emits `contract_ids` (space-separated `project_id:contract_id` pairs) to `GITHUB_OUTPUT`.

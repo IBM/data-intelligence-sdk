@@ -61,10 +61,16 @@ Configure these in **Settings → Secrets and variables → Actions**:
 | Secret | Description |
 |---|---|
 | `PLATFORM_URL` | Base URL of the CPD / watsonx instance (e.g. `https://api.dai.dev.cloud.ibm.com`) |
-| `PLATFORM_API_KEY` | IBM Cloud IAM API key with access to the target project |
-| `IAM_TOKEN_URL` | *(Optional)* IAM token endpoint matching the environment the API key belongs to, e.g. `https://iam.cloud.ibm.com/identity/token`. If unset, the IBM Cloud test endpoint `https://iam.test.cloud.ibm.com/identity/token` is used |
+| `PLATFORM_ENV` | *(Optional)* `ibm_cloud` (default), `aws_cloud`, `gov_cloud` or `on_prem` |
+| `PLATFORM_API_KEY` | API key with access to the target project. Required for cloud environments; for `on_prem` use it or `PLATFORM_USERNAME` + `PLATFORM_PASSWORD` |
+| `PLATFORM_USERNAME` | *(`on_prem` only)* Username |
+| `PLATFORM_PASSWORD` | *(`on_prem` only)* Password, when no API key is used |
+| `PLATFORM_ACCOUNT_ID` | *(`aws_cloud` only)* Account ID |
+| `IAM_TOKEN_URL` | *(Optional, cloud only)* IAM token endpoint matching the environment the API key belongs to, e.g. `https://iam.cloud.ibm.com/identity/token`. If unset, the IBM Cloud test endpoint `https://iam.test.cloud.ibm.com/identity/token` is used |
 
 `GITHUB_TOKEN` is provided automatically by GitHub Actions — no manual configuration needed.
+
+> **On-prem:** the jobs use `runs-on: ubuntu-latest` (GitHub-hosted), which cannot reach a private Cloud Pak for Data instance. Switch the jobs to a self-hosted runner or connect through a VPN first — see [On-prem network access](../README.md#on-prem-network-access).
 
 ---
 
