@@ -10,11 +10,28 @@ inputs:
   url:
     description: 'CPD / watsonx base URL'
     required: true
+  environment:
+    description: "Deployment type: 'ibm_cloud' (default), 'aws_cloud', 'gov_cloud' or 'on_prem'"
+    required: false
+    default: 'ibm_cloud'
   api-key:
-    description: 'IBM Cloud IAM API key'
-    required: true
+    description: 'API key (IBM Cloud IAM API key for cloud environments; optional for on_prem when username/password is used)'
+    required: false
+    default: ''
+  username:
+    description: 'Username (on_prem only)'
+    required: false
+    default: ''
+  password:
+    description: 'Password (on_prem only, when no api-key is given)'
+    required: false
+    default: ''
+  account-id:
+    description: 'Account ID (aws_cloud only)'
+    required: false
+    default: ''
   iam-url:
-    description: 'IAM token endpoint (e.g. https://iam.cloud.ibm.com/identity/token). Defaults to the IBM Cloud test IAM endpoint when empty.'
+    description: 'Token endpoint override for cloud environments (e.g. https://iam.cloud.ibm.com/identity/token). When empty, ibm_cloud uses the IBM Cloud test IAM endpoint and other cloud types use the SDK default. Ignored for on_prem.'
     required: false
     default: ''
   pr-number:
@@ -47,9 +64,13 @@ runs:
       id: validate
       shell: bash
       env:
-        PLATFORM_URL:     ${{ inputs.url }}
-        PLATFORM_API_KEY: ${{ inputs.api-key }}
-        IAM_TOKEN_URL:    ${{ inputs.iam-url }}
+        PLATFORM_URL:        ${{ inputs.url }}
+        PLATFORM_ENV:        ${{ inputs.environment }}
+        PLATFORM_API_KEY:    ${{ inputs.api-key }}
+        PLATFORM_USERNAME:   ${{ inputs.username }}
+        PLATFORM_PASSWORD:   ${{ inputs.password }}
+        PLATFORM_ACCOUNT_ID: ${{ inputs.account-id }}
+        IAM_TOKEN_URL:       ${{ inputs.iam-url }}
       run: |
         RESULT_MD="## 🔍 Data Contract Validation\n\n"
         OVERALL=0

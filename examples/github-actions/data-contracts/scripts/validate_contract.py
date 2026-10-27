@@ -5,9 +5,15 @@ Validate a single data contract file using the data-intelligence-sdk.
 Usage:
     python validate_contract.py <contract_file>
 
-Environment variables (required):
-    PLATFORM_URL     - Base URL of the instance (e.g. https://api.dai.dev.cloud.ibm.com)
-    PLATFORM_API_KEY - IBM Cloud IAM API key; a fresh bearer token is obtained at runtime
+Environment variables:
+    PLATFORM_URL        - (required) Base URL of the instance (e.g. https://api.dai.dev.cloud.ibm.com)
+    PLATFORM_ENV        - ibm_cloud (default) | aws_cloud | gov_cloud | on_prem
+    PLATFORM_API_KEY    - API key (cloud); optional for on_prem when username/password is used
+    PLATFORM_USERNAME   - on_prem only
+    PLATFORM_PASSWORD   - on_prem only, when no API key is given
+    PLATFORM_ACCOUNT_ID - aws_cloud only
+    IAM_TOKEN_URL       - optional token endpoint override (cloud environments)
+A fresh bearer token is obtained at runtime via wxdi.common.auth.
 
 customProperties.projectId is required for every contract, including DPH contracts
 (isDPH=true). Validation always runs against the project so that schema and rule
@@ -27,7 +33,6 @@ import os
 import sys
 import importlib.util
 
-import requests
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -45,29 +50,7 @@ extract_project_id = _mod.extract_project_id
 extract_target_info = _mod.extract_target_info
 is_valid_draft_id = _mod.is_valid_draft_id
 get_draft_contract_info = _mod.get_draft_contract_info
-
-IAM_TOKEN_URL = "https://iam.test.cloud.ibm.com/identity/token"
-
-
-def get_bearer_token(api_key: str) -> str:
-    """Exchange an IBM Cloud IAM API key for a fresh bearer token."""
-    resp = requests.post(
-        IAM_TOKEN_URL,
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-        data={
-            "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
-            "apikey": api_key,
-        },
-        timeout=30,
-    )
-    if not resp.ok:
-        raise RuntimeError(
-            f"Failed to obtain IAM token: {resp.status_code} {resp.text}"
-        )
-    token = resp.json().get("access_token")
-    if not token:
-        raise RuntimeError("IAM response did not contain access_token")
-    return f"Bearer {token}"
+get_bearer_token = _mod.get_bearer_token
 
 
 def main() -> int:
@@ -78,15 +61,14 @@ def main() -> int:
     contract_file = sys.argv[1]
 
     cpd_url  = os.environ.get("PLATFORM_URL", "").rstrip("/")
-    api_key  = os.environ.get("PLATFORM_API_KEY", "")
 
     # projectId is required for all contracts — DPH and non-DPH alike.
     # Validation always runs against the project (validate_project_data_contract)
     # so schema and rule errors are caught before merge.
     project_id = extract_project_id(contract_file, "")
 
-    if not cpd_url or not api_key or not project_id:
-        missing = [n for n, v in [("PLATFORM_URL", cpd_url), ("PLATFORM_API_KEY", api_key)] if not v]
+    if not cpd_url or not project_id:
+        missing = [n for n, v in [("PLATFORM_URL", cpd_url)] if not v]
         if not project_id:
             print(
                 f"ERROR: customProperties.projectId not found in {contract_file}. "
@@ -119,7 +101,7 @@ def main() -> int:
     print(f"Using project_id={project_id} for {contract_file}")
 
     try:
-        bearer_token = get_bearer_token(api_key)
+        bearer_token = get_bearer_token()
     except RuntimeError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1

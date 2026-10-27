@@ -26,13 +26,26 @@ pip install "data-intelligence-sdk==2.3.0"
 | Variable | Description |
 |---|---|
 | `PLATFORM_URL` | Base URL of the CPD / watsonx instance (e.g. `https://api.dai.dev.cloud.ibm.com`) |
-| `PLATFORM_API_KEY` | IBM Cloud IAM API key |
-| `IAM_TOKEN_URL` | *(Optional)* IAM token endpoint. Defaults to `https://iam.test.cloud.ibm.com/identity/token`. Use `https://iam.cloud.ibm.com/identity/token` for production IBM Cloud |
+| `PLATFORM_ENV` | *(Optional)* `ibm_cloud` (default), `aws_cloud`, `gov_cloud` or `on_prem` |
+| `PLATFORM_API_KEY` | API key. Required for cloud environments; for `on_prem` use it or `PLATFORM_USERNAME` + `PLATFORM_PASSWORD` |
+| `PLATFORM_USERNAME` | *(`on_prem` only, required there)* Username |
+| `PLATFORM_PASSWORD` | *(`on_prem` only)* Password, when no API key is used |
+| `PLATFORM_ACCOUNT_ID` | *(`aws_cloud` only, required there)* Account ID |
+| `IAM_TOKEN_URL` | *(Optional, cloud only)* Token endpoint override. For `ibm_cloud` defaults to `https://iam.test.cloud.ibm.com/identity/token` (use `https://iam.cloud.ibm.com/identity/token` for production); other cloud types use the SDK default |
+
+`PLATFORM_URL` is the platform API URL. For `on_prem` it is also the host used for authentication (`/icp4d-api/v1/authorize` is appended).
 
 ```bash
+# IBM Cloud
 export PLATFORM_URL="https://api.dai.dev.cloud.ibm.com"
 export PLATFORM_API_KEY="your-iam-api-key"
 export IAM_TOKEN_URL="https://iam.cloud.ibm.com/identity/token"   # optional
+
+# On-prem (Cloud Pak for Data)
+export PLATFORM_ENV="on_prem"
+export PLATFORM_URL="https://cpd.example.com"
+export PLATFORM_USERNAME="admin"
+export PLATFORM_PASSWORD="..."        # or PLATFORM_API_KEY  # pragma: whitelist secret
 ```
 
 ---
@@ -47,6 +60,7 @@ Shared utility module loaded at runtime via `importlib` by all other scripts —
 | `extract_project_id(contract_file, fallback)` | Returns `customProperties.projectId`, or `fallback` when not found |
 | `extract_target_info(contract_file)` | Returns a dict with `is_dph`, `type`, `draft_id`, `catalog_id`, and `project_id` from `customProperties` |
 | `is_valid_draft_id(draft_id)` | Returns `True` when `draft_id` is in `"<asset_uuid>@<catalog_uuid>"` format |
+| `get_bearer_token()` | Builds an `AuthConfig` from the `PLATFORM_*` environment variables, gets a token through `wxdi.common.auth.AuthProvider` and returns `"Bearer <token>"` |
 | `get_draft_contract_info(dph, draft_id)` | Fetches a DPH draft and returns `(existing_contract_id, contract_terms_id)` |
 
 ---
@@ -71,7 +85,7 @@ python .github/scripts/validate_contract.py contracts/dc.yaml
 2. For DPH contracts (`isDPH=true`) with `type=contract`:
    - Validates that `customProperties.draftId` is present and in `<asset_id>@<catalog_id>` format.
    - Checks the draft exists and has contract terms with an `id` via `DphV1`.
-3. Exchanges `PLATFORM_API_KEY` for a short-lived IBM Cloud IAM bearer token (endpoint from `IAM_TOKEN_URL`).
+3. Obtains a short-lived bearer token for `PLATFORM_ENV` via `wxdi.common.auth` (see environment variables above).
 4. Calls `DataContractsProvider.validate_project_data_contract()` with the contract content.
 5. Prints `VALID` or `INVALID` with a list of errors.
 

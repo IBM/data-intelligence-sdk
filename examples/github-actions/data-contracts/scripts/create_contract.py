@@ -22,9 +22,15 @@ Usage:
     python create_contract.py --mode pr   --pr-number <N> <file1> [<file2> ...]
     python create_contract.py --mode merge               <file1> [<file2> ...]
 
-Environment variables (required):
-    PLATFORM_URL     - Base URL of the instance (e.g. https://api.dai.dev.cloud.ibm.com)
-    PLATFORM_API_KEY - IBM Cloud IAM API key; a fresh bearer token is obtained at runtime
+Environment variables:
+    PLATFORM_URL        - (required) Base URL of the instance (e.g. https://api.dai.dev.cloud.ibm.com)
+    PLATFORM_ENV        - ibm_cloud (default) | aws_cloud | gov_cloud | on_prem
+    PLATFORM_API_KEY    - API key (cloud); optional for on_prem when username/password is used
+    PLATFORM_USERNAME   - on_prem only
+    PLATFORM_PASSWORD   - on_prem only, when no API key is given
+    PLATFORM_ACCOUNT_ID - aws_cloud only
+    IAM_TOKEN_URL       - optional token endpoint override (cloud environments)
+A fresh bearer token is obtained at runtime via wxdi.common.auth.
 
 Project ID is read exclusively from customProperties.projectId in each contract file.
 
@@ -43,7 +49,6 @@ import sys
 import json
 import argparse
 import importlib.util
-import requests
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -61,8 +66,7 @@ extract_target_info = _mod.extract_target_info
 is_valid_draft_id = _mod.is_valid_draft_id
 get_draft_contract_info = _mod.get_draft_contract_info
 _YAML_AVAILABLE = _mod._YAML_AVAILABLE
-
-IAM_TOKEN_URL = "https://iam.test.cloud.ibm.com/identity/token"
+get_bearer_token = _mod.get_bearer_token
 
 
 def get_dph_client(cpd_url: str, bearer_token: str):
@@ -145,23 +149,6 @@ def parse_contract_content(content: str) -> dict:
     return doc
 
 
-def get_bearer_token(api_key: str) -> str:
-    resp = requests.post(
-        IAM_TOKEN_URL,
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-        data={
-            "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
-            "apikey": api_key,
-        },
-        timeout=30,
-    )
-    resp.raise_for_status()
-    token = resp.json().get("access_token")
-    if not token:
-        raise RuntimeError("IAM response did not contain access_token")
-    return f"Bearer {token}"
-
-
 def _get_catalog_dc_type(dc) -> str:
     """Return the lowercased type string from a catalog DataContract, or "".
 
@@ -202,9 +189,8 @@ def main() -> int:
         return 1
 
     cpd_url = os.environ.get("PLATFORM_URL", "").rstrip("/")
-    api_key = os.environ.get("PLATFORM_API_KEY", "")
 
-    bearer   = get_bearer_token(api_key)
+    bearer   = get_bearer_token()
     config   = ProviderConfig(url=cpd_url, auth_token=bearer)
     provider = DataContractsProvider(config)
 

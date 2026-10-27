@@ -13,11 +13,17 @@ Triggers test runs for ephemeral contracts, polls until completion, and posts a 
 |---|---|---|
 | `contract-ids` | ✅ | Space-separated `project_id:contract_id` pairs (from the create action) |
 | `url` | ✅ | CPD / watsonx base URL |
-| `api-key` | ✅ | IBM Cloud IAM API key |
-| `iam-url` | ❌ | IAM token endpoint, e.g. `https://iam.cloud.ibm.com/identity/token`. Defaults to the IBM Cloud **test** endpoint (`https://iam.test.cloud.ibm.com/identity/token`) when empty |
+| `environment` | ❌ | Deployment type: `ibm_cloud` (default), `aws_cloud`, `gov_cloud` or `on_prem` |
+| `api-key` | ⚠️ | API key. Required for `ibm_cloud`, `aws_cloud` and `gov_cloud`; for `on_prem` provide it or `username` + `password` |
+| `username` | ❌ | Username (`on_prem` only; required there) |
+| `password` | ❌ | Password (`on_prem` only, when no `api-key` is given) |
+| `account-id` | ❌ | Account ID (`aws_cloud` only; required there) |
+| `iam-url` | ❌ | Token endpoint override for cloud environments, e.g. `https://iam.cloud.ibm.com/identity/token`. When empty, `ibm_cloud` uses the IBM Cloud **test** endpoint (`https://iam.test.cloud.ibm.com/identity/token`) and other cloud types use the SDK default. Ignored for `on_prem` |
 | `pr-number` | ✅ | PR number to post the comment on |
 | `repository` | ✅ | Repository in `owner/repo` format |
 | `github-token` | ✅ | GitHub token for posting PR comments |
+
+⚠️ = conditionally required — see [Authentication](../README.md#authentication) for what each `environment` needs.
 
 ## Outputs
 
@@ -30,7 +36,7 @@ Triggers test runs for ephemeral contracts, polls until completion, and posts a 
 
 ## Behaviour
 
-1. Installs `data-intelligence-sdk==2.3.0` from TestPyPI.
+1. Installs `data-intelligence-sdk==2.3.0` from PyPI.
 2. Runs `test_contract.py <contract-ids>`.
 3. For each contract, triggers a test run via `test_project_data_contract()`.
 4. Retries up to **3 times** on transient 5xx errors (exponential backoff: 15 s → 30 s → 60 s).
