@@ -45,7 +45,7 @@ export IAM_TOKEN_URL="https://iam.cloud.ibm.com/identity/token"   # optional
 export PLATFORM_ENV="on_prem"
 export PLATFORM_URL="https://cpd.example.com"
 export PLATFORM_USERNAME="admin"
-export PLATFORM_PASSWORD="..."        # or PLATFORM_API_KEY
+export PLATFORM_PASSWORD="..."        # or PLATFORM_API_KEY  # pragma: whitelist secret
 ```
 
 ---

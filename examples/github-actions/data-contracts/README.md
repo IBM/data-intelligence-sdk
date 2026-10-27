@@ -231,7 +231,7 @@ export PLATFORM_API_KEY="your-iam-api-key"
 export IAM_TOKEN_URL="https://iam.cloud.ibm.com/identity/token"   # optional
 
 # For on-prem instead of the API key above:
-#   export PLATFORM_ENV="on_prem" PLATFORM_USERNAME="admin" PLATFORM_PASSWORD="..."
+#   export PLATFORM_ENV="on_prem" PLATFORM_USERNAME="admin" PLATFORM_PASSWORD="..."  # pragma: whitelist secret
 
 # Validate a single contract
 python .github/scripts/validate_contract.py contracts/my_contract.yaml
