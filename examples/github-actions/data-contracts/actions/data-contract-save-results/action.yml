@@ -2,12 +2,17 @@ name: 'Data Contract — Save Test Results'
 description: >
   After a merge, finds the test results saved by the merged PR's test run and
   stores them against the newly created/updated real contracts using
-  POST /test_results.
+  POST /test_results. Then comments on the merged PR with the created/updated
+  contracts, their IDs and the saved test result IDs.
 
 inputs:
   contract-ids:
     description: 'Space-separated list of project_id:contract_id pairs (from the create action in merge mode)'
     required: true
+  create-summary:
+    description: "Markdown summary of the created/updated contracts (the create action's 'body' output); included in the merged PR comment"
+    required: false
+    default: ''
   url:
     description: 'CPD / watsonx base URL'
     required: true
@@ -39,7 +44,7 @@ inputs:
     description: 'Repository in owner/repo format'
     required: true
   github-token:
-    description: 'GitHub token used to look up the merged PR and download its artifact (needs actions: read)'
+    description: 'GitHub token used to look up the merged PR, download its artifact and post the PR comment (needs actions: read and pull-requests: write)'
     required: true
 
 runs:
@@ -59,6 +64,7 @@ runs:
           echo "found=false" >> "$GITHUB_OUTPUT"
           exit 0
         fi
+        echo "pr=$PR" >> "$GITHUB_OUTPUT"
 
         ARTIFACT_ID=$(gh api "repos/$REPO/actions/artifacts?name=data-contract-test-results-pr-$PR" \
           --jq '[.artifacts[] | select(.expired == false)] | sort_by(.created_at) | last | .id // empty')
@@ -81,6 +87,7 @@ runs:
         pip install "data-intelligence-sdk==2.3.0"
 
     - name: Save test results to the contracts
+      id: save
       if: steps.download.outputs.found == 'true'
       shell: bash
       env:
@@ -95,3 +102,33 @@ runs:
         python3 ${{ github.action_path }}/../../scripts/save_test_results.py \
           --results-dir "$RUNNER_TEMP/test-results" \
           ${{ inputs.contract-ids }}
+
+    - name: Comment on the merged PR
+      if: always() && steps.download.outputs.pr != ''
+      shell: bash
+      env:
+        GH_TOKEN:       ${{ inputs.github-token }}
+        PR:             ${{ steps.download.outputs.pr }}
+        REPO:           ${{ inputs.repository }}
+        CREATE_SUMMARY: ${{ inputs.create-summary }}
+        SAVE_SUMMARY:   ${{ steps.save.outputs.body }}
+        SAVE_OUTCOME:   ${{ steps.save.outcome }}
+        RUN_URL:        ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        {
+          echo "## 🚀 Data contracts deployed after merge"
+          echo
+          if [ -n "$CREATE_SUMMARY" ]; then
+            # Drop the create summary's own title; keep the per-contract lines.
+            printf '%s\n' "$CREATE_SUMMARY" | sed '1{/^## /d}'
+            echo
+          fi
+          if [ -n "$SAVE_SUMMARY" ]; then
+            printf '%s\n' "$SAVE_SUMMARY"
+          elif [ "$SAVE_OUTCOME" = "skipped" ]; then
+            echo "_No PR test results were found to save._"
+          else
+            echo "_Saving test results failed — see the [workflow run]($RUN_URL)._"
+          fi
+        } > /tmp/pr_body.md
+        gh pr comment "$PR" --body-file /tmp/pr_body.md --repo "$REPO"
