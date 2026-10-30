@@ -200,7 +200,7 @@ After a PR is merged to `main`, one job runs (`upsert-on-merge`) with two steps:
 1. **Upsert real contracts** — detects files changed since the last remote commit and upserts each one using its canonical name (filename without extension). Non-DPH contracts are upserted in the project; DPH contracts (`isDPH=true`) are upserted in the catalog and linked to their draft.
 2. **Save PR test results** — downloads the JSON test results uploaded by the merged PR's test job and saves each one to the matching real contract (project or catalog). Contracts with no saved result are skipped.
 
-No PR comment is posted on merge — results are visible in the Actions run log.
+The save-results step then comments on the merged PR with the created/updated contracts (and their IDs) and the saved test result IDs.
 
 ---
 

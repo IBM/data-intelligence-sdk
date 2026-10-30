@@ -23,6 +23,10 @@ A fresh bearer token is obtained at runtime via wxdi.common.auth.
 Exit codes:
     0 - all available results saved (contracts without a saved result are skipped)
     1 - one or more results failed to save
+
+Writes GITHUB_OUTPUT:
+    body - Markdown table (contract, contract id, test result id, status) used
+           for the comment posted on the merged PR
 """
 
 import argparse
@@ -47,6 +51,24 @@ _spec.loader.exec_module(_mod)
 get_bearer_token = _mod.get_bearer_token
 
 
+def write_body(rows: list) -> None:
+    """Write the Markdown summary table to GITHUB_OUTPUT as `body`."""
+    github_output = os.environ.get("GITHUB_OUTPUT", "")
+    if not github_output or not rows:
+        return
+    lines = [
+        "### 🧪 Test results saved to contracts",
+        "",
+        "| Contract | Contract ID | Test result ID | Status |",
+        "| --- | --- | --- | --- |",
+    ]
+    lines += [f"| `{n}` | `{c}` | {t} | {s} |" for n, c, t, s in rows]
+    with open(github_output, "a") as out:
+        out.write("body<<EOF\n")
+        out.write("\n".join(lines) + "\n")
+        out.write("EOF\n")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--results-dir", required=True)
@@ -64,6 +86,7 @@ def main() -> int:
     provider = DataContractsProvider(config)
 
     overall = 0
+    rows = []  # (contract name, contract id, test result id, status)
     for entry in args.entries:
         if ":" not in entry:
             print(f"ERROR: entry '{entry}' is not in project_id:contract_id format.",
@@ -91,12 +114,14 @@ def main() -> int:
             name = get_contract(container_id, cid).name
         except ValueError as exc:
             print(f"ERROR: could not look up contract {cid}: {exc}", file=sys.stderr)
+            rows.append((cid, cid, "—", "❌ contract lookup failed"))
             overall = 1
             continue
 
         path = os.path.join(args.results_dir, f"test-result_{name}.json")
         if not os.path.isfile(path):
             print(f"SKIP  {name} ({cid}): no saved test result at {path}")
+            rows.append((name, cid, "—", "No test result from PR"))
             continue
 
         with open(path, "r", encoding="utf-8") as fh:
@@ -111,11 +136,14 @@ def main() -> int:
                 container_id, cid, DataContractTestResultPrototype(**data)
             )
             print(f"Saved  {name} ({cid}): test result id={created.id} status={created.status}")
+            rows.append((name, cid, f"`{created.id}`", created.status))
         except ValueError as exc:
             print(f"ERROR: could not save test result for {name} ({cid}): {exc}",
                   file=sys.stderr)
+            rows.append((name, cid, "—", "❌ failed to save"))
             overall = 1
 
+    write_body(rows)
     return overall
 
 

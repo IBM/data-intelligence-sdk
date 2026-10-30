@@ -171,11 +171,12 @@ jobs:
           repository:    ${{ github.repository }}
           github-token:  ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Save PR test results to the contracts
+      - name: Save PR test results to the contracts and comment on the merged PR
         if: steps.upsert.outputs.contract-ids != ''
         uses: ./.github/actions/data-contract-save-results
         with:
-          contract-ids: ${{ steps.upsert.outputs.contract-ids }}
+          contract-ids:   ${{ steps.upsert.outputs.contract-ids }}
+          create-summary: ${{ steps.upsert.outputs.body }}
           url:          ${{ secrets.PLATFORM_URL }}
           api-key:      ${{ secrets.PLATFORM_API_KEY }}
           environment:  ${{ secrets.PLATFORM_ENV }}
