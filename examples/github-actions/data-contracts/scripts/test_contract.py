@@ -235,12 +235,13 @@ def main() -> int:
                     sv_rows.append(f"| `{asset_name}` | `{col_name}` | Column not found | - | - |")
                 t = col_sv.type
                 if t and (t.status or "").lower() in ("fail", "failed"):
-                    expected_type = t.expected_logical_type or t.expected_physical_type or "-"
-                    actual_type = t.actual_logical_type or t.actual_physical_type or "-"
-                    sv_rows.append(
-                        f"| `{asset_name}` | `{col_name}` | Type mismatch | "
-                        f"`{expected_type}` | `{actual_type}` |"
-                    )
+                    if t.expected_logical_type or t.actual_logical_type:
+                        expected_type = t.expected_logical_type or "-"
+                        actual_type = t.actual_logical_type or "-"
+                        sv_rows.append(
+                            f"| `{asset_name}` | `{col_name}` | Type mismatch | "
+                            f"`{expected_type}` | `{actual_type}` |"
+                        )
                 r = col_sv.required
                 if r and (r.status or "").lower() in ("fail", "failed"):
                     null_info = f"{r.null_count} nulls" if r.null_count is not None else "contains nulls"
