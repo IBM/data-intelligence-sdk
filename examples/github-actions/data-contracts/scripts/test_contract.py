@@ -135,7 +135,7 @@ def main() -> int:
             result = provider.get_project_data_contract_test_result(
                 project_id, cid, run_id, include_all_details=True
             )
-            if (result.status or "").lower() in ("completed", "failed"):
+            if (result.status or "").lower() in ("completed", "failed", "passed", "pass", "fail", "error", "succeeded", "success"):
                 break
             time.sleep(POLL_INTERVAL)
 
@@ -143,7 +143,7 @@ def main() -> int:
         start  = result.start  if result else "-"
         end    = result.end    if result else "-"
 
-        if status.lower() == "completed":
+        if status.lower() in ("completed", "passed", "pass", "succeeded", "success"):
             result_lines.append(f"### ✅ `{cid}` — test completed")
         else:
             overall = 1
@@ -219,7 +219,7 @@ def main() -> int:
                 if asset_sv.exists is False:
                     sv_rows.append(f"| `{asset_name}` | - | Asset not found | - | - |")
                 pt = asset_sv.physical_type
-                if pt and (pt.status or "").lower() == "failed":
+                if pt and (pt.status or "").lower() in ("fail", "failed"):
                     sv_rows.append(f"| `{asset_name}` | - | Physical type mismatch | `{pt.expected}` | `{pt.actual}` |")
                 for c in asset_sv.missing_columns:
                     sv_rows.append(f"| `{asset_name}` | `{c}` | Missing column | - | - |")
@@ -231,30 +231,35 @@ def main() -> int:
                 if not col_sv:
                     continue
                 col_name = col.name or col.physical_name or "-"
+                if col_sv.exists is False:
+                    sv_rows.append(f"| `{asset_name}` | `{col_name}` | Column not found | - | - |")
                 t = col_sv.type
-                if t and (t.status or "").lower() == "failed":
+                if t and (t.status or "").lower() in ("fail", "failed"):
+                    expected_type = t.expected_logical_type or t.expected_physical_type or "-"
+                    actual_type = t.actual_logical_type or t.actual_physical_type or "-"
                     sv_rows.append(
                         f"| `{asset_name}` | `{col_name}` | Type mismatch | "
-                        f"`{t.expected_logical_type or t.expected_physical_type}` | "
-                        f"`{t.actual_logical_type or t.actual_physical_type}` |"
+                        f"`{expected_type}` | `{actual_type}` |"
                     )
                 r = col_sv.required
-                if r and (r.status or "").lower() == "failed":
+                if r and (r.status or "").lower() in ("fail", "failed"):
+                    null_info = f"{r.null_count} nulls" if r.null_count is not None else "contains nulls"
                     sv_rows.append(
                         f"| `{asset_name}` | `{col_name}` | Required column contains nulls | "
-                        f"`not null` | `{r.null_count} nulls` |"
+                        f"`not null` | `{null_info}` |"
                     )
                 pk = col_sv.primary_key
-                if pk and (pk.status or "").lower() == "failed":
+                if pk and (pk.status or "").lower() in ("fail", "failed"):
                     sv_rows.append(
                         f"| `{asset_name}` | `{col_name}` | Primary key mismatch | "
                         f"`{pk.expected_primary_key}` | `{pk.actual_primary_key}` |"
                     )
                 u = col_sv.unique
-                if u and (u.status or "").lower() == "failed":
+                if u and (u.status or "").lower() in ("fail", "failed"):
+                    dup_info = f"{u.duplicate_count} duplicates" if u.duplicate_count is not None else "contains duplicates"
                     sv_rows.append(
                         f"| `{asset_name}` | `{col_name}` | Uniqueness violated | "
-                        f"`unique` | `{u.duplicate_count} duplicates` |"
+                        f"`unique` | `{dup_info}` |"
                     )
 
         if sv_rows:
@@ -263,7 +268,7 @@ def main() -> int:
 
         # Successful run: save the full result as a JSON file; the action uploads
         # RESULTS_DIR as a workflow artifact and links it from the PR comment.
-        if result and status.lower() == "completed":
+        if result and status.lower() in ("completed", "passed", "pass", "failed", "fail", "succeeded", "success"):
             os.makedirs(RESULTS_DIR, exist_ok=True)
             # Name the file after the canonical contract name (ephemeral contract is
             # "<name>_PR_<n>") so the merge job can match it to the real contract.
