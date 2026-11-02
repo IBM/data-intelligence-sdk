@@ -120,7 +120,7 @@ runs:
           echo
           if [ -n "$CREATE_SUMMARY" ]; then
             # Drop the create summary's own title; keep the per-contract lines.
-            printf '%s\n' "$CREATE_SUMMARY" | sed '1{/^## /d}'
+            printf '%s\n' "$CREATE_SUMMARY" | sed '1{/^## /d;}'
             echo
           fi
           if [ -n "$SAVE_SUMMARY" ]; then
