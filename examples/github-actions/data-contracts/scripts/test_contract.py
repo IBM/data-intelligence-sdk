@@ -218,9 +218,6 @@ def main() -> int:
             if asset_sv:
                 if asset_sv.exists is False:
                     sv_rows.append(f"| `{asset_name}` | - | Asset not found | - | - |")
-                pt = asset_sv.physical_type
-                if pt and (pt.status or "").lower() in ("fail", "failed"):
-                    sv_rows.append(f"| `{asset_name}` | - | Physical type mismatch | `{pt.expected}` | `{pt.actual}` |")
                 for c in asset_sv.missing_columns:
                     sv_rows.append(f"| `{asset_name}` | `{c}` | Missing column | - | - |")
                 for c in asset_sv.unexpected_columns:
