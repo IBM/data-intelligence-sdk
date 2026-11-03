@@ -132,10 +132,14 @@ def link_contract_to_data_product_draft(dph, draft_id: str, contract_terms_id: s
     print(f"  Successfully linked data_contract_id={contract_id} to draft {draft_id}")
 
 
-def parse_contract_content(content: str) -> dict:
-    """Parse contract file content (JSON or YAML) into a dict."""
+def parse_contract_content(content: str) -> tuple:
+    """Parse contract file content (JSON or YAML).
+
+    Returns (doc, fmt) where fmt is "json" or "yaml".
+    """
     try:
         doc = json.loads(content)
+        fmt = "json"
     except json.JSONDecodeError:
         if not _YAML_AVAILABLE:
             raise RuntimeError(
@@ -144,9 +148,21 @@ def parse_contract_content(content: str) -> dict:
             )
         import yaml
         doc = yaml.safe_load(content)
+        fmt = "yaml"
     if not isinstance(doc, dict):
         raise RuntimeError("Contract file did not parse to an object")
-    return doc
+    return doc, fmt
+
+
+def build_contract_body(name: str, content: str, **extra):
+    """Build the request body from the file content.
+
+    YAML content is sent as contract_yaml, JSON content as contract_json.
+    """
+    doc, fmt = parse_contract_content(content)
+    if fmt == "yaml":
+        return DataContractPrototypeYaml(name=name, contract_yaml=content, **extra)
+    return DataContractPrototypeJson(name=name, contract_json=doc, **extra)
 
 
 def _get_catalog_dc_type(dc) -> str:
@@ -264,6 +280,14 @@ def main() -> int:
         with open(f, "r", encoding="utf-8") as fh:
             content = fh.read()
 
+        # Verify the file is valid JSON or YAML (and an object) before any API call,
+        # for both the catalog (DPH) and project paths.
+        try:
+            parse_contract_content(content)
+        except Exception as exc:
+            print(f"ERROR: {f} is not a valid JSON/YAML contract: {exc}", file=sys.stderr)
+            sys.exit(1)
+
         if container_type == "catalog":
             existing_draft_contract_id = ""
             resolved_terms_id = ""
@@ -298,12 +322,12 @@ def main() -> int:
                 )
                 target_replace_id = existing.id if existing else None
 
-            # Catalog contracts are sent as contract_json (parsed from the JSON/YAML file).
+            # YAML files are sent as contract_yaml, JSON files as contract_json.
             # type is "contract" or "contract_template" (from customProperties.type)
             # data_product_id is the asset id from draftId for type "contract", else "".
-            body = DataContractPrototypeJson(
-                name=name,
-                contract_json=parse_contract_content(content),
+            body = build_contract_body(
+                name,
+                content,
                 type=contract_type,
                 data_product_id=draft_asset_id,
             )
@@ -384,7 +408,7 @@ def main() -> int:
         else:
             collection = provider.list_project_data_contracts(container_id, limit=200)
             existing   = next((dc for dc in collection.data_contracts if dc.name == name), None)
-            body       = DataContractPrototypeYaml(name=name, contract_yaml=content)
+            body       = build_contract_body(name, content)
             if existing:
                 contract = provider.replace_project_data_contract(
                     container_id, existing.id, body, validate=True
