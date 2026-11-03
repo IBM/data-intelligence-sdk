@@ -467,7 +467,6 @@ class DataContractTestResultDqRuleRef(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     id: Optional[str] = None
-    name: Optional[str] = None
     job: Optional[DataContractTestResultDqRuleJob] = None
 
 
@@ -770,7 +769,6 @@ class DataContractTestResultDqRuleRefPrototype(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     id: Optional[str] = None
-    name: Optional[str] = None
     job: Optional[DataContractTestResultDqRuleJobPrototype] = None
 
 
