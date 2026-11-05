@@ -1,3 +1,18 @@
+## [2.4.1](https://github.com/IBM/data-intelligence-sdk/compare/v2.4.0...v2.4.1) (2026-11-05)
+
+
+### Bug Fixes
+
+* **data-contracts:** handle 'fail' status and missing columns in schema validation output ([1806143](https://github.com/IBM/data-intelligence-sdk/commit/1806143d857d96d1bf1d9de495ef6673656442d5))
+* **data-contracts:** remove asset-level physical type mismatch row from schema validation output ([b4bc15e](https://github.com/IBM/data-intelligence-sdk/commit/b4bc15e9f50d262a5939317ccd38a8ac18a8c707))
+* **data-contracts:** skip column type mismatch row when no logical type is present ([e96579b](https://github.com/IBM/data-intelligence-sdk/commit/e96579be9cc1ab727d17c11e55b45089533a0f10))
+* model change and create contract issue fix in example. ([05850e3](https://github.com/IBM/data-intelligence-sdk/commit/05850e354f333b94e639db14bdd35808ff83f6bc))
+
+
+### Reverts
+
+* remove name field from DataContractTestResultDqRuleRef models ([51eb716](https://github.com/IBM/data-intelligence-sdk/commit/51eb7169eef03ba55ad3d6b218d8bf549f7799f3))
+
 # [2.4.0](https://github.com/IBM/data-intelligence-sdk/compare/v2.3.0...v2.4.0) (2026-10-26)
 
 
