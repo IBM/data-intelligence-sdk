@@ -50,7 +50,7 @@ After a PR is merged to `main`, a single job runs:
 1. **Upsert real contracts** — detects files changed since the last remote commit, then calls the [create action](../actions/data-contract-create/README.md) in `merge` mode. This upserts each changed contract using its canonical name (the filename without extension). If a contract with that name already exists in the project it is replaced; otherwise it is created fresh.
 2. **Save PR test results** — calls the [save-results action](../actions/data-contract-save-results/README.md), which downloads the JSON test results uploaded by the merged PR's test job and saves each one to the matching real contract with `POST /test_results`. Contracts with no saved result are skipped.
 
-No PR comment is posted on merge — results are visible in the Actions run log.
+The save-results action then comments on the merged PR with the created/updated contracts (and their IDs) and the saved test result IDs.
 
 ---
 
